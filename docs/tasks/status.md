@@ -6,7 +6,10 @@
 🆕 New • 🔄 In Progress • 👀 Review • ✅ Completed • ❌ Cancelled • 🔴 Blocked
 
 ## Active Tasks
-*No active tasks*
+
+| Task ID | Title | Status | Priority | Assignee | Created |
+|---------|-------|--------|----------|----------|---------|
+| [GRID-002](./GRID-002.md) | Create Development Activity Log | 🔄 In Progress | Medium | TBD | 2025-01-20 |
 
 ## Completed Tasks
 
@@ -18,8 +21,8 @@
 *No cancelled tasks yet*
 
 ## Task Statistics
-- **Total Tasks**: 1
-- **Active**: 0
+- **Total Tasks**: 2
+- **Active**: 1
 - **In Review**: 0
 - **Completed**: 1
 - **Cancelled**: 0
