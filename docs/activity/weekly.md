@@ -6,24 +6,15 @@
 
 ### Week of August 19-25, 2025
 
-#### Weekly Summary
 **Focus**: Project foundation and documentation infrastructure
 
+**Completed**: [GRID-001](../tasks/GRID-001.md), [GRID-002](../tasks/GRID-002.md) | **PRs**: 2 merged
+
 **Key Accomplishments**:
-- ✅ Complete project documentation structure established
-- ✅ Git repository and GitHub integration configured
-- ✅ Task management system operational
-- ✅ Development workflow defined and tested
-- 🔄 Activity logging system in development
+- ✅ Documentation structure and task management system
+- ✅ Git workflow and activity logging established
 
-**Tasks Completed**: 1 (GRID-001)  
-**Tasks In Progress**: 1 (GRID-002)  
-**Pull Requests**: 1 merged
-
-**Next Week Goals**:
-- Complete activity logging system
-- Define product requirements content
-- Establish design system foundations
+**Next Week**: Product requirements content, design system foundations
 
 ---
 
@@ -31,21 +22,15 @@
 ```markdown
 ### Week of [Start Date - End Date]
 
-#### Weekly Summary
 **Focus**: [Main theme or objectives]
 
+**Completed**: [GRID-XXX](../tasks/GRID-XXX.md), [GRID-YYY](../tasks/GRID-YYY.md) | **PRs**: [N] merged
+
 **Key Accomplishments**:
-- ✅ [Major achievement 1]
-- ✅ [Major achievement 2]
-- 🔄 [Ongoing work]
+- ✅ [High-level achievement 1]
+- ✅ [High-level achievement 2]
 
-**Tasks Completed**: [Number] ([Task IDs])  
-**Tasks In Progress**: [Number] ([Task IDs])  
-**Pull Requests**: [Number merged/created]
-
-**Next Week Goals**:
-- [Goal 1]
-- [Goal 2]
+**Next Week**: [Brief goals for next week]
 ```
 
 ## Maintenance Guidelines

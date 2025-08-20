@@ -99,6 +99,45 @@ export function UserService() {
 - Show progression from simple to complex examples
 - Explain each part of complex examples
 
+### Activity Feed Formatting
+The daily activity feed uses a concise format to maximize readability:
+
+```markdown
+### [Date]
+
+- ✅ **[GRID-XXX](../tasks/GRID-XXX.md)**: [Task title] - [PR #N](https://github.com/awynne/grid/pull/N)
+- 🔄 **[GRID-XXX](../tasks/GRID-XXX.md)**: [Task title] - [Brief status]
+- 🚀 **[Initiative]**: [Brief description]
+```
+
+**Key principles:**
+- **One line per item** - No verbose descriptions or sub-bullets
+- **Completed tasks (✅)** - Include PR link; implies successful merge, tests passing, and full completion
+- **In-progress tasks (🔄)** - Brief status only, details in task file
+- **New initiatives (🚀)** - Setup, planning, or non-task activities
+
+### Weekly Summary Formatting
+Weekly summaries provide high-level aggregation with compact format:
+
+```markdown
+### Week of [Start Date - End Date]
+
+**Focus**: [Main theme or objectives]
+
+**Completed**: [GRID-XXX](../tasks/GRID-XXX.md), [GRID-YYY](../tasks/GRID-YYY.md) | **PRs**: [N] merged
+
+**Key Accomplishments**:
+- ✅ [High-level achievement 1]
+- ✅ [High-level achievement 2]
+
+**Next Week**: [Brief goals for next week]
+```
+
+**Key principles:**
+- **Single line summaries** - Consolidate completed tasks and PR counts
+- **High-level focus** - Themes and major accomplishments, not detailed activities
+- **Forward-looking** - Brief next week goals without detailed planning
+
 ## Maintenance Process
 
 ### When to Update Documentation
@@ -119,6 +158,11 @@ export function UserService() {
 - Continuously as tasks are created, updated, completed
 - Project milestones change
 - Dependencies are resolved or added
+
+#### activity/ directory
+- Daily development activities logged immediately after sessions
+- Weekly summaries added at end of each week
+- Follow concise format for easy scanning
 
 #### design.md
 - Design system components added or modified
