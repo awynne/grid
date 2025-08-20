@@ -3,20 +3,21 @@
 **Status**: 🔄 In Progress  
 **Priority**: Medium  
 **Assignee**: TBD  
-**Created**: 2025-01-20  
-**Updated**: 2025-01-20  
+**Created**: 2025-08-20  
+**Updated**: 2025-08-20  
 
 ## Description
-Create an activity.md file that provides a chronological development log, tracking daily activities and accomplishments in reverse chronological order (like a blog or activity feed). Include weekly summary entries to provide higher-level progress overview.
+Create a structured activity logging system with separate daily and weekly tracking files. Provide chronological development logs, tracking daily activities and accomplishments in reverse chronological order (like a blog or activity feed). Include weekly summary entries to provide higher-level progress overview.
 
 ## Acceptance Criteria
-- [x] `docs/activity.md` - Development activity log with reverse chronological entries
+- [x] `docs/activity/daily.md` - Daily development activity log with reverse chronological entries
+- [x] `docs/activity/weekly.md` - Weekly summary log with progress overviews
 - [x] Daily entries with date headings showing development activities
 - [x] Weekly summary entries aggregating the week's accomplishments
 - [x] Consistent formatting and structure for easy scanning
 - [x] Integration with existing documentation structure
 - [x] Cross-references to relevant tasks and PRs
-- [x] Template/guidelines for maintaining the activity log
+- [x] Template/guidelines for maintaining the activity logs
 
 ## Definition of Done
 - [x] **Task requirements met** - All acceptance criteria satisfied
@@ -31,11 +32,13 @@ Create an activity.md file that provides a chronological development log, tracki
 - None
 
 ## Progress Notes
-- **2025-01-20**: Task created for development activity tracking
-- **2025-01-20**: `activity.md` created with reverse chronological structure ✅
-- **2025-01-20**: Daily and weekly entry templates included ✅
-- **2025-01-20**: Initial entries for January 20, 2025 added ✅
-- **2025-01-20**: Integration with documentation README completed ✅
+- **2025-08-20**: Task created for development activity tracking
+- **2025-08-20**: Restructured into `docs/activity/` directory with separate files ✅
+- **2025-08-20**: `daily.md` created with reverse chronological structure ✅
+- **2025-08-20**: `weekly.md` created for high-level summaries ✅
+- **2025-08-20**: Daily and weekly entry templates included ✅
+- **2025-08-20**: Initial entries for August 20, 2025 added ✅
+- **2025-08-20**: Integration with documentation README completed ✅
 
 ## Implementation Notes
 - Use reverse chronological order (newest first)
