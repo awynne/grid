@@ -7,23 +7,24 @@
 
 ## Active Tasks
 
-*No active tasks*
+| Task ID | Title | Status | Priority | Assignee | Created |
+|---------|-------|--------|----------|----------|---------|
+| [GRID-002](./GRID-002.md) | Create Development Activity Log | 👀 Review | Medium | TBD | 2025-08-20 |
 
 ## Completed Tasks
 
 | Task ID | Title | Status | Priority | Assignee | Created |
 |---------|-------|--------|----------|----------|---------|
 | [GRID-001](./GRID-001.md) | Create Comprehensive Documentation Structure | ✅ Completed | High | TBD | 2025-08-20 |
-| [GRID-002](./GRID-002.md) | Create Development Activity Log | ✅ Completed | Medium | TBD | 2025-08-20 |
 
 ## Cancelled Tasks
 *No cancelled tasks yet*
 
 ## Task Statistics
 - **Total Tasks**: 2
-- **Active**: 0
-- **In Review**: 0
-- **Completed**: 2
+- **Active**: 1
+- **In Review**: 1
+- **Completed**: 1
 - **Cancelled**: 0
 
 ## Quick Actions

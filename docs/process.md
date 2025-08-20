@@ -95,6 +95,31 @@ Users need a dashboard to view their project metrics and recent activity.
 
 **Never mark a task complete until the PR is merged.**
 
+### Example Workflow: GRID-002
+Here's the exact process followed for GRID-002 as a reference:
+
+```bash
+# 1. Complete development work (all acceptance criteria met)
+# 2. Commit final changes
+git add .
+git commit -m "Refine GRID-002: Streamline activity logs and add workflow guidance"
+
+# 3. Push feature branch to remote
+git push origin GRID-002-activity-log
+
+# 4. Create pull request
+gh pr create --title "GRID-002: Create Development Activity Log" --body "..."
+
+# 5. Update task status files
+```
+
+**Task file updates when moving to Review:**
+- Change status from 🔄 In Progress to 👀 Review
+- Update Definition of Done: PR created (✅) but not yet merged (⏳)
+- Add progress note with PR link
+- Move task to Active/Review section in status.md
+- Update task statistics
+
 ### Creating New Tasks
 1. **Use sequential GRID-XXX numbering** (GRID-001, GRID-002, etc.)
 2. **Include all required sections**: Description, Acceptance Criteria, Definition of Done
