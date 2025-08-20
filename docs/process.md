@@ -57,18 +57,21 @@ Users need a dashboard to view their project metrics and recent activity.
 ### Development Process Steps
 1. **Task creation required** - Create task file docs/tasks/GRID-XXX.md with clear requirements
 2. **Developer reviews task** - Understand acceptance criteria before starting
-3. **Developer works on feature** with frequent commits to feature branch
-4. **Developer creates PR** when feature is ready for review
-5. **Reviewer adds feedback** and requests changes if needed
-6. **Developer addresses feedback** with additional commits
-7. **Final reviewer approves** the changes
-8. **Final reviewer merges** PR with squash merge
-9. **Task closed** - Update task status to ✅ Completed and link PR
+3. **Developer works on feature** with frequent commits to feature branch (status: 🔄 In Progress)
+4. **Developer creates PR** when definition of done is achieved (status: 👀 Review)
+5. **Architect reviews PR** - Technical review, code quality, requirements verification
+6. **Developer addresses feedback** with additional commits if needed
+7. **Architect approves and merges** PR with squash merge
+8. **Task closed** - Update status to ✅ Completed and link merged PR
 
 ### Integration with Git Workflow
 - **Branch naming**: Use task ID in branch name (`feature/GRID-XXX-description`)
 - **Commit messages**: Include task ID (`feat(auth): add OAuth (GRID-XXX)`)
 - **PR linking**: Reference task in PR description (`Closes GRID-XXX`)
+- **Task status updates**: 
+  - 🔄 In Progress: During development
+  - 👀 Review: When PR created and ready for architect review
+  - ✅ Completed: Only after PR is approved and merged
 - **Task closure**: Mark complete when PR is merged and update status in task file and docs/tasks/status.md
 
 ## Task Management Process
@@ -76,10 +79,46 @@ Users need a dashboard to view their project metrics and recent activity.
 ### Task Status Legend
 - 🆕 **New** - Task created, not yet assigned
 - 🔄 **In Progress** - Currently being worked on
-- 👀 **Review** - Work complete, under review
-- ✅ **Completed** - Task finished and approved
+- 👀 **Review** - Definition of done achieved, PR created, awaiting architect review
+- ✅ **Completed** - PR reviewed, approved, and merged by architect
 - ❌ **Cancelled** - Task cancelled or no longer needed
 - 🔴 **Blocked** - Cannot proceed due to dependencies
+
+### Task Completion Workflow
+**Important**: Tasks are only marked ✅ Completed after the full review cycle:
+
+1. **Developer completes work** - All acceptance criteria and definition of done satisfied
+2. **Move to 👀 Review** - Create PR and update task status 
+3. **Architect reviews PR** - Technical review, code quality, requirements verification
+4. **PR approved and merged** - Architect merges after approval
+5. **Task marked ✅ Completed** - Update status and link merged PR
+
+**Never mark a task complete until the PR is merged.**
+
+### Example Workflow: GRID-002
+Here's the exact process followed for GRID-002 as a reference:
+
+```bash
+# 1. Complete development work (all acceptance criteria met)
+# 2. Commit final changes
+git add .
+git commit -m "Refine GRID-002: Streamline activity logs and add workflow guidance"
+
+# 3. Push feature branch to remote
+git push origin GRID-002-activity-log
+
+# 4. Create pull request
+gh pr create --title "GRID-002: Create Development Activity Log" --body "..."
+
+# 5. Update task status files
+```
+
+**Task file updates when moving to Review:**
+- Change status from 🔄 In Progress to 👀 Review
+- Update Definition of Done: PR created (✅) but not yet merged (⏳)
+- Add progress note with PR link
+- Move task to Active/Review section in status.md
+- Update task statistics
 
 ### Creating New Tasks
 1. **Use sequential GRID-XXX numbering** (GRID-001, GRID-002, etc.)

@@ -65,6 +65,15 @@ This directory contains all project documentation for the Grid project managemen
 
 **Use this when:** Creating or updating documentation, ensuring consistency across docs.
 
+### 📅 [activity/](./activity/)
+**Development Activity Log**
+- [daily.md](./activity/daily.md) - Daily development activities and accomplishments
+- [weekly.md](./activity/weekly.md) - Weekly progress summaries and milestones
+- Reverse chronological activity feeds
+- Templates for maintaining consistent logging
+
+**Use this when:** Tracking recent progress, updating stakeholders, or reviewing development history.
+
 ### 🎭 [roles.md](./roles.md)
 **LLM Roles and Personas**
 - Architect role: technical direction and architectural decisions
@@ -87,6 +96,7 @@ This directory contains all project documentation for the Grid project managemen
 - Follow coding standards in [coding.md](./coding.md)
 - Reference [design.md](./design.md) for UI consistency *(to be created)*
 - Update progress in [tasks/status.md](./tasks/status.md) and individual task files
+- Log daily activities in [activity/daily.md](./activity/daily.md)
 
 **For Reviews:**
 - Verify task completion in [tasks/status.md](./tasks/status.md)
