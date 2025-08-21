@@ -250,4 +250,4 @@
 - [Remix Stack Technical Standards](./coding-remix-stack.md) - Technology-specific implementation guidelines
 - [Design System](./design.md) - Visual and UX specifications
 - [Process Guidelines](./process.md) - Development workflow and task management
-- [Task Status](./tasks/status.md) - Current development progress
+- [Task Status](./specs/status.md) - Current development progress

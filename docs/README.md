@@ -37,14 +37,14 @@ This directory contains all project documentation for the Grid project managemen
 
 **Use this when:** Writing code, setting up development environment, or implementing features.
 
-### 📝 [tasks/](./tasks/)
-**Project Task Management**
-- [status.md](./tasks/status.md) - Task status overview and tracking
-- Individual task files (GRID-XXX.md) with detailed specifications
-- Task progress notes and implementation details
-- Quick reference for task workflow
+### 📝 [specs/](./specs/)
+**Technical Specifications & Research**
+- [status.md](./specs/status.md) - Implementation status overview and tracking
+- Individual spec files (GRID-XXX.md) with technical specifications
+- Research notes and implementation details
+- Cross-references to GitHub issues for public tracking
 
-**Use this when:** Checking task status, updating progress, or planning work.
+**Use this when:** Researching implementation details, checking development status, or understanding technical requirements.
 
 ### 🎨 [design.md](./design.md) *(To be created)*
 **Design System & UI Guidelines**
@@ -76,13 +76,13 @@ This directory contains all project documentation for the Grid project managemen
 **Use this when:** Creating or updating documentation, ensuring consistency across docs.
 
 ### 📅 [activity/](./activity/)
-**Development Activity Log**
-- [daily.md](./activity/daily.md) - Daily development activities and accomplishments
-- [weekly.md](./activity/weekly.md) - Weekly progress summaries and milestones
-- Reverse chronological activity feeds
-- Templates for maintaining consistent logging
+**Development Context & Research Log**
+- [daily.md](./activity/daily.md) - Daily context, research findings, and GitHub Issues summary
+- [weekly.md](./activity/weekly.md) - Strategic decisions and completed GitHub Issues aggregation
+- Focus on WHY decisions were made, not WHAT was completed
+- GitHub Issues provide completion tracking, activity logs provide context
 
-**Use this when:** Tracking recent progress, updating stakeholders, or reviewing development history.
+**Use this when:** Understanding decision context, reviewing research findings, or tracking strategic direction changes.
 
 ### 🎭 [roles.md](./roles.md)
 **LLM Roles and Personas**
@@ -100,18 +100,18 @@ This directory contains all project documentation for the Grid project managemen
 2. Review [process.md](./process.md) for workflow guidelines
 3. Study [coding.md](./coding.md) for universal principles
 4. Review [coding-remix-stack.md](./coding-remix-stack.md) for implementation details
-5. Check [tasks/status.md](./tasks/status.md) for current work
+5. Check [specs/status.md](./specs/status.md) for current work
 
 **During Development:**
 - Create tasks following [process.md](./process.md) guidelines
 - Follow universal standards in [coding.md](./coding.md)
 - Apply technology-specific patterns from [coding-remix-stack.md](./coding-remix-stack.md)
 - Reference [design.md](./design.md) for UI consistency *(to be created)*
-- Update progress in [tasks/status.md](./tasks/status.md) and individual task files
+- Update progress in [specs/status.md](./specs/status.md) and individual task files
 - Log daily activities in [activity/daily.md](./activity/daily.md)
 
 **For Reviews:**
-- Verify task completion in [tasks/status.md](./tasks/status.md)
+- Verify task completion in [specs/status.md](./specs/status.md)
 - Check code against universal standards in [coding.md](./coding.md)
 - Verify technology-specific patterns in [coding-remix-stack.md](./coding-remix-stack.md)
 - Ensure design consistency with [design.md](./design.md) *(to be created)*

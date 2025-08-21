@@ -1,25 +1,27 @@
 # Project Management Guidelines
 
-## Task-First Development Rule
+## Spec-First Development Rule
 
-### ❗ MANDATORY: No Work Without a Task
-- All development must start with a documented task in `docs/tasks.md`
+### ❗ MANDATORY: No Work Without a Technical Spec
+- All development must start with a documented spec in `docs/specs/GRID-XXX.md`
 - Never start coding based on verbal requests or informal discussions
-- Create task entry in `docs/tasks.md` BEFORE starting any work
-- Task must include: description, acceptance criteria, definition of done
+- Create spec file `docs/specs/GRID-XXX.md` BEFORE starting any work
+- Spec must include: technical overview, implementation requirements, research notes
 
-### Task Creation Example
+### Spec Creation Example
 ```markdown
-### GRID-XXX: Add user project dashboard
-**Status**: 🆕 New  
+### GRID-XXX: User Dashboard System
+
+**GitHub Issue**: #N (public tracking)
+**Spec Purpose**: Technical specification for dashboard implementation
+**Status**: 📋 Research  
 **Priority**: High  
-**Assignee**: TBD  
 **Created**: 2025-01-20  
 
-#### Description
-Users need a dashboard to view their project metrics and recent activity.
+## Technical Overview
+Implement a real-time dashboard system providing project metrics and activity feeds.
 
-#### Acceptance Criteria
+#### Implementation Requirements
 - [ ] Display project count widget
 - [ ] Show recent activity feed (last 10 items)
 - [ ] Add quick actions menu (New Project, Settings)
@@ -42,12 +44,12 @@ Users need a dashboard to view their project metrics and recent activity.
 # ✅ CORRECT approach
 # Manager: "Can you add a quick button to the dashboard?"
 # Developer: "I'll create a task first to document the requirements"
-# *Creates task in docs/tasks/GRID-XXX.md, gets approval, then starts development*
+# *Creates task in docs/specs/GRID-XXX.md, gets approval, then starts development*
 ```
 
 ### Task-Driven Development Benefits
 - Clear requirements prevent scope creep
-- Documented decisions in docs/tasks/ directory
+- Documented decisions in docs/specs/ directory
 - Proper estimation and planning
 - Accountability and progress tracking
 - Single source of truth in repository
@@ -55,24 +57,87 @@ Users need a dashboard to view their project metrics and recent activity.
 ## Development Process Integration
 
 ### Development Process Steps
-1. **Task creation required** - Create task file docs/tasks/GRID-XXX.md with clear requirements
-2. **Developer reviews task** - Understand acceptance criteria before starting
-3. **Developer works on feature** with frequent commits to feature branch (status: 🔄 In Progress)
-4. **Developer creates PR** when definition of done is achieved (status: 👀 Review)
-5. **Architect reviews PR** - Technical review, code quality, requirements verification
-6. **Developer addresses feedback** with additional commits if needed
-7. **Architect approves and merges** PR with squash merge
-8. **Task closed** - Update status to ✅ Completed and link merged PR
+1. **Task creation required** - Create task file docs/specs/GRID-XXX.md with clear requirements
+2. **GitHub issue creation** - Create corresponding GitHub issue for public tracking and automation
+3. **Developer reviews task** - Understand acceptance criteria before starting
+4. **Developer works on feature** with frequent commits to feature branch (status: 🔄 In Progress)
+5. **Developer creates PR** when definition of done is achieved (status: 👀 Review)
+6. **Architect reviews PR** - Technical review, code quality, requirements verification
+7. **Developer addresses feedback** with additional commits if needed
+8. **Architect approves and merges** PR with squash merge
+9. **Automatic closure** - GitHub issue automatically closes; update GRID-XXX.md status manually
 
-### Integration with Git Workflow
+### Integration with Git Workflow & GitHub Issues
 - **Branch naming**: Use task ID in branch name (`feature/GRID-XXX-description`)
-- **Commit messages**: Include task ID (`feat(auth): add OAuth (GRID-XXX)`)
-- **PR linking**: Reference task in PR description (`Closes GRID-XXX`)
+- **Commit messages**: Include both IDs (`feat(auth): add OAuth (GRID-XXX, #45)`)
+- **PR linking**: Reference both systems (`Closes GRID-XXX` and `Closes #45`)
+- **Dual tracking**: GRID-XXX.md files for detailed specs, GitHub issues for public tracking
 - **Task status updates**: 
-  - 🔄 In Progress: During development
+  - 🔄 In Progress: During development (update both systems)
   - 👀 Review: When PR created and ready for architect review
-  - ✅ Completed: Only after PR is approved and merged
-- **Task closure**: Mark complete when PR is merged and update status in task file and docs/tasks/status.md
+  - ✅ Completed: GitHub issue auto-closes, manually update GRID-XXX.md status
+- **Task closure**: GitHub issues close automatically; update GRID-XXX.md status and docs/specs/status.md manually
+
+## GitHub Issues Integration
+
+### Dual-Track System
+The project uses a **dual-track system** combining detailed task documentation with GitHub's automation benefits:
+
+1. **GRID-XXX.md files** - Detailed task specifications, acceptance criteria, and progress notes
+2. **GitHub issues** - Public tracking, automation, and integration with GitHub workflows
+
+### Creating Issues from Tasks
+```bash
+# After creating GRID-XXX.md file, create corresponding GitHub issue
+gh issue create --title "GRID-123: Add user authentication system" \
+  --body "Detailed specifications: [GRID-123](docs/specs/GRID-123.md)
+
+Summary of key requirements:
+- OAuth integration with Google/Microsoft
+- Session management with sliding expiration  
+- User profile creation and management
+
+See full acceptance criteria in the task file."
+
+# Issue gets assigned #45, now reference both: GRID-123 and #45
+```
+
+### Enhanced Commit Messages
+```bash
+# ✅ Include both GRID-XXX and GitHub issue number
+git commit -m "feat(auth): add OAuth providers (GRID-123, #45)"
+git commit -m "fix(dashboard): resolve loading race condition (GRID-456, #78)"
+git commit -m "docs(api): update integration guide (GRID-202, #91)"
+```
+
+### Enhanced PR Creation
+```bash
+# ✅ Reference both systems for automatic linking
+gh pr create --title "feat(auth): Add OAuth authentication system" \
+  --body "Implements GRID-123: User authentication system
+
+## Summary
+- Add Google and Microsoft OAuth providers
+- Implement session management with sliding expiration
+- Create user profile management workflow
+
+## Testing
+- [x] OAuth flow tested with both providers
+- [x] Session management verified
+- [x] User profile creation works
+- [x] Error handling for failed OAuth
+
+Closes GRID-123
+Closes #45"
+```
+
+### Benefits of Dual System
+- **Rich documentation** - Detailed specs remain in GRID-XXX.md files
+- **Public visibility** - Stakeholders can track progress in GitHub issues
+- **Automation** - Issues auto-close when PRs merge
+- **Integration** - Works with GitHub project boards, mentions, notifications
+- **Traceability** - Full links between tasks, issues, PRs, and code changes
+- **LLM-friendly** - Both systems optimized for AI assistant workflows
 
 ## Task Management Process
 
@@ -95,20 +160,46 @@ Users need a dashboard to view their project metrics and recent activity.
 
 **Never mark a task complete until the PR is merged.**
 
-### Example Workflow: GRID-002
-Here's the exact process followed for GRID-002 as a reference:
+### Example Workflow with GitHub Issues
+Here's the enhanced process with GitHub issues integration:
 
 ```bash
-# 1. Complete development work (all acceptance criteria met)
-# 2. Commit final changes
+# 0. Create GRID-XXX.md task file (as before)
+# 1. Create corresponding GitHub issue
+gh issue create --title "GRID-004: Add user dashboard metrics" \
+  --body "Full specifications: [GRID-004](docs/specs/GRID-004.md)
+
+Key requirements:
+- Project count widget
+- Recent activity feed  
+- Quick actions menu
+- Responsive design
+
+See task file for complete acceptance criteria."
+
+# Issue created as #12
+
+# 2. Development work with enhanced commit messages
 git add .
-git commit -m "Refine GRID-002: Streamline activity logs and add workflow guidance"
+git commit -m "feat(dashboard): add project count widget (GRID-004, #12)"
+git push origin feature/GRID-004-user-dashboard
 
-# 3. Push feature branch to remote
-git push origin GRID-002-activity-log
+git add .
+git commit -m "feat(dashboard): add activity feed component (GRID-004, #12)"
+git push
 
-# 4. Create pull request
-gh pr create --title "GRID-002: Create Development Activity Log" --body "..."
+# 3. Create PR linking both systems
+gh pr create --title "feat(dashboard): Add user dashboard metrics" \
+  --body "Implements GRID-004: User dashboard with project metrics
+
+## Changes
+- Add project count widget with real-time updates
+- Add recent activity feed (last 10 items)
+- Add quick actions menu (New Project, Settings)
+- Responsive design for mobile and desktop
+
+Closes GRID-004
+Closes #12"
 
 # 5. Update task status files
 ```
@@ -122,55 +213,72 @@ gh pr create --title "GRID-002: Create Development Activity Log" --body "..."
 
 ### Creating New Tasks
 1. **Use sequential GRID-XXX numbering** (GRID-001, GRID-002, etc.)
-2. **Include all required sections**: Description, Acceptance Criteria, Definition of Done
-3. **Set clear priorities**: High, Medium, Low
-4. **Estimate complexity** if helpful (Small, Medium, Large)
-5. **Identify dependencies** with other tasks
+2. **Create GRID-XXX.md file first** with all required sections
+3. **Create GitHub issue** linking to the task file for public tracking
+4. **Update task file** with GitHub issue number for cross-reference
+5. **Set clear priorities**: High, Medium, Low
+6. **Estimate complexity** if helpful (Small, Medium, Large)
+7. **Identify dependencies** with other tasks
 
 ### Task Status Updates
 - Update status emoji and date when changing status
-- Move completed tasks to "Completed Tasks" section in docs/tasks/status.md
+- Move completed tasks to "Completed Tasks" section in docs/specs/status.md
 - Add completion date and any relevant notes
 - Keep active tasks at top for visibility
 
-### Task Template
+### Technical Specification Template
 ```markdown
-### GRID-XXX: Task Title
-**Status**: 🆕 New  
-**Priority**: Medium  
-**Assignee**: TBD  
-**Created**: YYYY-MM-DD  
-**Estimated Size**: Medium  
+### GRID-XXX: Technical Feature Name
 
-#### Description
-Clear description of what needs to be done and why.
+**GitHub Issue**: #XXX (public tracking)
+**Spec Purpose**: Technical implementation details and research
+**Status**: 📋 Research | 🔄 In Progress | 👀 Review | ✅ Implemented
+**Priority**: High | Medium | Low
+**Created**: YYYY-MM-DD
 
-#### Acceptance Criteria
-- [ ] Specific, testable criteria
-- [ ] Each criterion should be verifiable
-- [ ] Include technical and functional requirements
+## Technical Overview
+High-level architecture and approach decisions. What are we building and why?
 
-#### Definition of Done
-- [ ] **Task requirements met** - All acceptance criteria satisfied
-- [ ] Code complete and tested (if applicable)
-- [ ] Documentation updated (if applicable)
-- [ ] Reviewed and approved
-- [ ] No TypeScript errors (if applicable)
-- [ ] Task marked complete in individual task file and docs/tasks/status.md
+## Implementation Requirements
+- [ ] Specific technical acceptance criteria
+- [ ] API contracts and schemas needed
+- [ ] Database migrations required
+- [ ] Security considerations addressed
+- [ ] Performance requirements met
+- [ ] Error handling implemented
+- [ ] Tests written and passing
 
-#### Dependencies
-- GRID-XXX (if any)
+## Research Notes
+- Investigation findings and technical decisions
+- Architecture alternatives considered
+- Framework-specific constraints discovered
+- Integration challenges and solutions
 
-#### Notes
-Any additional context, references, or considerations.
+## Implementation Details
+- Code patterns and conventions to follow
+- Specific algorithms or libraries to use
+- Configuration requirements
+- Deployment considerations
+
+## Dependencies & Integration
+- Technical dependencies on other specs: GRID-XXX
+- External service requirements
+- Breaking changes or migration needs
+- Cross-cutting concerns (auth, logging, etc.)
+
+## Testing Strategy
+- Unit testing approach
+- Integration testing requirements
+- End-to-end testing scenarios
+- Performance testing criteria
 ```
 
-### Task Review Process
-1. **Task Creation**: Anyone can create tasks following the template
-2. **Task Review**: Lead developer or product owner reviews new tasks
-3. **Task Assignment**: Tasks assigned during planning or as needed
-4. **Progress Updates**: Developer updates status as work progresses
-5. **Task Completion**: Mark complete when all acceptance criteria met
+### Specification Review Process
+1. **Spec Creation**: Developer or architect creates specs following the template
+2. **Technical Review**: Lead developer or architect reviews technical approach
+3. **Implementation Planning**: Break down into development phases if needed
+4. **Progress Updates**: Developer updates status as research and implementation progresses
+5. **Implementation Complete**: Mark complete when all technical requirements met and tested
 
 ## Project Planning
 
@@ -201,13 +309,13 @@ Any additional context, references, or considerations.
 - Link related PRs and commits
 
 ### Meetings and Reviews
-- Use docs/tasks/status.md as agenda for standups
+- Use docs/specs/status.md as agenda for standups
 - Review completed tasks in retrospectives
 - Plan upcoming tasks in planning sessions
 - Reference task IDs in all project discussions
 
 ### Documentation Requirements
-- Keep individual task files and docs/tasks/status.md updated with current status
+- Keep individual task files and docs/specs/status.md updated with current status
 - Link all code changes back to tasks
 - Document decisions and context in task notes
 - Maintain clean task history for future reference

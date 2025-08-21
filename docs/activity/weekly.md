@@ -6,15 +6,16 @@
 
 ### Week of August 19-25, 2025
 
-**Focus**: Project foundation and documentation infrastructure
+**Focus**: Project foundation and workflow optimization
 
-**Completed**: [GRID-001](../tasks/GRID-001.md), [GRID-002](../tasks/GRID-002.md) | **PRs**: 2 merged
+**GitHub Issues Completed**: [GRID-001 #4](https://github.com/awynne/grid/issues/4), [GRID-002 #5](https://github.com/awynne/grid/issues/5), [GRID-003 #6](https://github.com/awynne/grid/issues/6) | **PRs**: 3 merged
 
-**Key Accomplishments**:
-- ✅ Documentation structure and task management system
-- ✅ Git workflow and activity logging established
+**Key Decisions & Context**:
+- ✅ Established docs/specs/ for technical specifications vs. GitHub issues for public tracking
+- ✅ Enhanced workflow combines detailed local specs with GitHub automation
+- ✅ Activity logs simplified to focus on research context vs. duplicating GitHub data
 
-**Next Week**: Product requirements content, design system foundations
+**Next Week**: Begin core authentication system implementation, OAuth provider research
 
 ---
 
@@ -24,11 +25,11 @@
 
 **Focus**: [Main theme or objectives]
 
-**Completed**: [GRID-XXX](../tasks/GRID-XXX.md), [GRID-YYY](../tasks/GRID-YYY.md) | **PRs**: [N] merged
+**GitHub Issues Completed**: [GRID-XXX #N](https://github.com/awynne/grid/issues/N), [GRID-YYY #M](https://github.com/awynne/grid/issues/M) | **PRs**: [N] merged
 
-**Key Accomplishments**:
-- ✅ [High-level achievement 1]
-- ✅ [High-level achievement 2]
+**Key Decisions & Context**:
+- ✅ [Major architectural or strategic decisions made]
+- ✅ [Important research findings or direction changes]
 
 **Next Week**: [Brief goals for next week]
 ```
@@ -37,18 +38,19 @@
 
 ### Weekly Summaries
 - Create weekly summary every Friday or Sunday
-- Aggregate the week's major accomplishments
-- Highlight completed tasks and merged PRs
-- Set goals for the following week
-- Focus on high-level progress and trends
+- List completed GitHub Issues with direct links
+- Focus on major technical decisions and strategic context
+- Document important research findings and direction changes
+- Set strategic goals for the following week
+- Avoid duplicating information available in GitHub Issues
 
 ### Cross-References
-- Link to relevant tasks: `[GRID-XXX](../tasks/GRID-XXX.md)`
+- Link to relevant tasks: `[GRID-XXX](../specs/GRID-XXX.md)`
 - Reference PRs: `https://github.com/awynne/grid/pull/N`
 - Connect to documentation: `[doc-name](../doc-name.md)`
 
 ## Cross-References
 - [Daily Activities](./daily.md) - Detailed daily development log
-- [Task Status](../tasks/status.md) - Current task overview
+- [Task Status](../specs/status.md) - Current task overview
 - [Process Guidelines](../process.md) - Development workflow
 - [Documentation Standards](../documentation.md) - Documentation maintenance

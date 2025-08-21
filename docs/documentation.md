@@ -100,43 +100,46 @@ export function UserService() {
 - Explain each part of complex examples
 
 ### Activity Feed Formatting
-The daily activity feed uses a concise format to maximize readability:
+The daily activity feed focuses on context and research while summarizing GitHub Issues:
 
 ```markdown
 ### [Date]
 
-- ✅ **[GRID-XXX](../tasks/GRID-XXX.md)**: [Task title] - [PR #N](https://github.com/awynne/grid/pull/N)
-- 🔄 **[GRID-XXX](../tasks/GRID-XXX.md)**: [Task title] - [Brief status]
-- 🚀 **[Initiative]**: [Brief description]
+**GitHub Issues Completed**: [GRID-XXX #N](https://github.com/awynne/grid/issues/N), [GRID-YYY #M](https://github.com/awynne/grid/issues/M)
+
+- 🔄 **GRID-XXX**: [Development context, technical decisions]
+- 📚 **Research**: [Investigation findings, alternatives considered]
+- 🚀 **Infrastructure**: [Setup, tooling, environment changes]
 ```
 
 **Key principles:**
-- **One line per item** - No verbose descriptions or sub-bullets
-- **Completed tasks (✅)** - Include PR link; implies successful merge, tests passing, and full completion
-- **In-progress tasks (🔄)** - Brief status only, details in task file
-- **New initiatives (🚀)** - Setup, planning, or non-task activities
+- **GitHub Issues Summary** - List completed issues with direct links
+- **Focus on Context** - WHY decisions were made, not just WHAT was done
+- **Research Documentation** - Technical decisions and alternatives investigated
+- **Avoid Duplication** - Don't repeat information already in GitHub Issues/PRs
 
 ### Weekly Summary Formatting
-Weekly summaries provide high-level aggregation with compact format:
+Weekly summaries provide strategic context and GitHub Issues aggregation:
 
 ```markdown
 ### Week of [Start Date - End Date]
 
-**Focus**: [Main theme or objectives]
+**Focus**: [Main strategic theme or objectives]
 
-**Completed**: [GRID-XXX](../tasks/GRID-XXX.md), [GRID-YYY](../tasks/GRID-YYY.md) | **PRs**: [N] merged
+**GitHub Issues Completed**: [GRID-XXX #N](https://github.com/awynne/grid/issues/N), [GRID-YYY #M](https://github.com/awynne/grid/issues/M) | **PRs**: [N] merged
 
-**Key Accomplishments**:
-- ✅ [High-level achievement 1]
-- ✅ [High-level achievement 2]
+**Key Decisions & Context**:
+- ✅ [Major architectural or strategic decisions made]
+- ✅ [Important research findings or direction changes]
 
-**Next Week**: [Brief goals for next week]
+**Next Week**: [Strategic goals and technical focus areas]
 ```
 
 **Key principles:**
-- **Single line summaries** - Consolidate completed tasks and PR counts
-- **High-level focus** - Themes and major accomplishments, not detailed activities
-- **Forward-looking** - Brief next week goals without detailed planning
+- **GitHub Issues Summary** - Direct links to completed issues with PR counts
+- **Strategic Context** - Major decisions, research findings, direction changes
+- **Architecture Focus** - Technical decisions that affect future development
+- **Process Evolution** - Workflow improvements and methodology changes
 
 ## Maintenance Process
 
@@ -154,7 +157,7 @@ Weekly summaries provide high-level aggregation with compact format:
 - Security requirements change
 - Coding patterns evolve
 
-#### tasks/ directory
+#### specs/ directory
 - Continuously as tasks are created, updated, completed
 - Project milestones change
 - Dependencies are resolved or added

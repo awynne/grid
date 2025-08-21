@@ -148,12 +148,12 @@ Closes GRID-123
 ### Task-First Development Rule
 ```bash
 # ❗ MANDATORY: No work without a task
-# - All development must start with a documented task in docs/tasks/GRID-XXX.md
+# - All development must start with a documented task in docs/specs/GRID-XXX.md
 # - Never start coding based on verbal requests or informal discussions
-# - Create task file in docs/tasks/GRID-XXX.md BEFORE starting any work
+# - Create task file in docs/specs/GRID-XXX.md BEFORE starting any work
 # - Task must include: description, acceptance criteria, definition of done
 
-# ✅ Create task first in docs/tasks/GRID-XXX.md
+# ✅ Create task first in docs/specs/GRID-XXX.md
 # Add new task following the template:
 ### GRID-XXX: Add user project dashboard
 **Status**: 🆕 New  
@@ -186,8 +186,9 @@ Users need a dashboard to view their project metrics and recent activity.
 npm install -g gh
 gh auth login
 
-# 0. VERIFY TASK EXISTS - Check task in docs/tasks/GRID-XXX.md
+# 0. VERIFY TASK EXISTS - Check task in docs/specs/GRID-XXX.md
 # Review GRID-XXX task requirements before starting
+# Ensure GitHub issue was created and note the issue number (e.g., #45)
 
 # 1. Create feature branch from main (using task ID)
 gh repo sync  # Sync with upstream
@@ -197,24 +198,24 @@ git checkout -b feature/GRID-123-user-dashboard
 
 # 2. Commit frequently while developing (save progress)
 git add .
-git commit -m "feat(dashboard): add basic dashboard layout (GRID-123)"
+git commit -m "feat(dashboard): add basic dashboard layout (GRID-123, #45)"
 git push origin feature/GRID-123-user-dashboard
 
 # Continue working and committing frequently
 git add .
-git commit -m "feat(dashboard): add project count widget (GRID-123)"
+git commit -m "feat(dashboard): add project count widget (GRID-123, #45)"
 git push
 
 git add .
-git commit -m "feat(dashboard): add recent activity feed (GRID-123)"
+git commit -m "feat(dashboard): add recent activity feed (GRID-123, #45)"
 git push
 
 git add .
-git commit -m "feat(dashboard): add quick actions menu (GRID-123)"
+git commit -m "feat(dashboard): add quick actions menu (GRID-123, #45)"
 git push
 
 # 3. When feature is ready for review, create PR
-gh pr create --title "feat(dashboard): Add user project metrics" --body "Implements GRID-123\n\n- Add project count widget\n- Add recent activity feed\n- Add quick actions menu\n\nCloses GRID-123"
+gh pr create --title "feat(dashboard): Add user project metrics" --body "Implements GRID-123\n\n- Add project count widget\n- Add recent activity feed\n- Add quick actions menu\n\nCloses GRID-123\nCloses #45"
 
 # 4. After review, merge via CLI (squash combines all commits)
 gh pr merge --squash --delete-branch
@@ -358,7 +359,7 @@ Code is ready when:
 - [ ] Code follows established patterns and conventions
 - [ ] PR is reviewed, approved, and merged
 - [ ] Branch is deleted after merge
-- [ ] Task status updated in individual task file and docs/tasks/status.md
+- [ ] Task status updated in individual task file and docs/specs/status.md
 
 ## Tools & Setup
 
