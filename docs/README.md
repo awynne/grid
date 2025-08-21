@@ -6,13 +6,13 @@ This directory contains all project documentation for the Grid project managemen
 
 ### 📋 [process.md](./process.md)
 **Project Management & Workflow**
-- Task-first development rule and guidelines
+- Spec-first development rule and guidelines
 - Development process steps and workflow
-- Task management processes and templates
-- Integration between tasks and Git workflow
+- Spec management processes and templates
+- Integration between specs and Git workflow
 - Project planning and communication guidelines
 
-**Use this when:** Creating tasks, understanding workflow, or managing project processes.
+**Use this when:** Creating specs, understanding workflow, or managing project processes.
 
 ### 💻 [coding.md](./coding.md)
 **Universal Coding Standards**
@@ -42,7 +42,7 @@ This directory contains all project documentation for the Grid project managemen
 - [status.md](./specs/status.md) - Implementation status overview and tracking
 - Individual spec files (GRID-XXX.md) with technical specifications
 - Research notes and implementation details
-- Cross-references to GitHub issues for public tracking
+- Cross-references to issues for public tracking
 
 **Use this when:** Researching implementation details, checking development status, or understanding technical requirements.
 
@@ -103,15 +103,15 @@ This directory contains all project documentation for the Grid project managemen
 5. Check [specs/status.md](./specs/status.md) for current work
 
 **During Development:**
-- Create tasks following [process.md](./process.md) guidelines
+- Create specs following [process.md](./process.md) guidelines
 - Follow universal standards in [coding.md](./coding.md)
 - Apply technology-specific patterns from [coding-remix-stack.md](./coding-remix-stack.md)
 - Reference [design.md](./design.md) for UI consistency *(to be created)*
-- Update progress in [specs/status.md](./specs/status.md) and individual task files
+- Update progress in [specs/status.md](./specs/status.md) and individual spec files
 - Log daily activities in [activity/daily.md](./activity/daily.md)
 
 **For Reviews:**
-- Verify task completion in [specs/status.md](./specs/status.md)
+- Verify spec completion in [specs/status.md](./specs/status.md)
 - Check code against universal standards in [coding.md](./coding.md)
 - Verify technology-specific patterns in [coding-remix-stack.md](./coding-remix-stack.md)
 - Ensure design consistency with [design.md](./design.md) *(to be created)*
@@ -125,7 +125,7 @@ See [documentation.md](./documentation.md) for comprehensive guidelines on:
 - Templates and quality checklists
 
 **Quick reference:**
-- Create tasks for major documentation changes
+- Create specs for major documentation changes
 - Follow Git workflow for all updates
 - Review for accuracy and test all links
 - Maintain consistency across documents

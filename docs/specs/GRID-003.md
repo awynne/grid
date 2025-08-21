@@ -19,7 +19,7 @@ Refactor the monolithic coding standards documentation into a layered architectu
 - [x] Remix-specific file covers: TypeScript, React, Remix, shadcn/ui, database patterns
 
 ## Definition of Done
-- [x] **Task requirements met** - All acceptance criteria satisfied
+- [x] **Spec requirements met** - All acceptance criteria satisfied
 - [x] Files properly separated with clear scope definitions
 - [x] All cross-references updated to point to correct files
 - [x] Documentation navigation updated in README.md
@@ -54,15 +54,15 @@ Refactor the monolithic coding standards documentation into a layered architectu
 - Package.json scripts and dependencies
 
 ## Progress Notes
-- **2025-08-21**: Task created for coding standards separation
-- **2025-08-21**: Feature branch created, task moved to In Progress
+- **2025-08-21**: Spec created for coding standards separation
+- **2025-08-21**: Feature branch created, spec moved to In Progress
 - **2025-08-21**: Coding standards separation completed - [PR #3](https://github.com/awynne/grid/pull/3) created and merged
 
-## Related Tasks
+## Related Specs
 - [GRID-001](./GRID-001.md) - Documentation structure foundation
 - [GRID-002](./GRID-002.md) - Development activity log system
 
 ## Links
-- Back to [Task Status](./status.md)
+- Back to [Spec Status](./status.md)
 - [Process Guidelines](../process.md)
 - [Documentation Standards](../documentation.md)

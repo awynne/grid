@@ -11,7 +11,7 @@ Establish a comprehensive documentation system that serves as the foundation for
 
 ## Implementation Requirements
 - [x] `docs/coding.md` - Complete coding standards and conventions
-- [x] `docs/process.md` - Task management processes and guidelines
+- [x] `docs/process.md` - Spec management processes and guidelines
 - [x] `docs/README.md` - Documentation overview and navigation
 - [x] `docs/documentation.md` - Documentation guidelines and standards
 - [x] `docs/roles.md` - LLM roles and personas for consistent AI behavior
@@ -24,7 +24,7 @@ Establish a comprehensive documentation system that serves as the foundation for
 - [x] Table of contents in each document for easy navigation
 
 ## Definition of Done
-- [x] **Task requirements met** - All acceptance criteria satisfied
+- [x] **Spec requirements met** - All acceptance criteria satisfied
 - [x] All documentation files created with comprehensive content
 - [x] Documentation reviewed for completeness and accuracy
 - [x] Links between documents tested and working
@@ -38,11 +38,11 @@ Establish a comprehensive documentation system that serves as the foundation for
 
 ## Progress Notes
 - **2025-08-20**: `coding.md` already complete with comprehensive standards ✅
-- **2025-08-20**: `process.md` created with task management guidelines ✅
+- **2025-08-20**: `process.md` created with spec management guidelines ✅
 - **2025-08-20**: `README.md` created as documentation hub ✅
 - **2025-08-20**: `documentation.md` created with guidelines and standards ✅
 - **2025-08-20**: `roles.md` created with LLM personas and interaction patterns ✅
-- **2025-08-20**: Task directory structure established with individual task files ✅
+- **2025-08-20**: Spec directory structure established with individual spec files ✅
 - **2025-08-20**: `design.md` created with comprehensive outline and structure ✅
 - **2025-08-20**: `prd.md` created with comprehensive outline and structure ✅
 - **2025-08-20**: Git repository initialized and GitHub repo created ✅
@@ -56,10 +56,10 @@ Establish a comprehensive documentation system that serves as the foundation for
 - Consider future maintenance and updates
 - Ensure all cross-references work correctly
 
-## Related Tasks
+## Related Specs
 *None yet*
 
 ## Links
-- Back to [Task Status](./status.md)
+- Back to [Spec Status](./status.md)
 - [Process Guidelines](../process.md)
 - [Documentation Standards](../documentation.md)

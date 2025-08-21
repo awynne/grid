@@ -16,11 +16,11 @@ Implement a structured activity logging system that provides chronological devel
 - [x] Weekly summary entries aggregating the week's accomplishments
 - [x] Consistent formatting and structure for easy scanning
 - [x] Integration with existing documentation structure
-- [x] Cross-references to relevant tasks and PRs
+- [x] Cross-references to relevant specs and PRs
 - [x] Template/guidelines for maintaining the activity logs
 
 ## Definition of Done
-- [x] **Task requirements met** - All acceptance criteria satisfied
+- [x] **Spec requirements met** - All acceptance criteria satisfied
 - [x] Activity log created with initial entries
 - [x] Documentation follows established formatting standards
 - [x] Cross-references to other docs are working
@@ -32,28 +32,28 @@ Implement a structured activity logging system that provides chronological devel
 - None
 
 ## Progress Notes
-- **2025-08-20**: Task created for development activity tracking
+- **2025-08-20**: Spec created for development activity tracking
 - **2025-08-20**: Restructured into `docs/activity/` directory with separate files ✅
 - **2025-08-20**: `daily.md` created with reverse chronological structure ✅
 - **2025-08-20**: `weekly.md` created for high-level summaries ✅
 - **2025-08-20**: Daily and weekly entry templates included ✅
 - **2025-08-20**: Initial entries for August 20, 2025 added ✅
 - **2025-08-20**: Integration with documentation README completed ✅
-- **2025-08-20**: Final commit completed, task marked as complete ✅
-- **2025-08-20**: PR #2 created, task moved to Review status 👀
-- **2025-08-21**: PR #2 merged to main, task completed ✅
+- **2025-08-20**: Final commit completed, spec marked as complete ✅
+- **2025-08-20**: PR #2 created, spec moved to Review status 👀
+- **2025-08-21**: PR #2 merged to main, spec completed ✅
 
 ## Implementation Notes
 - Use reverse chronological order (newest first)
 - Include both daily and weekly entries
-- Reference completed tasks, PRs, and major milestones
+- Reference completed specs, PRs, and major milestones
 - Provide templates for consistent formatting
 - Make it easy to scan for recent activity
 
-## Related Tasks
+## Related Specs
 - [GRID-001](./GRID-001.md) - Documentation structure foundation
 
 ## Links
-- Back to [Task Status](./status.md)
+- Back to [Spec Status](./status.md)
 - [Process Guidelines](../process.md)
 - [Documentation Standards](../documentation.md)

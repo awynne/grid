@@ -249,5 +249,5 @@
 - [Universal Coding Standards](./coding.md) - Language-agnostic development principles
 - [Remix Stack Technical Standards](./coding-remix-stack.md) - Technology-specific implementation guidelines
 - [Design System](./design.md) - Visual and UX specifications
-- [Process Guidelines](./process.md) - Development workflow and task management
-- [Task Status](./specs/status.md) - Current development progress
+- [Process Guidelines](./process.md) - Development workflow and spec management
+- [Spec Status](./specs/status.md) - Current development progress

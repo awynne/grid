@@ -19,7 +19,7 @@
 
 - 🔄 **GRID-002**: Activity logging system design and implementation
 - 📚 **Activity Log Research**: Investigated optimal formats for development tracking
-- 📚 **Workflow Documentation**: Designed task completion process with Review status
+- 📚 **Workflow Documentation**: Designed spec completion process with Review status
 - 🚀 **Repository Setup**: Grid project initialized with foundational structure
 
 ---
@@ -58,17 +58,17 @@
 
 ### Daily Updates
 - Add entries at the end of each development session
-- Include relevant task IDs and PR links
+- Include relevant spec IDs and PR links
 - Use consistent formatting and categories
 - Keep entries concise but informative
 
 ### Cross-References
-- Link to relevant tasks: `[GRID-XXX](../specs/GRID-XXX.md)`
+- Link to relevant specs: `[GRID-XXX](../specs/GRID-XXX.md)`
 - Reference PRs: `https://github.com/awynne/grid/pull/N`
 - Connect to documentation: `[doc-name](../doc-name.md)`
 
 ## Cross-References
 - [Weekly Activities](./weekly.md) - Weekly summary overview
-- [Task Status](../specs/status.md) - Current task overview
+- [Spec Status](../specs/status.md) - Current spec overview
 - [Process Guidelines](../process.md) - Development workflow
 - [Documentation Standards](../documentation.md) - Documentation maintenance
