@@ -33,7 +33,7 @@
 **Create New Specification:**
 1. Create new file: `docs/specs/GRID-XXX.md`
 2. Use the [spec template](../process.md#spec-template) from process.md
-3. Create corresponding GitHub issue for public tracking
+3. Create corresponding issue for public tracking
 4. Add entry to this status table
 5. Update implementation statistics
 
@@ -45,4 +45,4 @@
 
 ## Recent Activity
 - **2025-01-20**: GRID-001 created for documentation structure
-- **2025-01-20**: Task directory structure established
+- **2025-01-20**: Spec directory structure established

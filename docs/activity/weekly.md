@@ -11,7 +11,7 @@
 **GitHub Issues Completed**: [GRID-001 #4](https://github.com/awynne/grid/issues/4), [GRID-002 #5](https://github.com/awynne/grid/issues/5), [GRID-003 #6](https://github.com/awynne/grid/issues/6) | **PRs**: 3 merged
 
 **Key Decisions & Context**:
-- ✅ Established docs/specs/ for technical specifications vs. GitHub issues for public tracking
+- ✅ Established docs/specs/ for technical specifications vs. issues for public tracking
 - ✅ Enhanced workflow combines detailed local specs with GitHub automation
 - ✅ Activity logs simplified to focus on research context vs. duplicating GitHub data
 
@@ -45,12 +45,12 @@
 - Avoid duplicating information available in GitHub Issues
 
 ### Cross-References
-- Link to relevant tasks: `[GRID-XXX](../specs/GRID-XXX.md)`
+- Link to relevant specs: `[GRID-XXX](../specs/GRID-XXX.md)`
 - Reference PRs: `https://github.com/awynne/grid/pull/N`
 - Connect to documentation: `[doc-name](../doc-name.md)`
 
 ## Cross-References
 - [Daily Activities](./daily.md) - Detailed daily development log
-- [Task Status](../specs/status.md) - Current task overview
+- [Spec Status](../specs/status.md) - Current spec overview
 - [Process Guidelines](../process.md) - Development workflow
 - [Documentation Standards](../documentation.md) - Documentation maintenance

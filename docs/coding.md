@@ -107,7 +107,7 @@ MAX_LOGIN_ATTEMPTS = 3;
 
 ## Git Workflow
 
-> **📋 Project Management**: See [process.md](./process.md) for task creation, workflow processes, and project management guidelines.
+> **📋 Project Management**: See [process.md](./process.md) for spec creation, workflow processes, and project management guidelines.
 
 ### Branch Naming
 ```bash
@@ -145,16 +145,16 @@ parameters for bookmarkable filtered views.
 Closes GRID-123
 ```
 
-### Task-First Development Rule
+### Spec-First Development Rule
 ```bash
-# ❗ MANDATORY: No work without a task
-# - All development must start with a documented task in docs/specs/GRID-XXX.md
+# ❗ MANDATORY: No work without a spec
+# - All development must start with a documented spec in docs/specs/GRID-XXX.md
 # - Never start coding based on verbal requests or informal discussions
-# - Create task file in docs/specs/GRID-XXX.md BEFORE starting any work
-# - Task must include: description, acceptance criteria, definition of done
+# - Create spec file in docs/specs/GRID-XXX.md BEFORE starting any work
+# - Spec must include: description, acceptance criteria, definition of done
 
-# ✅ Create task first in docs/specs/GRID-XXX.md
-# Add new task following the template:
+# ✅ Create spec first in docs/specs/GRID-XXX.md
+# Add new spec following the template:
 ### GRID-XXX: Add user project dashboard
 **Status**: 🆕 New  
 **Priority**: High  
@@ -177,7 +177,7 @@ Users need a dashboard to view their project metrics and recent activity.
 - [ ] Works on mobile and desktop
 - [ ] Data loading handled gracefully
 
-# Task gets assigned GRID-XXX, NOW you can start development
+# Spec gets assigned GRID-XXX, NOW you can start development
 ```
 
 ### Development Workflow with GitHub CLI
@@ -186,11 +186,11 @@ Users need a dashboard to view their project metrics and recent activity.
 npm install -g gh
 gh auth login
 
-# 0. VERIFY TASK EXISTS - Check task in docs/specs/GRID-XXX.md
-# Review GRID-XXX task requirements before starting
-# Ensure GitHub issue was created and note the issue number (e.g., #45)
+# 0. VERIFY SPEC EXISTS - Check spec in docs/specs/GRID-XXX.md
+# Review GRID-XXX spec requirements before starting
+# Ensure issue was created and note the issue number (e.g., #45)
 
-# 1. Create feature branch from main (using task ID)
+# 1. Create feature branch from main (using spec ID)
 gh repo sync  # Sync with upstream
 git checkout main
 git pull origin main
@@ -342,15 +342,15 @@ git push  # Push after each commit or group of commits
 ```
 
 ### Development Process Steps
-1. **Task creation required** - Create GitHub issue/Jira ticket with clear requirements
-2. **Developer reviews task** - Understand acceptance criteria before starting
+1. **Spec creation required** - Create issue with clear requirements
+2. **Developer reviews spec** - Understand acceptance criteria before starting
 3. **Developer works on feature** with frequent commits to feature branch
 4. **Developer creates PR** when feature is ready for review via `gh pr create`
 5. **Reviewer adds feedback** via `gh pr review --comment` or `--request-changes`
 6. **Developer addresses feedback** with additional commits and pushes updates
 7. **Final reviewer approves** via `gh pr review --approve`
 8. **Final reviewer merges** via `gh pr merge --squash --delete-branch` (combines all commits)
-9. **Task closed** - Link PR to task and close ticket
+9. **Spec closed** - Link PR to spec and close issue
 
 ### Technical Definition of Done
 Code is ready when:
@@ -359,7 +359,7 @@ Code is ready when:
 - [ ] Code follows established patterns and conventions
 - [ ] PR is reviewed, approved, and merged
 - [ ] Branch is deleted after merge
-- [ ] Task status updated in individual task file and docs/specs/status.md
+- [ ] Spec status updated in individual spec file and docs/specs/status.md
 
 ## Tools & Setup
 

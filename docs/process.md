@@ -37,17 +37,17 @@ Implement a real-time dashboard system providing project metrics and activity fe
 
 ### What NOT to Do
 ```bash
-# ❌ NEVER start work without a task
+# ❌ NEVER start work without a spec
 # Manager: "Can you add a quick button to the dashboard?"
 # Developer: "Sure!" *starts coding immediately*
 
 # ✅ CORRECT approach
 # Manager: "Can you add a quick button to the dashboard?"
-# Developer: "I'll create a task first to document the requirements"
-# *Creates task in docs/specs/GRID-XXX.md, gets approval, then starts development*
+# Developer: "I'll create a spec first to document the requirements"
+# *Creates spec in docs/specs/GRID-XXX.md, gets approval, then starts development*
 ```
 
-### Task-Driven Development Benefits
+### Spec-Driven Development Benefits
 - Clear requirements prevent scope creep
 - Documented decisions in docs/specs/ directory
 - Proper estimation and planning
@@ -57,9 +57,9 @@ Implement a real-time dashboard system providing project metrics and activity fe
 ## Development Process Integration
 
 ### Development Process Steps
-1. **Task creation required** - Create task file docs/specs/GRID-XXX.md with clear requirements
+1. **Spec creation required** - Create spec file docs/specs/GRID-XXX.md with clear requirements
 2. **GitHub issue creation** - Create corresponding GitHub issue for public tracking and automation
-3. **Developer reviews task** - Understand acceptance criteria before starting
+3. **Developer reviews spec** - Understand acceptance criteria before starting
 4. **Developer works on feature** with frequent commits to feature branch (status: 🔄 In Progress)
 5. **Developer creates PR** when definition of done is achieved (status: 👀 Review)
 6. **Architect reviews PR** - Technical review, code quality, requirements verification
@@ -72,23 +72,23 @@ Implement a real-time dashboard system providing project metrics and activity fe
 - **Commit messages**: Include both IDs (`feat(auth): add OAuth (GRID-XXX, #45)`)
 - **PR linking**: Reference both systems (`Closes GRID-XXX` and `Closes #45`)
 - **Dual tracking**: GRID-XXX.md files for detailed specs, GitHub issues for public tracking
-- **Task status updates**: 
+- **Spec status updates**: 
   - 🔄 In Progress: During development (update both systems)
   - 👀 Review: When PR created and ready for architect review
   - ✅ Completed: GitHub issue auto-closes, manually update GRID-XXX.md status
-- **Task closure**: GitHub issues close automatically; update GRID-XXX.md status and docs/specs/status.md manually
+- **Spec closure**: Issues close automatically; update GRID-XXX.md status and docs/specs/status.md manually
 
 ## GitHub Issues Integration
 
 ### Dual-Track System
-The project uses a **dual-track system** combining detailed task documentation with GitHub's automation benefits:
+The project uses a **dual-track system** combining detailed spec documentation with GitHub's automation benefits:
 
-1. **GRID-XXX.md files** - Detailed task specifications, acceptance criteria, and progress notes
-2. **GitHub issues** - Public tracking, automation, and integration with GitHub workflows
+1. **GRID-XXX.md files** - Detailed technical specifications, acceptance criteria, and progress notes
+2. **Issues** - Public tracking, automation, and integration with GitHub workflows
 
-### Creating Issues from Tasks
+### Creating Issues from Specs
 ```bash
-# After creating GRID-XXX.md file, create corresponding GitHub issue
+# After creating GRID-XXX.md file, create corresponding issue
 gh issue create --title "GRID-123: Add user authentication system" \
   --body "Detailed specifications: [GRID-123](docs/specs/GRID-123.md)
 
@@ -97,7 +97,7 @@ Summary of key requirements:
 - Session management with sliding expiration  
 - User profile creation and management
 
-See full acceptance criteria in the task file."
+See full acceptance criteria in the spec file."
 
 # Issue gets assigned #45, now reference both: GRID-123 and #45
 ```
@@ -136,36 +136,36 @@ Closes #45"
 - **Public visibility** - Stakeholders can track progress in GitHub issues
 - **Automation** - Issues auto-close when PRs merge
 - **Integration** - Works with GitHub project boards, mentions, notifications
-- **Traceability** - Full links between tasks, issues, PRs, and code changes
+- **Traceability** - Full links between specs, issues, PRs, and code changes
 - **LLM-friendly** - Both systems optimized for AI assistant workflows
 
-## Task Management Process
+## Spec Management Process
 
-### Task Status Legend
-- 🆕 **New** - Task created, not yet assigned
+### Spec Status Legend
+- 🆕 **New** - Spec created, not yet assigned
 - 🔄 **In Progress** - Currently being worked on
 - 👀 **Review** - Definition of done achieved, PR created, awaiting architect review
 - ✅ **Completed** - PR reviewed, approved, and merged by architect
-- ❌ **Cancelled** - Task cancelled or no longer needed
+- ❌ **Cancelled** - Spec cancelled or no longer needed
 - 🔴 **Blocked** - Cannot proceed due to dependencies
 
-### Task Completion Workflow
-**Important**: Tasks are only marked ✅ Completed after the full review cycle:
+### Spec Completion Workflow
+**Important**: Specs are only marked ✅ Completed after the full review cycle:
 
 1. **Developer completes work** - All acceptance criteria and definition of done satisfied
-2. **Move to 👀 Review** - Create PR and update task status 
+2. **Move to 👀 Review** - Create PR and update spec status 
 3. **Architect reviews PR** - Technical review, code quality, requirements verification
 4. **PR approved and merged** - Architect merges after approval
-5. **Task marked ✅ Completed** - Update status and link merged PR
+5. **Spec marked ✅ Completed** - Update status and link merged PR
 
-**Never mark a task complete until the PR is merged.**
+**Never mark a spec complete until the PR is merged.**
 
-### Example Workflow with GitHub Issues
-Here's the enhanced process with GitHub issues integration:
+### Example Workflow with Issues
+Here's the enhanced process with issues integration:
 
 ```bash
-# 0. Create GRID-XXX.md task file (as before)
-# 1. Create corresponding GitHub issue
+# 0. Create GRID-XXX.md spec file (as before)
+# 1. Create corresponding issue
 gh issue create --title "GRID-004: Add user dashboard metrics" \
   --body "Full specifications: [GRID-004](docs/specs/GRID-004.md)
 
@@ -175,7 +175,7 @@ Key requirements:
 - Quick actions menu
 - Responsive design
 
-See task file for complete acceptance criteria."
+See spec file for complete acceptance criteria."
 
 # Issue created as #12
 
@@ -201,30 +201,30 @@ gh pr create --title "feat(dashboard): Add user dashboard metrics" \
 Closes GRID-004
 Closes #12"
 
-# 5. Update task status files
+# 5. Update spec status files
 ```
 
-**Task file updates when moving to Review:**
+**Spec file updates when moving to Review:**
 - Change status from 🔄 In Progress to 👀 Review
 - Update Definition of Done: PR created (✅) but not yet merged (⏳)
 - Add progress note with PR link
-- Move task to Active/Review section in status.md
-- Update task statistics
+- Move spec to Active/Review section in status.md
+- Update spec statistics
 
-### Creating New Tasks
+### Creating New Specs
 1. **Use sequential GRID-XXX numbering** (GRID-001, GRID-002, etc.)
 2. **Create GRID-XXX.md file first** with all required sections
-3. **Create GitHub issue** linking to the task file for public tracking
-4. **Update task file** with GitHub issue number for cross-reference
+3. **Create issue** linking to the spec file for public tracking
+4. **Update spec file** with issue number for cross-reference
 5. **Set clear priorities**: High, Medium, Low
 6. **Estimate complexity** if helpful (Small, Medium, Large)
-7. **Identify dependencies** with other tasks
+7. **Identify dependencies** with other specs
 
-### Task Status Updates
+### Spec Status Updates
 - Update status emoji and date when changing status
-- Move completed tasks to "Completed Tasks" section in docs/specs/status.md
+- Move completed specs to "Completed Specifications" section in docs/specs/status.md
 - Add completion date and any relevant notes
-- Keep active tasks at top for visibility
+- Keep active specs at top for visibility
 
 ### Technical Specification Template
 ```markdown
@@ -283,39 +283,39 @@ High-level architecture and approach decisions. What are we building and why?
 ## Project Planning
 
 ### Sprint/Milestone Planning
-- Group related tasks into logical milestones
-- Prioritize tasks based on user value and dependencies
+- Group related specs into logical milestones
+- Prioritize specs based on user value and dependencies
 - Consider team capacity and skill requirements
-- Plan for testing and documentation tasks
+- Plan for testing and documentation work
 
 ### Estimation Guidelines
 - **Small**: 1-2 hours, simple changes, clear requirements
 - **Medium**: 0.5-1 day, moderate complexity, may need research
 - **Large**: 1-3 days, complex features, multiple components affected
-- **Extra Large**: Break down into smaller tasks
+- **Extra Large**: Break down into smaller specs
 
 ### Dependency Management
-- Identify blocking tasks early
-- Plan dependent tasks in logical order
+- Identify blocking specs early
+- Plan dependent specs in logical order
 - Communicate blockers immediately
 - Consider parallel work opportunities
 
 ## Communication Guidelines
 
-### Task Updates
-- Update task status regularly (at least daily)
+### Spec Updates
+- Update spec status regularly (at least daily)
 - Add notes for significant progress or blockers
 - Tag relevant team members for input needed
 - Link related PRs and commits
 
 ### Meetings and Reviews
 - Use docs/specs/status.md as agenda for standups
-- Review completed tasks in retrospectives
-- Plan upcoming tasks in planning sessions
-- Reference task IDs in all project discussions
+- Review completed specs in retrospectives
+- Plan upcoming specs in planning sessions
+- Reference spec IDs in all project discussions
 
 ### Documentation Requirements
-- Keep individual task files and docs/specs/status.md updated with current status
-- Link all code changes back to tasks
-- Document decisions and context in task notes
-- Maintain clean task history for future reference
+- Keep individual spec files and docs/specs/status.md updated with current status
+- Link all code changes back to specs
+- Document decisions and context in spec notes
+- Maintain clean spec history for future reference

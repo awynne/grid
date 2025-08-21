@@ -47,8 +47,8 @@ export function UserService() {
 #### Lists and Checkboxes
 ```markdown
 # ✅ Use checkboxes for actionable items
-- [ ] Task to be completed
-- [x] Completed task
+- [ ] Work item to be completed
+- [x] Completed work item
 
 # ✅ Use bullets for reference lists
 - Reference item
@@ -68,7 +68,7 @@ export function UserService() {
 
 ### Cross-References
 - Always use relative links: `[process.md](./process.md)`
-- Include anchor links for specific sections: `[task template](./process.md#task-template)`
+- Include anchor links for specific sections: `[spec template](./process.md#spec-template)`
 - Update all references when moving or renaming content
 - Test links when making changes
 
@@ -147,7 +147,7 @@ Weekly summaries provide strategic context and GitHub Issues aggregation:
 
 #### process.md
 - Workflow processes change
-- Task management procedures evolve
+- Spec management procedures evolve
 - New project management tools adopted
 - Team roles or responsibilities change
 
@@ -158,7 +158,7 @@ Weekly summaries provide strategic context and GitHub Issues aggregation:
 - Coding patterns evolve
 
 #### specs/ directory
-- Continuously as tasks are created, updated, completed
+- Continuously as specs are created, updated, completed
 - Project milestones change
 - Dependencies are resolved or added
 
@@ -187,7 +187,7 @@ Weekly summaries provide strategic context and GitHub Issues aggregation:
 3. Ensure cross-references remain accurate
 
 #### For Major Updates
-1. **Create task** in [tasks/status.md](./tasks/status.md) for significant documentation changes
+1. **Create spec** in [specs/status.md](./specs/status.md) for significant documentation changes
 2. **Follow Git workflow** from [coding.md](./coding.md)
 3. **Review for accuracy** - Ensure technical accuracy and completeness
 4. **Review for clarity** - Test with someone unfamiliar with the content

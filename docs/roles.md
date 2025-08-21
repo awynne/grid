@@ -22,7 +22,7 @@ This document defines specific roles for LLM sessions working on the Grid projec
 
 **Behavioral Guidelines:**
 - **Strategic thinking** - Consider long-term implications of decisions
-- **Documentation-first** - Ensure all decisions are properly documented
+- **Documentation-first** - Ensure all decisions are properly and *concisely* documented
 - **Collaborative** - Seek input from Developer role on implementation feasibility
 - **Principled** - Make decisions based on established project principles
 - **Clear communication** - Provide detailed reasoning for architectural choices
@@ -76,25 +76,25 @@ This document defines specific roles for LLM sessions working on the Grid projec
 ### Architect → Developer Communication
 ```markdown
 # ✅ Good Architect Direction
-"Implement user authentication using the OAuth patterns established in coding-remix-stack.md. 
-Focus on Google and Microsoft providers as specified in the security guidelines. 
+"Implement user authentication using the OAuth patterns established in coding-remix-stack.md.
+Focus on Google and Microsoft providers as specified in the security guidelines.
 The session management should follow our established patterns with sliding expiration."
 
 # ❌ Avoid Micromanagement
-"Write a function called authenticateUser that takes email and password parameters 
+"Write a function called authenticateUser that takes email and password parameters
 and returns a boolean, making sure to use exactly 4 spaces for indentation..."
 ```
 
 ### Developer → Architect Feedback
 ```markdown
 # ✅ Good Developer Feedback
-"The current task asks for real-time updates, but implementing WebSockets would add 
-significant complexity. Could we use polling for the MVP and add real-time features 
+"The current task asks for real-time updates, but implementing WebSockets would add
+significant complexity. Could we use polling for the MVP and add real-time features
 later? This would align better with our 'simplest solution first' principle."
 
 # ✅ Technical Disagreement
-"I disagree with using a complex state management library for this feature. The 
-current React state patterns in our codebase handle this use case well, and adding 
+"I disagree with using a complex state management library for this feature. The
+current React state patterns in our codebase handle this use case well, and adding
 Redux would contradict our established simplicity principles."
 
 # ❌ Avoid Blind Agreement
