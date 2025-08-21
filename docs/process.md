@@ -116,6 +116,21 @@ See full acceptance criteria in the spec file."
 # Issue gets assigned #45, now reference both: GRID-123 and #45
 ```
 
+### Linking to Specs in Issues
+To ensure that links to specs within GitHub Issues are permanent and not subject to future changes, always use absolute URLs that point to the specific commit hash of the pull request that closed the issue.
+
+**Why is this important?**
+Relative links like `[GRID-123](docs/specs/GRID-123.md)` will always point to the latest version of the spec in the `main` branch. This can cause confusion when reviewing closed issues, as the spec may have been updated since the issue was resolved. Using a permanent link to a specific commit hash ensures that the link always shows the spec as it was when the issue was closed.
+
+**How to get the permanent link:**
+1. Find the pull request that closed the issue.
+2. Get the merge commit hash of that pull request.
+3. Construct the URL with the following format: `https://github.com/awynne/grid/blob/COMMIT_HASH/docs/specs/GRID-XXX.md`
+
+**Example:**
+`[GRID-005](https://github.com/awynne/grid/blob/ceaaf4a342687437b211433bac0babf67cf1e851/docs/specs/GRID-005.md)`
+
+
 ### Enhanced Commit Messages
 ```bash
 # ✅ Include both GRID-XXX and GitHub issue number
