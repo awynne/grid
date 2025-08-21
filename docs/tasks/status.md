@@ -10,7 +10,7 @@
 | Task ID | Title | Status | Priority | Assignee | Created |
 |---------|-------|--------|----------|----------|---------|
 | [GRID-002](./GRID-002.md) | Create Development Activity Log | 👀 Review | Medium | TBD | 2025-08-20 |
-| [GRID-003](./GRID-003.md) | Separate Coding Standards into Language-Agnostic and Technology-Specific Files | 🔄 In Progress | Medium | TBD | 2025-08-21 |
+| [GRID-003](./GRID-003.md) | Separate Coding Standards into Language-Agnostic and Technology-Specific Files | 👀 Review | Medium | TBD | 2025-08-21 |
 
 ## Completed Tasks
 
