@@ -134,7 +134,7 @@
 ## Accessibility Design
 
 ### WCAG AA Compliance
-- *Reference accessibility standards from coding.md*
+- *Reference accessibility standards from [coding.md](./coding.md#accessibility-standards)*
 
 ### Focus Management
 - *To be defined*
@@ -185,7 +185,7 @@
 - *To be defined*
 
 ### CSS Variables
-- *Reference existing variables from coding.md*
+- *Reference existing variables from [coding-remix-stack.md](./coding-remix-stack.md)*
 
 ### Theme Configuration
 - *To be defined*
@@ -208,6 +208,7 @@
 - *To be defined*
 
 ## Cross-References
-- [Coding Standards](./coding.md) - Technical implementation of design patterns
-- [Accessibility Standards](./coding.md#accessibility-standards) - Technical accessibility requirements
-- [CSS/Styling Conventions](./coding.md#cssstyling-conventions) - shadcn/ui implementation details
+- [Universal Coding Standards](./coding.md) - Language-agnostic development principles
+- [Remix Stack Technical Standards](./coding-remix-stack.md) - Technology-specific implementation details
+- [Accessibility Standards](./coding.md#accessibility-standards) - WCAG accessibility requirements
+- [CSS/Styling Conventions](./coding-remix-stack.md#cssstyling-conventions) - shadcn/ui and Tailwind implementation

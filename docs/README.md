@@ -15,17 +15,27 @@ This directory contains all project documentation for the Grid project managemen
 **Use this when:** Creating tasks, understanding workflow, or managing project processes.
 
 ### 💻 [coding.md](./coding.md)
-**Technical Standards & Implementation**
+**Universal Coding Standards**
+- Language-agnostic coding principles and philosophy
+- Security guidelines (general concepts)
+- Accessibility standards (WCAG AA principles)
+- Git workflow and code review process
+- Testing philosophy and strategies
+- Performance guidelines
+
+**Use this when:** Understanding universal development principles and establishing project workflow.
+
+### ⚡ [coding-remix-stack.md](./coding-remix-stack.md)
+**Technology-Specific Implementation**
 - TypeScript, React, and Remix coding conventions
-- Security guidelines (OAuth, sessions, validation)
-- Accessibility standards (WCAG AA)
-- CSS/Styling conventions with shadcn/ui
-- File naming and project structure
+- Database patterns with Prisma
+- CSS/Styling conventions with shadcn/ui and Tailwind
+- Authentication with Remix sessions
 - Environment configuration and Railway deployment
 - Progressive Web App implementation
-- Git workflow and code review process
+- Tool configurations and setup
 
-**Use this when:** Writing code, setting up development environment, or reviewing technical standards.
+**Use this when:** Writing code, setting up development environment, or implementing features.
 
 ### 📝 [tasks/](./tasks/)
 **Project Task Management**
@@ -88,19 +98,22 @@ This directory contains all project documentation for the Grid project managemen
 **Getting Started:**
 1. Read [prd.md](./prd.md) for product understanding *(to be created)*
 2. Review [process.md](./process.md) for workflow guidelines
-3. Study [coding.md](./coding.md) for technical standards
-4. Check [tasks/status.md](./tasks/status.md) for current work
+3. Study [coding.md](./coding.md) for universal principles
+4. Review [coding-remix-stack.md](./coding-remix-stack.md) for implementation details
+5. Check [tasks/status.md](./tasks/status.md) for current work
 
 **During Development:**
 - Create tasks following [process.md](./process.md) guidelines
-- Follow coding standards in [coding.md](./coding.md)
+- Follow universal standards in [coding.md](./coding.md)
+- Apply technology-specific patterns from [coding-remix-stack.md](./coding-remix-stack.md)
 - Reference [design.md](./design.md) for UI consistency *(to be created)*
 - Update progress in [tasks/status.md](./tasks/status.md) and individual task files
 - Log daily activities in [activity/daily.md](./activity/daily.md)
 
 **For Reviews:**
 - Verify task completion in [tasks/status.md](./tasks/status.md)
-- Check code against [coding.md](./coding.md) standards
+- Check code against universal standards in [coding.md](./coding.md)
+- Verify technology-specific patterns in [coding-remix-stack.md](./coding-remix-stack.md)
 - Ensure design consistency with [design.md](./design.md) *(to be created)*
 
 ## Contributing to Documentation
