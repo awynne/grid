@@ -56,16 +56,30 @@ Implement a real-time dashboard system providing project metrics and activity fe
 
 ## Development Process Integration
 
-### Development Process Steps
+### Solo Development Process (Current Reality)
+**Context**: Single developer (awynne) with GitHub self-approval restriction
+
 1. **Spec creation required** - Create spec file docs/specs/GRID-XXX.md with clear requirements
-2. **GitHub issue creation** - Create corresponding GitHub issue for public tracking and automation
-3. **Developer reviews spec** - Understand acceptance criteria before starting
-4. **Developer works on feature** with frequent commits to feature branch (status: 🔄 In Progress)
-5. **Developer creates PR** when definition of done is achieved (status: 👀 Review)
-6. **Architect reviews PR** - Technical review, code quality, requirements verification
-7. **Developer addresses feedback** with additional commits if needed
-8. **Architect approves and merges** PR with squash merge
-9. **Automatic closure** - GitHub issue automatically closes; update GRID-XXX.md status manually
+2. **Issue creation** - Create corresponding GitHub issue for public tracking and automation
+3. **Mandatory feature branch** - Always create `feature/GRID-XXX-description` (NEVER commit directly to main)
+4. **Development with frequent commits** - Save progress regularly to feature branch (status: 🔄 In Progress)
+5. **PR creation** - Create PR for audit trail and GitHub automation (status: 👀 Review)
+6. **Self-review validation** - Use quality checklist to validate work meets standards
+7. **Self-merge** - Squash merge after validation (GitHub prevents self-approval)
+8. **Status updates** - Issue auto-closes; manually update GRID-XXX.md status and docs/specs/status.md
+
+### Team Development Process (Future State)
+**Context**: Multiple developers with external review capability
+
+1. **Spec creation required** - Create spec file docs/specs/GRID-XXX.md with clear requirements
+2. **Issue creation** - Create corresponding GitHub issue for public tracking and automation
+3. **Mandatory feature branch** - Always create `feature/GRID-XXX-description` (NEVER commit directly to main)
+4. **Development with frequent commits** - Save progress regularly to feature branch (status: 🔄 In Progress)
+5. **PR creation** - Create PR when definition of done achieved (status: 👀 Review)
+6. **External review** - Architect/senior developer reviews PR for technical quality and requirements
+7. **Feedback cycle** - Developer addresses review comments with additional commits
+8. **External approval and merge** - Reviewer approves and merges PR with squash merge
+9. **Status updates** - Issue auto-closes; manually update GRID-XXX.md status and docs/specs/status.md
 
 ### Integration with Git Workflow & GitHub Issues
 - **Branch naming**: Use task ID in branch name (`feature/GRID-XXX-description`)
@@ -139,33 +153,76 @@ Closes #45"
 - **Traceability** - Full links between specs, issues, PRs, and code changes
 - **LLM-friendly** - Both systems optimized for AI assistant workflows
 
+## Solo Development Quality Gates
+
+### Self-Review Validation Checklist
+Since no external reviewer is available in solo development, use this checklist before self-merge:
+
+**Spec Compliance:**
+- [ ] All spec requirements satisfied
+- [ ] Definition of done criteria met
+- [ ] Implementation matches technical overview
+
+**Code Quality:**
+- [ ] No breaking changes introduced
+- [ ] Code follows established patterns and conventions
+- [ ] Error handling appropriate for scope
+- [ ] Performance considerations addressed
+
+**Documentation & Integration:**
+- [ ] Documentation updated as needed
+- [ ] Cross-references and links functional
+- [ ] Commit messages follow conventional format
+- [ ] PR description comprehensive and clear
+
+**Testing & Validation:**
+- [ ] Tests pass (when applicable)
+- [ ] Manual validation completed
+- [ ] No obvious regressions introduced
+- [ ] Feature works as specified
+
+**Repository Standards:**
+- [ ] Branch naming follows convention
+- [ ] No direct commits to main
+- [ ] GitHub issue properly linked
+- [ ] Status updates prepared for post-merge
+
 ## Spec Management Process
 
 ### Spec Status Legend
 - 🆕 **New** - Spec created, not yet assigned
 - 🔄 **In Progress** - Currently being worked on
-- 👀 **Review** - Definition of done achieved, PR created, awaiting architect review
-- ✅ **Completed** - PR reviewed, approved, and merged by architect
+- 👀 **Review** - Definition of done achieved, PR created, awaiting review
+- ✅ **Completed** - PR merged to main branch
 - ❌ **Cancelled** - Spec cancelled or no longer needed
 - 🔴 **Blocked** - Cannot proceed due to dependencies
 
-### Spec Completion Workflow
-**Important**: Specs are only marked ✅ Completed after the full review cycle:
+### Solo Development Completion Workflow
+**Current Reality**: Specs are marked ✅ Completed after self-validation and merge:
 
 1. **Developer completes work** - All acceptance criteria and definition of done satisfied
-2. **Move to 👀 Review** - Create PR and update spec status 
-3. **Architect reviews PR** - Technical review, code quality, requirements verification
-4. **PR approved and merged** - Architect merges after approval
+2. **Move to 👀 Review** - Create PR and update spec status
+3. **Self-validation** - Complete quality checklist and verify all requirements met
+4. **Self-merge** - Squash merge after validation (GitHub prevents self-approval)
+5. **Spec marked ✅ Completed** - Update status and link merged PR
+
+### Team Development Completion Workflow
+**Future State**: Specs are marked ✅ Completed after external review cycle:
+
+1. **Developer completes work** - All acceptance criteria and definition of done satisfied
+2. **Move to 👀 Review** - Create PR and update spec status
+3. **External review** - Architect/senior developer reviews PR for technical quality
+4. **External approval and merge** - Reviewer merges after approval
 5. **Spec marked ✅ Completed** - Update status and link merged PR
 
 **Never mark a spec complete until the PR is merged.**
 
-### Example Workflow with Issues
-Here's the enhanced process with issues integration:
+### Solo Development Example Workflow
+Here's the complete solo development process with mandatory feature branches:
 
 ```bash
-# 0. Create GRID-XXX.md spec file (as before)
-# 1. Create corresponding issue
+# 0. Create GRID-XXX.md spec file with all requirements
+# 1. Create corresponding issue for tracking
 gh issue create --title "GRID-004: Add user dashboard metrics" \
   --body "Full specifications: [GRID-004](docs/specs/GRID-004.md)
 
@@ -179,16 +236,19 @@ See spec file for complete acceptance criteria."
 
 # Issue created as #12
 
-# 2. Development work with enhanced commit messages
+# 2. MANDATORY: Create feature branch (NEVER commit directly to main)
+git checkout -b feature/GRID-004-user-dashboard
+
+# 3. Development work with frequent commits
 git add .
 git commit -m "feat(dashboard): add project count widget (GRID-004, #12)"
-git push origin feature/GRID-004-user-dashboard
+git push -u origin feature/GRID-004-user-dashboard
 
 git add .
 git commit -m "feat(dashboard): add activity feed component (GRID-004, #12)"
 git push
 
-# 3. Create PR linking both systems
+# 4. Create PR for audit trail and GitHub automation
 gh pr create --title "feat(dashboard): Add user dashboard metrics" \
   --body "Implements GRID-004: User dashboard with project metrics
 
@@ -198,10 +258,21 @@ gh pr create --title "feat(dashboard): Add user dashboard metrics" \
 - Add quick actions menu (New Project, Settings)
 - Responsive design for mobile and desktop
 
+## Solo Development Validation
+- [x] All spec requirements satisfied
+- [x] No breaking changes introduced
+- [x] Documentation updated
+- [x] Manual testing completed
+
 Closes GRID-004
 Closes #12"
 
-# 5. Update spec status files
+# 5. Self-merge after validation (GitHub prevents self-approval)
+gh pr merge --squash --delete-branch
+
+# 6. Update spec status manually
+# - Update GRID-004.md status to ✅ Completed
+# - Update docs/specs/status.md with completion
 ```
 
 **Spec file updates when moving to Review:**
