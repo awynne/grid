@@ -10,6 +10,7 @@
 | Task ID | Title | Status | Priority | Assignee | Created |
 |---------|-------|--------|----------|----------|---------|
 | [GRID-002](./GRID-002.md) | Create Development Activity Log | 👀 Review | Medium | TBD | 2025-08-20 |
+| [GRID-003](./GRID-003.md) | Separate Coding Standards into Language-Agnostic and Technology-Specific Files | 🔄 In Progress | Medium | TBD | 2025-08-21 |
 
 ## Completed Tasks
 
@@ -21,8 +22,8 @@
 *No cancelled tasks yet*
 
 ## Task Statistics
-- **Total Tasks**: 2
-- **Active**: 1
+- **Total Tasks**: 3
+- **Active**: 2
 - **In Review**: 1
 - **Completed**: 1
 - **Cancelled**: 0

@@ -108,7 +108,7 @@
 ## Technical Requirements
 
 ### Platform Requirements
-- *Reference technical stack from coding.md*
+- *Reference technical stack from [coding-remix-stack.md](./coding-remix-stack.md)*
 
 ### Browser Support
 - *To be defined*
@@ -139,13 +139,13 @@
 ## Performance Requirements
 
 ### Page Load Times
-- *Reference performance guidelines from coding.md*
+- *Reference performance guidelines from [coding.md](./coding.md#performance-guidelines)*
 
 ### Core Web Vitals
-- *Reference targets from coding.md*
+- *Reference targets from [coding-remix-stack.md](./coding-remix-stack.md)*
 
 ### Offline Functionality
-- *Reference PWA guidelines from coding.md*
+- *Reference PWA guidelines from [coding-remix-stack.md](./coding-remix-stack.md)*
 
 ### Scalability Requirements
 - *To be defined*
@@ -153,7 +153,7 @@
 ## Security Requirements
 
 ### Authentication Requirements
-- *Reference security guidelines from coding.md*
+- *Reference security guidelines from [coding.md](./coding.md#security-guidelines) and [coding-remix-stack.md](./coding-remix-stack.md)*
 
 ### Authorization Requirements
 - *To be defined*
@@ -167,7 +167,7 @@
 ## Accessibility Requirements
 
 ### WCAG Compliance
-- *Reference accessibility standards from coding.md*
+- *Reference accessibility standards from [coding.md](./coding.md#accessibility-standards)*
 
 ### Assistive Technology Support
 - *To be defined*
@@ -246,7 +246,8 @@
 - *To be defined*
 
 ## Cross-References
-- [Coding Standards](./coding.md) - Technical implementation guidelines
+- [Universal Coding Standards](./coding.md) - Language-agnostic development principles
+- [Remix Stack Technical Standards](./coding-remix-stack.md) - Technology-specific implementation guidelines
 - [Design System](./design.md) - Visual and UX specifications
 - [Process Guidelines](./process.md) - Development workflow and task management
 - [Task Status](./tasks/status.md) - Current development progress
