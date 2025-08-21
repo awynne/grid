@@ -158,7 +158,6 @@ Closes GRID-123
 ### GRID-XXX: Add user project dashboard
 **Status**: 🆕 New  
 **Priority**: High  
-**Assignee**: TBD  
 **Created**: 2025-01-20  
 
 #### Description

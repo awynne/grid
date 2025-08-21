@@ -66,7 +66,7 @@ Implement a real-time dashboard system providing project metrics and activity fe
 5. **PR creation** - Create PR for audit trail and GitHub automation (status: 👀 Review)
 6. **Self-review validation** - Use quality checklist to validate work meets standards
 7. **Self-merge** - Squash merge after validation (GitHub prevents self-approval)
-8. **Status updates** - Issue auto-closes; manually update GRID-XXX.md status and docs/specs/status.md
+8. **Status updates** - Issue auto-closes; manually update GRID-XXX.md status and docs/specs/status.md with completion date
 
 ### Team Development Process (Future State)
 **Context**: Multiple developers with external review capability
@@ -79,7 +79,7 @@ Implement a real-time dashboard system providing project metrics and activity fe
 6. **External review** - Architect/senior developer reviews PR for technical quality and requirements
 7. **Feedback cycle** - Developer addresses review comments with additional commits
 8. **External approval and merge** - Reviewer approves and merges PR with squash merge
-9. **Status updates** - Issue auto-closes; manually update GRID-XXX.md status and docs/specs/status.md
+9. **Status updates** - Issue auto-closes; manually update GRID-XXX.md status and docs/specs/status.md with completion date
 
 ### Integration with Git Workflow & GitHub Issues
 - **Branch naming**: Use task ID in branch name (`feature/GRID-XXX-description`)
@@ -90,7 +90,7 @@ Implement a real-time dashboard system providing project metrics and activity fe
   - 🔄 In Progress: During development (update both systems)
   - 👀 Review: When PR created and ready for architect review
   - ✅ Completed: GitHub issue auto-closes, manually update GRID-XXX.md status
-- **Spec closure**: Issues close automatically; update GRID-XXX.md status and docs/specs/status.md manually
+- **Spec closure**: Issues close automatically; update GRID-XXX.md status and docs/specs/status.md with completion date manually
 
 ## GitHub Issues Integration
 
@@ -272,7 +272,7 @@ gh pr merge --squash --delete-branch
 
 # 6. Update spec status manually
 # - Update GRID-004.md status to ✅ Completed
-# - Update docs/specs/status.md with completion
+# - Update docs/specs/status.md with completion date in Completed column
 ```
 
 **Spec file updates when moving to Review:**
@@ -294,7 +294,7 @@ gh pr merge --squash --delete-branch
 ### Spec Status Updates
 - Update status emoji and date when changing status
 - Move completed specs to "Completed Specifications" section in docs/specs/status.md
-- Add completion date and any relevant notes
+- Add completion date in the Completed column and any relevant notes
 - Keep active specs at top for visibility
 
 ### Technical Specification Template
