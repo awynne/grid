@@ -127,6 +127,17 @@
 
 **User Story:** As an analyst or educator, I want to surface the "duckiest" days and explain net-load dynamics so I can teach and communicate grid flexibility needs.
 
+**What Are "Duckiest Days"?**
+The "duck curve" is a famous graph showing daily electricity demand that resembles a duck's profile:
+- **Morning ramp-up** (duck's tail) - demand rises as people wake up
+- **Midday belly dip** (duck's belly) - demand drops as solar panels produce peak power  
+- **Evening ramp** (duck's neck) - steep demand spike as sun sets but people come home
+
+"Duckiest days" are when this pattern is most extreme, featuring:
+- **Deep valley**: Midday demand drops far below normal due to high solar generation and mild weather
+- **Steep evening ramp**: Rapid demand spike 3-9pm as solar drops off but residential/commercial loads surge
+- **Grid stress**: These days test grid flexibility and highlight renewable intermittency challenges
+
 **Problem:** It's hard to find and explain "duck curve" days quickly.
 
 **Outcome:** Ranked gallery and annotated detail that make the dynamics obvious.

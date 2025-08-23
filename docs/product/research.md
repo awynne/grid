@@ -121,6 +121,58 @@ We scored each idea on two axes and summed them:
 4. **Brand/Cohesion:** Name = "GridPulse" (confirmed)
 5. **Embeds:** Inline script vs iFrame; which hosts will we target for a quick demo?
 
+## Grid Phenomena Reference
+
+### Understanding the Duck Curve & "Duckiest Days"
+
+The **duck curve** is a famous graph showing daily electricity demand that looks like the profile of a duck:
+
+**Duck Anatomy:**
+- **Morning ramp-up** (duck's tail) - demand rises as people wake up, turn on lights, start industrial processes
+- **Midday belly dip** (duck's belly) - demand drops as solar panels produce peak power, often exceeding local consumption
+- **Evening ramp** (duck's neck) - steep demand spike as sun sets but people come home, turn on appliances, charge electric vehicles
+
+**"Duckiest Days" Defined:**
+The **duckiest days** are when this pattern is most extreme, typically featuring:
+
+**Deep Belly (Valley)**: Midday demand drops way below normal because:
+- Lots of solar generation (clear, sunny day)
+- Mild weather requiring less air conditioning or heating
+- Low industrial activity (weekends, holidays)
+- High behind-the-meter solar adoption in the region
+
+**Steep Neck (Evening Ramp)**: Demand spikes rapidly between 3-9pm because:
+- Solar generation drops off quickly as sun sets
+- People return home from work and school
+- Residential loads surge: lights, cooking, TV, appliances
+- Industrial activity resumes for evening shifts
+- Electric vehicle charging begins en masse
+
+**Why "Duckiest Days" Matter:**
+These extreme days create significant grid management challenges:
+
+- **Grid operators** must rapidly scale up dispatchable (non-solar) generation as the sun sets, sometimes requiring expensive peaker plants
+- **Energy storage** becomes crucial to smooth the transitions by storing excess midday solar and releasing it during evening ramps  
+- **Grid flexibility** is tested to its limits, requiring sophisticated forecasting and resource coordination
+- **Energy costs** often spike during evening ramps due to supply/demand imbalances
+- **Grid stability** can be threatened if ramp rates exceed generation dispatch capabilities
+
+**GridPulse F3 Connection:**
+F3: Duck Days finds and ranks these extreme days using a "duckiness score" (0-100) based on:
+- **50% evening ramp rate** - measures how steep the 3-9pm demand spike (MW/hour change)
+- **35% valley depth** - measures how deep the midday dip compared to daily peak (MW difference)  
+- **15% trough timing** - rewards earlier midday minimums which indicate stronger solar impact
+
+This scoring helps analysts and educators **visualize grid flexibility challenges** and understand exactly when the grid experiences the most stress from renewable intermittency. By surfacing the most extreme examples, F3 makes abstract grid concepts tangible and teachable.
+
+**Real-World Impact:**
+Understanding duck curve dynamics is essential for:
+- **Policy makers** designing renewable energy incentives and grid modernization
+- **Utilities** planning storage investments and demand response programs
+- **Educators** teaching about renewable integration challenges
+- **Energy consumers** understanding when electricity is cleanest and cheapest
+- **Grid researchers** studying intermittency patterns and solutions
+
 ## Cross-References
 
 - [Features & Epics](./features.md) - Detailed feature specifications derived from this research
