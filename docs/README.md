@@ -1,6 +1,6 @@
-# Grid Project Documentation
+# GridPulse Project Documentation
 
-This directory contains all project documentation for the Grid project management application. Each document serves a specific purpose in guiding development and maintaining project standards.
+This directory contains all project documentation for the GridPulse electric grid data visualization platform. Each document serves a specific purpose in guiding development and maintaining project standards.
 
 ## Documentation Overview
 
@@ -56,13 +56,13 @@ This directory contains all project documentation for the Grid project managemen
 
 **Use this when:** Designing UI components, creating consistent visual experiences, or maintaining brand standards.
 
-### 📖 [prd.md](./prd.md) *(To be created)*
-**Product Requirements Document**
-- Product vision and objectives
-- User personas and use cases
-- Feature specifications and user stories
-- Technical requirements and constraints
-- Success metrics and acceptance criteria
+### 📖 [product/](./product/)
+**Product Requirements & Research**
+- [prd.md](./product/prd.md) - Product requirements and specifications
+- [research.md](./product/research.md) - EIA-930 dataset research and analysis
+- [features.md](./product/features.md) - Feature definitions and user stories
+- [stack-fit.md](./product/stack-fit.md) - Architecture and technology analysis
+- [design.md](./product/design.md) - UI/UX design specifications
 
 **Use this when:** Understanding product goals, planning features, or making product decisions.
 
@@ -96,7 +96,7 @@ This directory contains all project documentation for the Grid project managemen
 ## Quick Navigation
 
 **Getting Started:**
-1. Read [prd.md](./prd.md) for product understanding *(to be created)*
+1. Read [product/prd.md](./product/prd.md) for product understanding
 2. Review [process.md](./process.md) for workflow guidelines
 3. Study [coding.md](./coding.md) for universal principles
 4. Review [coding-remix-stack.md](./coding-remix-stack.md) for implementation details
@@ -120,7 +120,7 @@ This directory contains all project documentation for the Grid project managemen
 
 See [documentation.md](./documentation.md) for comprehensive guidelines on:
 - Documentation standards and formatting
-- Content guidelines and writing style  
+- Content guidelines and writing style
 - Maintenance processes and review procedures
 - Templates and quality checklists
 

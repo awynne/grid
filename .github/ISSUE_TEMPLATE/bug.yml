@@ -1,0 +1,71 @@
+name: 🐛 Bug Report
+description: Report a bug in GridPulse
+title: "[Bug] "
+labels: ["type:bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report
+        Use this template to report bugs or issues with GridPulse functionality.
+        
+  - type: textarea
+    id: bug_description
+    attributes:
+      label: Bug Description
+      description: A clear description of what the bug is
+      placeholder: "Describe what went wrong..."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+      
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+      placeholder: "Describe the expected behavior..."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: "Describe what actually happened..."
+    validations:
+      required: true
+      
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - Critical (prevents core functionality)
+        - High (major feature broken)
+        - Medium (minor feature issue)
+        - Low (cosmetic or edge case)
+    validations:
+      required: true
+      
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, device, etc.
+      placeholder: "Chrome 120, Desktop, etc."
+    validations:
+      required: false

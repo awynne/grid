@@ -1,0 +1,64 @@
+name: 🎯 Feature Implementation
+description: Implement a specific feature or capability for GridPulse
+title: "[Feature] "
+labels: ["type:feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Implementation Request
+        Use this template for implementing new features or capabilities in GridPulse.
+        
+  - type: dropdown
+    id: epic
+    attributes:
+      label: Epic
+      description: Which feature epic does this belong to?
+      options:
+        - F0 - Shared Shell & Freshness
+        - F1 - Daily Pulse  
+        - F2 - What's Powering Me
+        - F3 - Duck Days
+        - F4 - What Changed
+        - Other (specify in description)
+    validations:
+      required: true
+      
+  - type: input
+    id: product_doc
+    attributes:
+      label: Product Documentation
+      description: Link to relevant feature documentation
+      placeholder: "https://github.com/awynne/grid/blob/main/docs/product/features.md#f1-daily-pulse"
+    validations:
+      required: false
+      
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to be implemented?
+      placeholder: "Describe the specific functionality to implement..."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will we know this is done?
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: true
+      
+  - type: textarea
+    id: technical_notes
+    attributes:
+      label: Technical Notes
+      description: Any technical considerations or constraints
+      placeholder: "Implementation notes, dependencies, etc."
+    validations:
+      required: false

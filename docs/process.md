@@ -47,6 +47,29 @@ Implement a real-time dashboard system providing project metrics and activity fe
 # *Creates spec in docs/specs/GRID-XXX.md, gets approval, then starts development*
 ```
 
+### Pushing Back on Unspecified Work
+
+When someone asks you to do work without a spec or GitHub issue, **push back confidently and politely**:
+
+**✅ Recommended Responses:**
+- *"I'd be happy to help with that. Let me create a GRID spec first to document the requirements and approach."*
+- *"This sounds important. Can we create a GitHub issue and spec so we can track it properly and ensure we build the right thing?"*
+- *"Before I start, I need to create a spec to clarify the requirements. This will help us avoid scope creep and ensure quality."*
+- *"Our process requires a spec for all development work. I can create GRID-XXX for this - it'll take 10 minutes and save us hours later."*
+
+**Why This Matters:**
+- **Prevents scope creep** - Clear requirements upfront
+- **Ensures quality** - Proper planning and acceptance criteria
+- **Maintains consistency** - All work follows same documentation standards
+- **Enables tracking** - Progress visibility and audit trail
+- **Reduces rework** - Requirements clarified before implementation
+
+**Even for "Quick" Tasks:**
+- 5-minute tasks often become 2-hour tasks without proper specification
+- "Simple" requests frequently have hidden complexity
+- Quick specs (even 1-2 paragraphs) prevent misunderstandings
+- Documentation time investment pays dividends in implementation speed
+
 ### Spec-Driven Development Benefits
 - Clear requirements prevent scope creep
 - Documented decisions in docs/specs/ directory
@@ -94,11 +117,47 @@ Implement a real-time dashboard system providing project metrics and activity fe
 
 ## GitHub Issues Integration
 
-### Dual-Track System
-The project uses a **dual-track system** combining detailed spec documentation with GitHub's automation benefits:
+### Triple-Track System
+The project uses a **triple-track system** combining product features, technical specifications, and GitHub automation:
 
-1. **GRID-XXX.md files** - Detailed technical specifications, acceptance criteria, and progress notes
-2. **Issues** - Public tracking, automation, and integration with GitHub workflows
+1. **Product Features** - Strategic feature definitions in `docs/product/features.md` (F0-F4)
+2. **GRID-XXX.md files** - Detailed technical specifications, acceptance criteria, and progress notes
+3. **GitHub Issues** - Implementation tracking, automation, and workflow integration
+
+### Feature-to-Issue Workflow
+Features (F0-F4) from product documentation map directly to implementation issues without intermediate story layers:
+
+- **Features** define user value and strategic direction
+- **Issues** track specific implementation tasks
+- **Specs** provide technical implementation details
+
+**Example Flow:**
+- F1: Daily Pulse (strategic feature) → Multiple GitHub issues for implementation → GRID specs for technical details
+
+### Creating Issues from Features
+
+Use the GitHub issue templates to create issues that link back to product features:
+
+```bash
+# For feature implementation
+gh issue create --template feature.yml --title "[Feature] Daily pulse data display" \
+  --label "epic:f1-daily-pulse,type:feature"
+
+# For technical debt  
+gh issue create --template tech-debt.yml --title "[Tech] Database partitioning for time-series data" \
+  --label "type:tech-debt,priority:high"
+
+# For bugs
+gh issue create --template bug.yml --title "[Bug] Chart rendering fails on mobile" \
+  --label "type:bug,severity:medium"
+```
+
+### Issue Template Integration
+The project includes three GitHub issue templates:
+
+- **feature.yml** - Links to product epics (F0-F4) with structured fields
+- **tech-debt.yml** - Categorizes technical work (infrastructure, performance, etc.)
+- **bug.yml** - Captures bug reports with severity levels
 
 ### Creating Issues from Specs
 ```bash
@@ -133,10 +192,13 @@ Relative links like `[GRID-123](docs/specs/GRID-123.md)` will always point to th
 
 ### Enhanced Commit Messages
 ```bash
-# ✅ Include both GRID-XXX and GitHub issue number
-git commit -m "feat(auth): add OAuth providers (GRID-123, #45)"
+# ✅ Include GRID-XXX, GitHub issue number, and epic context when applicable
+git commit -m "feat(daily-pulse): add real-time data display (GRID-123, #45)"
 git commit -m "fix(dashboard): resolve loading race condition (GRID-456, #78)"
 git commit -m "docs(api): update integration guide (GRID-202, #91)"
+
+# For epic-related work, include epic reference
+git commit -m "feat(f1-daily-pulse): implement chart components (GRID-124, #46)"
 ```
 
 ### Enhanced PR Creation
@@ -160,13 +222,41 @@ Closes GRID-123
 Closes #45"
 ```
 
-### Benefits of Dual System
+### GitHub Labels and Milestones
+
+The project uses structured labels for organization and filtering:
+
+**Epic Labels** (link to product features):
+- `epic:f0-shared-shell` - F0: Shared Shell & Freshness
+- `epic:f1-daily-pulse` - F1: Daily Pulse  
+- `epic:f2-powering-me` - F2: What's Powering Me
+- `epic:f3-duck-days` - F3: Duck Days
+- `epic:f4-what-changed` - F4: What Changed
+
+**Type Labels**:
+- `type:feature` - New feature or capability
+- `type:bug` - Bug or issue fix
+- `type:tech-debt` - Technical debt, refactoring, infrastructure
+- `type:docs` - Documentation updates
+- `type:spec` - GRID-XXX technical specification
+
+**Priority & Size Labels**:
+- Priority: `priority:critical/high/medium/low`
+- Size: `size:xs/s/m/l/xl` (for estimation)
+- Status: `status:blocked/in-review/ready`
+
+**Milestones**:
+- "MVP - Core Features" - F1 Daily Pulse and F2 What's Powering Me
+- "Phase 2 - Analytics" - F3 Duck Days and F4 What Changed
+
+### Benefits of Triple System
+- **Strategic alignment** - Features linked to business value and user needs
 - **Rich documentation** - Detailed specs remain in GRID-XXX.md files
 - **Public visibility** - Stakeholders can track progress in GitHub issues
-- **Automation** - Issues auto-close when PRs merge
+- **Automation** - Issues auto-close when PRs merge, labels enable filtering
 - **Integration** - Works with GitHub project boards, mentions, notifications
-- **Traceability** - Full links between specs, issues, PRs, and code changes
-- **LLM-friendly** - Both systems optimized for AI assistant workflows
+- **Traceability** - Full links between features, specs, issues, PRs, and code changes
+- **LLM-friendly** - All systems optimized for AI assistant workflows
 
 ## Solo Development Quality Gates
 
@@ -233,45 +323,56 @@ Since no external reviewer is available in solo development, use this checklist 
 **Never mark a spec complete until the PR is merged.**
 
 ### Solo Development Example Workflow
-Here's the complete solo development process with mandatory feature branches:
+Here's the complete solo development process with feature integration:
 
 ```bash
 # 0. Create GRID-XXX.md spec file with all requirements
-# 1. Create corresponding issue for tracking
-gh issue create --title "GRID-004: Add user dashboard metrics" \
-  --body "Full specifications: [GRID-004](docs/specs/GRID-004.md)
+# 1. Create corresponding issue using template
+gh issue create --template feature.yml \
+  --title "[Feature] Real-time grid frequency display" \
+  --body "Epic: F1 - Daily Pulse
 
-Key requirements:
-- Project count widget
-- Recent activity feed  
-- Quick actions menu
-- Responsive design
+Product Documentation: https://github.com/awynne/grid/blob/main/docs/product/features.md#f1-daily-pulse
 
-See spec file for complete acceptance criteria."
+Description: Implement real-time frequency chart showing current grid stability
+
+Acceptance Criteria:
+- [ ] Display current frequency (Hz) with 1-second updates
+- [ ] Show color coding (green=stable, yellow=caution, red=alert)  
+- [ ] Include 24-hour historical trend line
+- [ ] Responsive design for mobile/desktop
+
+Technical Notes: Uses EIA-930 real-time data stream" \
+  --label "epic:f1-daily-pulse,type:feature,size:l"
 
 # Issue created as #12
 
 # 2. MANDATORY: Create feature branch (NEVER commit directly to main)
-git checkout -b feature/GRID-004-user-dashboard
+git checkout -b feature/GRID-004-frequency-display
 
 # 3. Development work with frequent commits
 git add .
-git commit -m "feat(dashboard): add project count widget (GRID-004, #12)"
-git push -u origin feature/GRID-004-user-dashboard
+git commit -m "feat(f1-daily-pulse): add frequency chart component (GRID-004, #12)"
+git push -u origin feature/GRID-004-frequency-display
 
 git add .
-git commit -m "feat(dashboard): add activity feed component (GRID-004, #12)"
+git commit -m "feat(f1-daily-pulse): implement real-time data updates (GRID-004, #12)"
 git push
 
 # 4. Create PR for audit trail and GitHub automation
-gh pr create --title "feat(dashboard): Add user dashboard metrics" \
-  --body "Implements GRID-004: User dashboard with project metrics
+gh pr create --title "feat(f1-daily-pulse): Add real-time grid frequency display" \
+  --body "Implements GRID-004: Real-time frequency chart for F1 Daily Pulse
 
 ## Changes
-- Add project count widget with real-time updates
-- Add recent activity feed (last 10 items)
-- Add quick actions menu (New Project, Settings)
+- Add frequency chart component with 1-second updates
+- Implement color coding for stability indicators
+- Add 24-hour historical trend line
 - Responsive design for mobile and desktop
+
+## Epic Integration
+- Part of F1: Daily Pulse feature epic
+- Uses EIA-930 real-time data stream
+- Contributes to grid stability awareness goal
 
 ## Solo Development Validation
 - [x] All spec requirements satisfied
