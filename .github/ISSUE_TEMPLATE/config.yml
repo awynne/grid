@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📖 Product Documentation
+    url: https://github.com/awynne/grid/tree/main/docs/product
+    about: Product requirements, features, and research
+  - name: 🏗️ Technical Specs
+    url: https://github.com/awynne/grid/tree/main/docs/specs
+    about: GRID-XXX technical specifications and status

@@ -1,0 +1,95 @@
+# GitHub Labels Configuration
+# Use with: gh label sync --file .github/labels.yml
+
+# Epic Labels (Features)
+- name: "epic:f0-shared-shell"
+  color: "0052CC"
+  description: "F0 - Shared Shell & Freshness epic"
+
+- name: "epic:f1-daily-pulse"
+  color: "0052CC" 
+  description: "F1 - Daily Pulse epic"
+
+- name: "epic:f2-powering-me"
+  color: "0052CC"
+  description: "F2 - What's Powering Me epic"
+
+- name: "epic:f3-duck-days"
+  color: "0052CC"
+  description: "F3 - Duck Days epic"
+
+- name: "epic:f4-what-changed"
+  color: "0052CC"
+  description: "F4 - What Changed epic"
+
+# Type Labels
+- name: "type:feature"
+  color: "1D76DB"
+  description: "New feature or capability"
+
+- name: "type:bug"
+  color: "D93F0B"
+  description: "Bug or issue fix"
+
+- name: "type:tech-debt"
+  color: "FBCA04"
+  description: "Technical debt, refactoring, infrastructure"
+
+- name: "type:docs"
+  color: "02D7BB"
+  description: "Documentation updates"
+
+- name: "type:spec"
+  color: "5319E7"
+  description: "GRID-XXX technical specification"
+
+# Priority Labels  
+- name: "priority:critical"
+  color: "B60205"
+  description: "Critical issue, needs immediate attention"
+
+- name: "priority:high"
+  color: "D93F0B"
+  description: "High priority, important for current milestone"
+
+- name: "priority:medium"
+  color: "FBCA04"
+  description: "Medium priority, should be addressed soon"
+
+- name: "priority:low"
+  color: "0E8A16"
+  description: "Low priority, nice to have"
+
+# Status Labels
+- name: "status:blocked"
+  color: "B60205"
+  description: "Work is blocked by external dependency"
+
+- name: "status:in-review"
+  color: "FBCA04"
+  description: "Pull request is in review"
+
+- name: "status:ready"
+  color: "0E8A16"
+  description: "Ready to work on"
+
+# Size Labels (for estimation)
+- name: "size:xs"
+  color: "C2E0C6"
+  description: "Extra small task (< 2 hours)"
+
+- name: "size:s"
+  color: "7FF27F"
+  description: "Small task (2-4 hours)"
+
+- name: "size:m"
+  color: "FFFF7F"
+  description: "Medium task (4-8 hours)"
+
+- name: "size:l"
+  color: "FF7F7F"
+  description: "Large task (1-2 days)"
+
+- name: "size:xl"
+  color: "FF4444"
+  description: "Extra large task (2+ days)"
