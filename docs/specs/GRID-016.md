@@ -6,7 +6,7 @@
 **Updated**: 2025-08-22  
 **Type**: Application Spec
 
-**Issue Link**: *To be created*
+**Issue Link**: https://github.com/awynne/grid/issues/17
 
 ## Overview
 
