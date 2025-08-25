@@ -2,7 +2,7 @@
 
 > **📋 Purpose**: Language-agnostic coding principles, workflow standards, and universal development practices that apply across all technology stacks.
 
-> **🔗 See Also**: [Remix Stack Technical Standards](./coding-remix-stack.md) for TypeScript, React, Prisma, and deployment-specific guidelines.
+> **🔗 See Also**: [React Router Technical Standards](./coding-react-router.md) for TypeScript, React, Prisma, and deployment-specific guidelines.
 
 ## Table of Contents
 - [General Principles](#general-principles)

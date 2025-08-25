@@ -76,7 +76,7 @@ This document defines specific roles for LLM sessions working on the Grid projec
 ### Architect → Developer Communication
 ```markdown
 # ✅ Good Architect Direction
-"Implement user authentication using the OAuth patterns established in coding-remix-stack.md.
+"Implement user authentication using the OAuth patterns established in coding-react-router.md.
 Focus on Google and Microsoft providers as specified in the security guidelines.
 The session management should follow our established patterns with sliding expiration."
 

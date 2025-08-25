@@ -25,12 +25,12 @@ This directory contains all project documentation for the GridPulse electric gri
 
 **Use this when:** Understanding universal development principles and establishing project workflow.
 
-### ⚡ [coding-remix-stack.md](./coding-remix-stack.md)
+### ⚡ [coding-react-router.md](./coding-react-router.md)
 **Technology-Specific Implementation**
-- TypeScript, React, and Remix coding conventions
+- TypeScript, React, and React Router coding conventions
 - Database patterns with Prisma
 - CSS/Styling conventions with shadcn/ui and Tailwind
-- Authentication with Remix sessions
+- Authentication with React Router sessions
 - Environment configuration and Railway deployment
 - Progressive Web App implementation
 - Tool configurations and setup
@@ -99,13 +99,13 @@ This directory contains all project documentation for the GridPulse electric gri
 1. Read [product/prd.md](./product/prd.md) for product understanding
 2. Review [process.md](./process.md) for workflow guidelines
 3. Study [coding.md](./coding.md) for universal principles
-4. Review [coding-remix-stack.md](./coding-remix-stack.md) for implementation details
+4. Review [coding-react-router.md](./coding-react-router.md) for implementation details
 5. Check [specs/status.md](./specs/status.md) for current work
 
 **During Development:**
 - Create specs following [process.md](./process.md) guidelines
 - Follow universal standards in [coding.md](./coding.md)
-- Apply technology-specific patterns from [coding-remix-stack.md](./coding-remix-stack.md)
+- Apply technology-specific patterns from [coding-react-router.md](./coding-react-router.md)
 - Reference [design.md](./design.md) for UI consistency *(to be created)*
 - Update progress in [specs/status.md](./specs/status.md) and individual spec files
 - Log daily activities in [activity/daily.md](./activity/daily.md)
@@ -113,7 +113,7 @@ This directory contains all project documentation for the GridPulse electric gri
 **For Reviews:**
 - Verify spec completion in [specs/status.md](./specs/status.md)
 - Check code against universal standards in [coding.md](./coding.md)
-- Verify technology-specific patterns in [coding-remix-stack.md](./coding-remix-stack.md)
+- Verify technology-specific patterns in [coding-react-router.md](./coding-react-router.md)
 - Ensure design consistency with [design.md](./design.md) *(to be created)*
 
 ## Contributing to Documentation
