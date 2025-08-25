@@ -4,3 +4,11 @@ dist
 dist-ssr
 *.local
 .playwright-mcp/
+
+# Environment files (never commit secrets)
+.env
+.env.backup
+.env.production
+.env.prod
+.env.staging
+.env.test

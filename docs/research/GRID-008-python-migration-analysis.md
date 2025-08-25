@@ -114,7 +114,7 @@ graph TB
     EIA[EIA v2 API] -->|hourly fetch| NW[Node.js Worker]
     NW -->|simple calculations| TS[(TimescaleDB)]
     NW -->|cache results| R[(Redis)]
-    WEB[Remix Web] -->|queries| TS
+    WEB[React Router v7 Web] -->|queries| TS
     WEB -->|cache| R
 ```
 
@@ -127,7 +127,7 @@ graph TB
     Q -->|complex calculations| PW[Python Analytics Service]
     PW -->|advanced metrics| TS
     PW -->|cache results| R[(Redis)]
-    WEB[Remix Web] -->|queries| TS
+    WEB[React Router v7 Web] -->|queries| TS
     WEB -->|cache| R
 ```
 
@@ -139,7 +139,7 @@ graph TB
     PW -->|advanced analytics| PA[Python Analytics Service]
     PA -->|ML predictions| TS
     PW -->|cache results| R[(Redis)]
-    WEB[Remix Web] -->|queries| TS
+    WEB[React Router v7 Web] -->|queries| TS
     WEB -->|cache| R
 ```
 

@@ -178,7 +178,7 @@ GridPulse delivers four core experiences:
 ## Technical Requirements
 
 ### Platform Requirements
-- **Architecture**: Dual-service (Remix web + worker) on Railway
+- **Architecture**: Dual-service (React Router v7 web + worker) on Railway
 - **Database**: PostgreSQL with monthly partitioning (TimescaleDB upgrade path)
 - **Caching**: Redis (Upstash) for computed results and API responses
 - **Background Jobs**: node-cron for hourly ingestion (BullMQ upgrade path)
@@ -380,7 +380,7 @@ GridPulse delivers four core experiences:
 ### Assumptions
 - **EIA Stability**: API structure and data quality remain consistent
 - **User Interest**: Demand exists for accessible grid data insights
-- **Technical Stack**: Remix/Railway ecosystem meets scaling needs
+- **Technical Stack**: React Router v7/Railway ecosystem meets scaling needs
 - **Data Freshness**: Users accept 1-2 hour lag for non-demand data
 
 ## Risk Assessment
