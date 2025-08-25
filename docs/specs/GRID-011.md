@@ -163,38 +163,38 @@ INGEST_SCHEDULE="15 * * * *"  # Every hour at 15 minutes past
 
 ## Implementation Tasks
 
-### Phase 1: Railway Project Setup
-- [ ] Create Railway project "gridpulse-prod"
-- [ ] Configure project settings and team access
-- [ ] Set up cost monitoring and alerts
-- [ ] Configure deployment notifications
+### Phase 1: Codebase Preparation ✅ COMPLETED
+- [x] Create health check endpoints for both services
+- [x] Implement worker service with Express server
+- [x] Configure TypeScript build pipeline for worker
+- [x] Create Railway configuration files
+- [x] Update package.json with worker scripts and dependencies
 
-### Phase 2: Add-on Provisioning
-- [ ] Add TimescaleDB (PostgreSQL) add-on
-- [ ] Add Redis (Upstash) add-on  
-- [ ] Verify add-on connectivity
-- [ ] Configure connection pooling if needed
+### Phase 2: Manual Railway Setup (IN PROGRESS)
+**See [docs/railway-setup-guide.md](../railway-setup-guide.md) for detailed instructions**
 
-### Phase 3: Web Service Deployment
-- [ ] Create web service from GitHub repo
-- [ ] Configure build settings (React Router v7 app)
-- [ ] Set environment variables
-- [ ] Configure health check endpoint
-- [ ] Test deployment and scaling
+#### Test Environment:
+- [ ] Create web-test service from GitHub repo
+- [ ] Create worker-test service from GitHub repo  
+- [ ] Add postgres-test database with TimescaleDB extension
+- [ ] Add redis-test cache (Upstash)
+- [ ] Configure environment variables for test environment
+- [ ] Verify health endpoints respond correctly
 
-### Phase 4: Worker Service Deployment
-- [ ] Create worker service from same GitHub repo
-- [ ] Configure build settings (Node.js worker)
-- [ ] Set environment variables
-- [ ] Configure health check endpoint
-- [ ] Test cron job execution
+#### Production Environment:
+- [ ] Create web-prod service from GitHub repo
+- [ ] Create worker-prod service from GitHub repo
+- [ ] Add postgres-prod database with TimescaleDB extension  
+- [ ] Add redis-prod cache (Upstash)
+- [ ] Configure environment variables for production environment
+- [ ] Verify health endpoints respond correctly
 
-### Phase 5: Service Integration
-- [ ] Verify inter-service communication
+### Phase 3: Service Integration
 - [ ] Test database connectivity from both services
 - [ ] Test Redis connectivity from both services
 - [ ] Configure logging and monitoring
-- [ ] Validate cost projections
+- [ ] Set up cost monitoring and alerts
+- [ ] Validate cost projections under $25/month
 
 ## Success Criteria
 
@@ -281,8 +281,19 @@ INGEST_SCHEDULE="15 * * * *"  # Every hour at 15 minutes past
 - **Clear identification** - Easy to distinguish between test and production resources
 - **Configuration alignment** - Environment variables and deployment configs can reference services clearly
 
-## Notes
+## Implementation Notes
 
-This spec focuses purely on infrastructure setup and service deployment. Application logic, database schema, and business functionality are covered in subsequent specs (GRID-012 through GRID-015).
+### Current Status (2025-08-25)
+**Phase 1 Complete:** All code components are implemented and tested locally:
+- Health endpoints functional at `/health` and `/worker/health`
+- Worker service builds and runs successfully
+- Both services return proper JSON health status
+- Railway configuration files are ready
 
-The dual-service architecture provides clear separation of concerns while maintaining cost efficiency within the $25/month budget constraint.
+**Next Required Action:** Manual Railway service setup via web interface due to CLI TTY limitations.
+
+### Technical Notes
+- This spec focuses purely on infrastructure setup and service deployment
+- Application logic, database schema, and business functionality are covered in subsequent specs (GRID-012 through GRID-015)
+- The dual-service architecture provides clear separation of concerns while maintaining cost efficiency within the $25/month budget constraint
+- Health endpoints are simplified initially - database connection testing will be enhanced in GRID-012
