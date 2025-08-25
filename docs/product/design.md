@@ -1,6 +1,8 @@
 # GridPulse Design System & UI Guidelines
 
 > **🎨 Purpose**: Design standards, visual guidelines, and UI/UX patterns for the GridPulse electric grid data visualization platform.
+>
+> **📋 Complete Specification**: This document is implemented from [GRID-016: Product Design System Specification](../specs/GRID-016.md), which contains the full design system requirements, implementation details, and success criteria.
 
 ## Table of Contents
 - [Design Principles](#design-principles)
@@ -390,6 +392,17 @@ const dashboardCardVariants = cva(
 - **Breadcrumbs**: Clear path back to dashboard from detail views
 - **Mobile Menu**: Collapsible hamburger menu for smaller screens
 
+### BA Selection Experience
+Users should see complete, recognizable balancing authority names throughout the selection process. When space constraints require it, names gracefully truncate with ellipsis while maintaining left alignment for consistent reading patterns.
+
+**Implementation:**
+- Show full names: "Electric Reliability Council of Texas" not "ERCOT"
+- Fixed selector width: 250px for consistent layout
+- Truncate overflow: "Electric Reliability Council..." (mid-word truncation acceptable)
+- Hover behavior: Truncated names reveal full text in tooltip
+- Left-justify all text for scanning efficiency
+- No responsive adaptations for space-constrained devices at this time
+
 ### Data Display Patterns
 - **Hybrid Architecture**: Stackable dashboard cards + deep-link pages
 - **Progressive Disclosure**: Summary cards expand to detailed views
@@ -588,5 +601,5 @@ export function DataForm() {
 - [Technical Stack Analysis](./stack-fit.md) - Architecture decisions
 - [GRID-008 Architecture](../specs/GRID-008.md) - MVP implementation plan
 - [GRID-016 Design Specification](../specs/GRID-016.md) - This design system's specification
-- [Remix Coding Standards](./coding-remix-stack.md) - Implementation guidelines
+- [React Router Coding Standards](../coding-react-router.md) - Implementation guidelines
 - [Accessibility Standards](./coding.md#accessibility-standards) - WCAG compliance details

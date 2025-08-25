@@ -10,13 +10,13 @@
 Refactor the monolithic coding standards documentation into a layered architecture that separates universal development principles from technology-specific implementation patterns. This separation enables better maintainability, clearer scope definition, and easier navigation for developers working across different technology stacks.
 
 ## Implementation Requirements
-- [x] Create new `coding-remix-stack.md` with Remix/TypeScript/React specific content
+- [x] Create new `coding-react-router.md` with React Router/TypeScript/React specific content
 - [x] Update `coding.md` to contain only language-agnostic standards
 - [x] Maintain all existing content (no information loss)
 - [x] Update cross-references in other documentation files
 - [x] Ensure clear navigation between the two files
 - [x] Language-agnostic file covers: Git workflow, general principles, security, accessibility
-- [x] Remix-specific file covers: TypeScript, React, Remix, shadcn/ui, database patterns
+- [x] React Router-specific file covers: TypeScript, React, React Router, shadcn/ui, database patterns
 
 ## Definition of Done
 - [x] **Spec requirements met** - All acceptance criteria satisfied
@@ -42,9 +42,9 @@ Refactor the monolithic coding standards documentation into a layered architectu
 - Environment variable patterns
 - Testing philosophy
 
-### Technology-Specific Content (moves to `coding-remix-stack.md`)
+### Technology-Specific Content (moves to `coding-react-router.md`)
 - TypeScript guidelines and patterns
-- Remix conventions (routes, loaders, actions)
+- React Router conventions (routes, loaders, actions)
 - React component guidelines
 - Database guidelines (Prisma-specific)
 - CSS/Styling conventions (shadcn/ui, Tailwind)

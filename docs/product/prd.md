@@ -241,10 +241,10 @@ GridPulse delivers four core experiences:
 - *Reference performance guidelines from [coding.md](./coding.md#performance-guidelines)*
 
 ### Core Web Vitals
-- *Reference targets from [coding-remix-stack.md](./coding-remix-stack.md)*
+- *Reference targets from [coding-react-router.md](../coding-react-router.md)*
 
 ### Offline Functionality
-- *Reference PWA guidelines from [coding-remix-stack.md](./coding-remix-stack.md)*
+- *Reference PWA guidelines from [coding-react-router.md](../coding-react-router.md)*
 
 ### Scalability Requirements
 - *To be defined*
@@ -252,7 +252,7 @@ GridPulse delivers four core experiences:
 ## Security Requirements
 
 ### Authentication Requirements
-- *Reference security guidelines from [coding.md](./coding.md#security-guidelines) and [coding-remix-stack.md](./coding-remix-stack.md)*
+- *Reference security guidelines from [coding.md](../coding.md#security-guidelines) and [coding-react-router.md](../coding-react-router.md)*
 
 ### Authorization Requirements
 - *To be defined*
@@ -415,7 +415,7 @@ GridPulse delivers four core experiences:
 
 ### Technical Documentation
 - [Universal Coding Standards](../coding.md) - Language-agnostic development principles
-- [Remix Stack Technical Standards](../coding-remix-stack.md) - Technology-specific implementation guidelines
+- [React Router Technical Standards](../coding-react-router.md) - Technology-specific implementation guidelines
 - [Process Guidelines](../process.md) - Development workflow and spec management
 - [GRID-007](../specs/GRID-007.md) - Data volume analysis task
 - [GRID-008](../specs/GRID-008.md) - MVP architecture design specification

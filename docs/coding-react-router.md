@@ -1,12 +1,14 @@
-# Remix Stack Technical Standards
+# React Router v7 (Remix) Technical Standards
 
-> **📋 Purpose**: Technology-specific guidelines for the Remix stack including TypeScript, React, Prisma, shadcn/ui, and deployment patterns.
+> **📋 Purpose**: Technology-specific guidelines for React Router v7 (formerly Remix) including TypeScript, React, Prisma, shadcn/ui, and deployment patterns.
 
 > **🔗 See Also**: [General Coding Standards](./coding.md) for language-agnostic principles, Git workflow, and universal development practices.
 
+> **⚠️ Migration Note**: React Router v7 is the evolution of Remix v2. This document reflects the latest React Router v7 patterns and conventions.
+
 ## Table of Contents
 - [TypeScript Guidelines](#typescript-guidelines)
-- [Remix Conventions](#remix-conventions)
+- [React Router v7 Conventions](#react-router-v7-conventions)
 - [React Component Guidelines](#react-component-guidelines)
 - [Database Guidelines](#database-guidelines)
 - [CSS/Styling Conventions](#cssstyling-conventions)
@@ -65,25 +67,58 @@ class ValidationError extends Error {
 }
 ```
 
-## Remix Conventions
+## React Router v7 Conventions
 
-### Route Organization
+### Route Configuration (routes.ts)
 ```typescript
-// ✅ Use nested routing for related functionality
-app/routes/
-  dashboard/
-    _layout.tsx           // Layout for all dashboard routes
-    _index.tsx           // /dashboard
-    projects/
-      _index.tsx         // /dashboard/projects
-      $projectId.tsx     // /dashboard/projects/:projectId
-      new.tsx            // /dashboard/projects/new
+// ✅ Define routes in app/routes.ts using the new configuration API
+import { type RouteConfig, route, index, layout } from "@react-router/dev/routes";
+
+export default [
+  // Layout route with nested children
+  layout("layouts/dashboard.tsx", [
+    index("routes/home.tsx"),
+    route("projects", "routes/projects.tsx", [
+      index("routes/projects/index.tsx"),
+      route(":projectId", "routes/projects/project.tsx"),
+      route("new", "routes/projects/new.tsx"),
+    ]),
+  ]),
+  route("about", "routes/about.tsx"),
+] satisfies RouteConfig;
+```
+
+### File-Based Routing (Alternative)
+```typescript
+// ✅ Use flatRoutes for file-based routing (similar to old Remix)
+import { type RouteConfig } from "@react-router/dev/routes";
+import { flatRoutes } from "@react-router/fs-routes";
+
+export default flatRoutes() satisfies RouteConfig;
+```
+
+### Route File Structure
+```bash
+app/
+├── routes.ts              # Route configuration
+├── routes/
+│   ├── home.tsx          # / route
+│   ├── about.tsx         # /about route
+│   ├── projects.tsx      # /projects layout
+│   └── projects/
+│       ├── index.tsx     # /projects index
+│       ├── project.tsx   # /projects/:projectId
+│       └── new.tsx       # /projects/new
+└── layouts/
+    └── dashboard.tsx     # Shared layout
 ```
 
 ### Data Loading Patterns
 ```typescript
-// ✅ Loader functions should be pure and handle errors gracefully
-export async function loader({ params, request }: LoaderFunctionArgs) {
+// ✅ Use React Router v7 loader patterns with type safety
+import type { Route } from "./+types/project";
+
+export async function loader({ params, request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const search = url.searchParams.get('search') || '';
   
@@ -100,19 +135,29 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
       throw new Response('Project not found', { status: 404 });
     }
     
-    return json({ project, search });
+    return { project, search };
   } catch (error) {
     // Log error for debugging while providing user-friendly message
     console.error('Failed to load project:', error);
     throw new Response('Unable to load project', { status: 500 });
   }
 }
+
+// ✅ Use typed component with generated route types
+export default function ProjectPage({ loaderData }: Route.ComponentProps) {
+  const { project, search } = loaderData;
+  // TypeScript knows the exact shape of loaderData
+  return <div>{project.name}</div>;
+}
 ```
 
 ### Action Patterns
 ```typescript
-// ✅ Actions should validate input and provide clear feedback
-export async function action({ request, params }: ActionFunctionArgs) {
+// ✅ Use React Router v7 action patterns with type safety
+import type { Route } from "./+types/project";
+import { redirect } from "react-router";
+
+export async function action({ request, params }: Route.ActionArgs) {
   const formData = await request.formData();
   const intent = formData.get('intent');
   
@@ -122,7 +167,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
       const result = await createProject(formData);
       if (!result.success) {
         // Return validation errors for the form to display
-        return json({ errors: result.errors }, { status: 400 });
+        return { errors: result.errors };
       }
       return redirect(`/projects/${result.data.id}`);
     }
@@ -137,6 +182,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
     default:
       throw new Response('Invalid action', { status: 400 });
   }
+}
+
+// ✅ Access action data with type safety
+export default function ProjectPage({ actionData }: Route.ComponentProps) {
+  if (actionData?.errors) {
+    // TypeScript knows actionData structure
+    return <div>Error: {actionData.errors.message}</div>;
+  }
+  return <div>Project form</div>;
 }
 ```
 
@@ -823,10 +877,9 @@ export { ProjectCardSkeleton };
 ### Route File Organization
 ```typescript
 // ✅ Route file structure
-// routes/dashboard.projects.$id.tsx
-import type { LoaderFunctionArgs, ActionFunctionArgs } from '@remix-run/node';
-import { json, redirect } from '@remix-run/node';
-import { useLoaderData, useFetcher } from '@remix-run/react';
+// routes/projects/project.tsx
+import type { Route } from "./+types/project";
+import { redirect } from "react-router";
 import { ProjectForm } from '@/components/project';
 import { ProjectService } from '@/lib/ProjectService';
 
@@ -835,19 +888,24 @@ interface LoaderData {
   project: Project;
 }
 
-// Loader function
-export async function loader({ params }: LoaderFunctionArgs) {
+// Loader function with type safety
+export async function loader({ params }: Route.LoaderArgs) {
   // Loader implementation
+  const project = await ProjectService.findById(params.projectId);
+  return { project };
 }
 
-// Action function
-export async function action({ request, params }: ActionFunctionArgs) {
+// Action function with type safety
+export async function action({ request, params }: Route.ActionArgs) {
   // Action implementation
+  const formData = await request.formData();
+  // Handle form submission
+  return redirect('/projects');
 }
 
-// Route component
-export default function ProjectDetailPage() {
-  const { project } = useLoaderData<typeof loader>();
+// Route component with generated types
+export default function ProjectDetailPage({ loaderData, actionData }: Route.ComponentProps) {
+  const { project } = loaderData; // TypeScript knows the shape
   
   return (
     <div>
@@ -884,6 +942,53 @@ export type { User, UserRole, CreateUserInput } from './User';
 ```
 
 ## Environment & Configuration
+
+### React Router v7 Configuration
+```typescript
+// ✅ react-router.config.ts - Main configuration file
+import type { Config } from "@react-router/dev/config";
+
+export default {
+  appDirectory: "app",
+  buildDirectory: "build", 
+  ssr: true, // Enable server-side rendering
+  async prerender() {
+    // Pre-render static routes
+    return ["/", "/about"];
+  },
+  // Enable type generation for routes
+  future: {
+    unstable_typegen: true,
+  },
+} satisfies Config;
+```
+
+### TypeScript Configuration for Route Types
+```json
+// ✅ tsconfig.json - Include generated route types
+{
+  "include": [
+    "app/**/*",
+    ".react-router/types/**/*"
+  ],
+  "compilerOptions": {
+    "rootDirs": [".", "./.react-router/types"]
+  }
+}
+```
+
+### Package.json Scripts
+```json
+{
+  "scripts": {
+    "build": "react-router build",
+    "dev": "react-router dev",
+    "start": "react-router-serve ./build/server/index.js",
+    "typegen": "react-router typegen",
+    "typecheck": "react-router typegen && tsc"
+  }
+}
+```
 
 ### Environment Variable Naming
 ```bash
@@ -1100,19 +1205,29 @@ test('user can create and view a project', async ({ page }) => {
 
 ### Environment Setup
 ```bash
-# Install dependencies
-pnpm install
+# Create React Router v7 project
+npx create-react-router@latest my-app
+
+# Or install dependencies manually
+npm i react-router @react-router/node @react-router/serve react react-dom
+npm i -D @react-router/dev vite typescript
 
 # Setup database
-pnpm db:push
-pnpm db:seed
+npm run db:push
+npm run db:seed
 
 # Run development server
-pnpm dev          # Remix app
+npm run dev       # React Router v7 app
+
+# Build for production
+npm run build
 
 # Run tests
-pnpm test         # Unit tests
-pnpm test:e2e     # End-to-end tests
+npm run test      # Unit tests
+npm run test:e2e  # End-to-end tests
+
+# Generate route types
+npm run typegen
 ```
 
 ## Performance Guidelines

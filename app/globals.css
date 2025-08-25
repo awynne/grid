@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* shadcn/ui base variables */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+
+    /* GridPulse-specific fuel colors */
+    --fuel-solar: 45 93% 47%;         /* Solar yellow */
+    --fuel-wind: 142 76% 36%;         /* Wind green */
+    --fuel-gas: 25 95% 53%;           /* Gas orange */
+    --fuel-coal: 0 84% 60%;           /* Coal red */
+    --fuel-nuclear: 262 83% 58%;      /* Nuclear purple */
+    --fuel-hydro: 199 89% 48%;        /* Hydro blue */
+    --fuel-other: 215 16% 47%;        /* Other/unknown gray */
+
+    /* Grid status colors */
+    --status-clean: 142 76% 36%;      /* Clean energy periods */
+    --status-dirty: 0 84% 60%;        /* High emissions periods */
+    --status-estimated: 47 95% 53%;   /* Estimated/forecasted data */
+    --status-missing: 215 16% 47%;    /* Missing/unavailable data */
+    --status-fresh: 142 76% 36%;      /* Fresh data (<1hr old) */
+    --status-stale: 47 95% 53%;       /* Stale data (1-6hr old) */
+    --status-very-stale: 0 84% 60%;   /* Very stale data (>6hr old) */
+
+    /* GridPulse layout variables */
+    --dashboard-gap: 1.5rem;
+    --container-max-width: 1280px;
+    --chart-height-sm: 200px;
+    --chart-height-md: 300px;
+    --chart-height-lg: 400px;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+
+    /* Adjust fuel colors for dark mode */
+    --fuel-solar: 45 93% 57%;
+    --fuel-wind: 142 70% 45%;
+    --fuel-gas: 25 95% 63%;
+    --fuel-coal: 0 84% 70%;
+    --fuel-nuclear: 262 83% 68%;
+    --fuel-hydro: 199 89% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+  }
+}
