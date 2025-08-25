@@ -503,7 +503,7 @@ export const FUEL_TYPES = {
 ## Implementation Tasks
 
 ### Phase 1: Project Initialization
-- [ ] Initialize Remix application with TypeScript
+- [ ] Initialize React Router v7 application with TypeScript
 - [ ] Configure Tailwind CSS and PostCSS
 - [ ] Set up shadcn/ui component library
 - [ ] Create basic folder structure following coding standards
@@ -572,7 +572,7 @@ export const FUEL_TYPES = {
 
 ### Prerequisite Specs
 - **GRID-016**: Product Design System Specification (✅ Complete)
-- **Remix Coding Standards**: Technical implementation guidelines
+- **React Router v7 Coding Standards**: Technical implementation guidelines
 
 ### Dependent Specs
 - **GRID-011**: Railway Infrastructure Setup (for deployment)
@@ -587,7 +587,7 @@ export const FUEL_TYPES = {
 ## Deliverables
 
 ### Primary Deliverable
-- **Working Remix application** with minimal GridPulse UI
+- **Working React Router v7 application** with minimal GridPulse UI
 
 ### Supporting Deliverables
 - **Component library** with shadcn/ui + GridPulse extensions

@@ -14,7 +14,7 @@ Set up the dual-service Railway infrastructure for GridPulse MVP, including web 
 ## Problem Statement
 
 GridPulse requires a dual-service architecture on Railway with:
-- Web service for Remix SSR + API routes
+- Web service for React Router v7 SSR + API routes
 - Worker service for Node.js data ingestion
 - TimescaleDB for time-series data storage
 - Redis for caching layer
@@ -44,8 +44,8 @@ GridPulse requires a dual-service architecture on Railway with:
 
 ```mermaid
 graph TB
-    subgraph "Railway Project: GridPulse"
-        WEB[Web Service<br/>Remix App]
+    subgraph "Railway Project: gridpulse-prod"
+        WEB[Web Service<br/>React Router v7 App]
         WORKER[Worker Service<br/>Node.js Cron]
         
         subgraph "Add-ons"
@@ -142,7 +142,7 @@ NODE_ENV=production
 
 #### Web Service Specific
 ```bash
-# Remix
+# React Router v7
 SESSION_SECRET=...
 PORT=3000
 
@@ -164,7 +164,7 @@ INGEST_SCHEDULE="15 * * * *"  # Every hour at 15 minutes past
 ## Implementation Tasks
 
 ### Phase 1: Railway Project Setup
-- [ ] Create Railway project "gridpulse-mvp"
+- [ ] Create Railway project "gridpulse-prod"
 - [ ] Configure project settings and team access
 - [ ] Set up cost monitoring and alerts
 - [ ] Configure deployment notifications
@@ -177,7 +177,7 @@ INGEST_SCHEDULE="15 * * * *"  # Every hour at 15 minutes past
 
 ### Phase 3: Web Service Deployment
 - [ ] Create web service from GitHub repo
-- [ ] Configure build settings (Remix app)
+- [ ] Configure build settings (React Router v7 app)
 - [ ] Set environment variables
 - [ ] Configure health check endpoint
 - [ ] Test deployment and scaling
@@ -257,6 +257,29 @@ INGEST_SCHEDULE="15 * * * *"  # Every hour at 15 minutes past
 - Cost tracking and alerts
 - Service health monitoring
 - Database performance monitoring
+
+## Service Naming Convention
+
+**Railway Project:** `gridpulse`  
+**Project URL:** https://railway.com/project/10593acb-4a7a-4331-a993-52d24860d1fa
+
+### Test Environment Services
+- `web-test` - React Router v7 web application service
+- `worker-test` - Node.js cron worker service  
+- `postgres-test` - PostgreSQL database with TimescaleDB extension
+- `redis-test` - Redis cache database
+
+### Production Environment Services  
+- `web-prod` - React Router v7 web application service
+- `worker-prod` - Node.js cron worker service
+- `postgres-prod` - PostgreSQL database with TimescaleDB extension  
+- `redis-prod` - Redis cache database
+
+### Naming Rationale
+- **Environment suffix required** - Railway requires unique service names across entire project
+- **Consistent pattern** - All services follow `{service-name}-{environment}` format
+- **Clear identification** - Easy to distinguish between test and production resources
+- **Configuration alignment** - Environment variables and deployment configs can reference services clearly
 
 ## Notes
 

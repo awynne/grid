@@ -42,14 +42,14 @@ Need to design an architecture that starts simple (MVP) but can scale to product
 
 ### Service Architecture: Dual-Service Pattern
 
-**Decision**: Split into two services instead of monolithic Remix app
+**Decision**: Split into two services instead of monolithic React Router v7 app
 
 ```mermaid
 flowchart LR
   EIA[EIA v2 API] -->|hourly fetch| W[Worker Service]
   subgraph Railway
     W[Worker Service<br/>node-cron]
-    WEB[Remix Web App<br/>SSR + API routes]
+    WEB[React Router v7 Web App<br/>SSR + API routes]
     R[(Redis Cache)]
     PG[(PostgreSQL)]
   end
@@ -207,7 +207,7 @@ interface AuthenticatedFeatures {
 - [ ] Create diff/baseline calculations using statistical methods
 
 ### Phase 3: UI Integration (GRID-010) - Full Python Migration
-- [ ] Connect Remix frontend to cached data
+- [ ] Connect React Router v7 frontend to cached data
 - [ ] Implement freshness indicators
 - [ ] Add anonymous preference system
 - [ ] Create embeddable components
@@ -299,7 +299,7 @@ def calculate_duck_metrics(ba_code: str, days: int):
 
 #### Phase 3: Full Python Migration (12+ months)
 - Complete migration to Python for all data processing
-- Keep Remix frontend (optimal for UI/UX)
+- Keep React Router v7 frontend (optimal for UI/UX)
 - Enable advanced ML/AI features
 
 **Migration Benefits:**

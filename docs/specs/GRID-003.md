@@ -48,7 +48,7 @@ Refactor the monolithic coding standards documentation into a layered architectu
 - React component guidelines
 - Database guidelines (Prisma-specific)
 - CSS/Styling conventions (shadcn/ui, Tailwind)
-- Authentication patterns (Remix session management)
+- Authentication patterns (React Router v7 session management)
 - Progressive Web App implementation
 - Specific tool configurations
 - Package.json scripts and dependencies

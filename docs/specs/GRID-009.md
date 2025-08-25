@@ -56,7 +56,7 @@ This spec documents the comprehensive product documentation reorganization and G
 The original "Grid project management application" focus was replaced with "GridPulse electric grid data visualization platform" based on:
 - EIA-930 dataset availability and richness
 - Clear market need for accessible grid data visualization
-- Technical feasibility with Remix stack + PostgreSQL + Redis
+- Technical feasibility with React Router v7 stack + PostgreSQL + Redis
 - Strong feature derivation potential (F0-F4)
 
 ### Workflow Design Decisions
