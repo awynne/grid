@@ -7,7 +7,9 @@
 
 ## Active Implementations
 
-*Currently no specs in active development*
+| Spec ID | Title | Status | Priority | Started | Target | Dependencies |
+|---------|-------|--------|----------|---------|--------|--------------|
+| [GRID-011](./GRID-011.md) | Railway Infrastructure Setup | 🔄 In Progress | High | 2025-08-25 | 2025-08-26 | None |
 
 ## Implementation Backlog
 
@@ -16,7 +18,6 @@
 
 | Spec ID | Title | Priority | Created | Target | Dependencies |
 |---------|-------|----------|---------|--------|--------------|
-| [GRID-011](./GRID-011.md) | Railway Infrastructure Setup | High | 2025-08-22 | 2025-08-24 | None - Start here |
 | [GRID-012](./GRID-012.md) | TimescaleDB Schema Implementation | High | 2025-08-22 | 2025-08-24 | GRID-011 (Railway setup) |
 | [GRID-013](./GRID-013.md) | EIA Data Ingestion Service | High | 2025-08-22 | 2025-08-25 | GRID-011, GRID-012 |
 | [GRID-014](./GRID-014.md) | Redis Caching Layer | High | 2025-08-22 | 2025-08-25 | GRID-011, GRID-012 |
@@ -54,10 +55,10 @@
 
 ## Implementation Statistics
 - **Total Specs**: 17
-  - **Infrastructure**: 15 (9 completed, 5 backlog)
+  - **Infrastructure**: 15 (9 completed, 1 active, 4 backlog)
   - **Application**: 2 (2 completed, 0 backlog)
-- **Active**: 0
-- **Backlog**: 5 (5 infrastructure, 0 application)
+- **Active**: 1 (1 infrastructure, 0 application)
+- **Backlog**: 4 (4 infrastructure, 0 application)
 - **In Review**: 0
 - **Completed**: 11 (9 infrastructure, 2 application)
 - **Cancelled**: 0
@@ -82,6 +83,8 @@
 - **Application**: User features, business logic, UI components, analytics
 
 ## Recent Activity
+- **2025-08-25**: GRID-011 started - Railway Infrastructure Setup in progress
+- **2025-08-25**: GRID-017 completed - Minimal GridPulse UI Setup with React Router v7
 - **2025-08-22**: GRID-016 created for Product Design System Specification (first application spec)
 - **2025-08-22**: GRID-011 through GRID-015 created for MVP implementation (5 infrastructure specs added to backlog)
 - **2025-08-22**: GRID-008 completed - GridPulse MVP architecture design finalized

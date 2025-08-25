@@ -1,11 +1,11 @@
 # GRID-011: Railway Infrastructure Setup
 
-**Status**: 🆕 New  
+**Status**: 🔄 In Progress  
 **Priority**: High  
 **Created**: 2025-08-22  
-**Updated**: 2025-08-22  
+**Updated**: 2025-08-25  
 
-**Issue Link**: *To be created*
+**Issue Link**: https://github.com/awynne/grid/issues/22
 
 ## Overview
 

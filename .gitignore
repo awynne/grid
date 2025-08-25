@@ -4,6 +4,7 @@ dist
 dist-ssr
 *.local
 .playwright-mcp/
+build/
 
 # Environment files (never commit secrets)
 .env
@@ -12,3 +13,6 @@ dist-ssr
 .env.prod
 .env.staging
 .env.test
+
+# Railway setup files (local only)
+.railway-setup-checklist.md
