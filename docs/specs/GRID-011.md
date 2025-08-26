@@ -44,9 +44,8 @@ GridPulse requires a dual-service architecture on Railway with:
 
 ```mermaid
 graph TB
-    subgraph "Railway Project: gridpulse-prod"
+    subgraph "Railway Project: gridpulse"
         WEB[Web Service<br/>React Router v7 App]
-        WORKER[Worker Service<br/>Node.js Cron]
         
         subgraph "Add-ons"
             PG[(TimescaleDB<br/>PostgreSQL)]
@@ -56,11 +55,10 @@ graph TB
     
     WEB --> PG
     WEB --> REDIS
-    WORKER --> PG
-    WORKER --> REDIS
     
-    EIA[EIA v2 API] --> WORKER
     USERS[Users] --> WEB
+    
+    note1[Python Worker Service<br/>To be implemented in GRID-013]
 ```
 
 ### Service Specifications
@@ -199,12 +197,12 @@ INGEST_SCHEDULE="15 * * * *"  # Every hour at 15 minutes past
 ## Success Criteria
 
 ### Functional Requirements
-- [ ] Both services deploy successfully from GitHub
-- [ ] Web service responds to HTTP requests
-- [ ] Worker service executes scheduled jobs
-- [ ] Database connections established from both services
-- [ ] Redis connections established from both services
-- [ ] Health checks pass for both services
+- [x] Web services deploy successfully (test: auto, prod: manual)
+- [x] Web services respond to HTTP requests  
+- [x] Database connections established from web services
+- [x] Redis connections established from web services
+- [x] Health checks pass for web services
+- [ ] Worker service implementation (deferred to GRID-013 Python implementation)
 
 ### Performance Requirements
 - [ ] Web service startup time <30 seconds
@@ -218,8 +216,10 @@ INGEST_SCHEDULE="15 * * * *"  # Every hour at 15 minutes past
 - [ ] Resource usage tracking enabled
 
 ### Operational Requirements
-- [ ] Automated deployments from main branch
-- [ ] Environment variables securely managed
+- [x] Test environment auto-deployment from main branch configured
+- [x] Production environment manual deployment only (no auto-deploy)
+- [x] Environment variables securely managed via Railway
+- [x] Health monitoring via `/health` endpoints
 - [ ] Logging aggregation working
 - [ ] Monitoring dashboards accessible
 
@@ -264,14 +264,12 @@ INGEST_SCHEDULE="15 * * * *"  # Every hour at 15 minutes past
 **Project URL:** https://railway.com/project/10593acb-4a7a-4331-a993-52d24860d1fa
 
 ### Test Environment Services
-- `web-test` - React Router v7 web application service
-- `worker-test` - Node.js cron worker service  
+- `web-test` - React Router v7 web application service 
 - `postgres-test` - PostgreSQL database with TimescaleDB extension
 - `redis-test` - Redis cache database
 
 ### Production Environment Services  
 - `web-prod` - React Router v7 web application service
-- `worker-prod` - Node.js cron worker service
 - `postgres-prod` - PostgreSQL database with TimescaleDB extension  
 - `redis-prod` - Redis cache database
 
@@ -284,13 +282,26 @@ INGEST_SCHEDULE="15 * * * *"  # Every hour at 15 minutes past
 ## Implementation Notes
 
 ### Current Status (2025-08-25)
-**Phase 1 Complete:** All code components are implemented and tested locally:
-- Health endpoints functional at `/health` and `/worker/health`
-- Worker service builds and runs successfully
-- Both services return proper JSON health status
-- Railway configuration files are ready
+**Phase 1 Complete:** Web service infrastructure implemented and deployed:
+- Health endpoint functional at `/health` 
+- Web service builds and runs successfully on Railway
+- Database and Redis connections configured
+- Railway MCP server used to automate most setup steps
 
-**Next Required Action:** Manual Railway service setup via web interface due to CLI TTY limitations.
+**Worker Service Decision (2025-08-25):** Removed Node.js worker service from scope. Future worker implementation (GRID-013) will use Python instead for better data processing capabilities.
+
+**Infrastructure Status:** 
+- ✅ Web services (test/prod) deployed and healthy
+- ✅ PostgreSQL with TimescaleDB extension configured  
+- ✅ Redis caching layer configured
+- ✅ Environment variables set via Railway MCP
+- ✅ Deployment strategy configured (test: auto, prod: manual)
+- ❌ Worker services removed from architecture
+
+**Deployment Configuration:**
+- **Test Environment**: Auto-deploy enabled on `main` branch pushes
+- **Production Environment**: Manual deploy only via `railway deploy --environment prod`
+- **Health Endpoints**: Both environments accessible and responding correctly
 
 ### Technical Notes
 - This spec focuses purely on infrastructure setup and service deployment

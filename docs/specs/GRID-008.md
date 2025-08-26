@@ -46,9 +46,9 @@ Need to design an architecture that starts simple (MVP) but can scale to product
 
 ```mermaid
 flowchart LR
-  EIA[EIA v2 API] -->|hourly fetch| W[Worker Service]
+  EIA[EIA v2 API] -->|hourly fetch| W[Python Worker Service]
   subgraph Railway
-    W[Worker Service<br/>node-cron]
+    W[Python Worker Service<br/>FastAPI + cron]
     WEB[React Router v7 Web App<br/>SSR + API routes]
     R[(Redis Cache)]
     PG[(PostgreSQL)]
@@ -140,29 +140,33 @@ const cacheKeys = {
 - **Cost efficiency**: Reduces database query load
 - **Simple patterns**: Easy to implement and debug
 
-### Background Jobs: node-cron for MVP
+### Background Jobs: Python with APScheduler
 
-**Decision**: Use node-cron for scheduled ingestion, upgrade to BullMQ later if needed
+**Decision**: Use Python with APScheduler for scheduled ingestion and data processing
 
-```typescript
-// Simple cron patterns for MVP
-import cron from 'node-cron';
+```python
+# Python cron patterns for data processing
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import pandas as pd
 
-// Every hour at 15 minutes past (gives EIA time to publish)
-cron.schedule('15 * * * *', async () => {
-  await ingestLatestData();
-});
+scheduler = AsyncIOScheduler()
 
-// Daily computation at 1 AM
-cron.schedule('0 1 * * *', async () => {
-  await computeDailyMetrics();
-});
+# Every hour at 15 minutes past (gives EIA time to publish)
+@scheduler.scheduled_job('cron', minute=15)
+async def ingest_latest_data():
+    await ingest_eia_data()
+
+# Daily computation at 1 AM
+@scheduler.scheduled_job('cron', hour=1)
+async def compute_daily_metrics():
+    await compute_dashboard_metrics()
 ```
 
 **Rationale**:
-- **Simplicity**: Minimal setup and configuration
-- **Reliability**: Good enough for hourly ingestion
-- **Upgrade path**: Can migrate to BullMQ when we need better error handling and retries
+- **Data processing power**: Native pandas/numpy for efficient time-series operations
+- **Scientific libraries**: Access to scipy, statsmodels for advanced analytics
+- **Reliability**: APScheduler provides robust error handling and retries
+- **Future-proof**: No migration needed for ML/analytics features
 
 ### Authentication: Public-First with Optional Preferences
 
@@ -191,28 +195,27 @@ interface AuthenticatedFeatures {
 
 ## Implementation Plan
 
-### Phase 1: Foundation (GRID-008) - Node.js MVP
-- [ ] Set up dual-service structure in Railway
-- [ ] Implement TimescaleDB schema with hypertables
-- [ ] Configure continuous aggregates for dashboard queries
-- [ ] Add Redis caching layer
-- [ ] Create basic EIA API ingestion job (18.8 records/hour/BA)
-- [ ] Design language-agnostic REST APIs for future Python integration
+### Phase 1: Foundation (GRID-011/012) - Infrastructure Setup
+- [x] Set up web service structure in Railway (GRID-011)
+- [ ] Implement TimescaleDB schema with hypertables (GRID-012)
+- [ ] Configure continuous aggregates for dashboard queries (GRID-012)
+- [ ] Add Redis caching layer (GRID-014)
 
-### Phase 2: Core Features (GRID-009) - Hybrid Architecture
-- [ ] Implement Daily Pulse computation and caching (Node.js)
-- [ ] Introduce Python analytics microservice for complex calculations
-- [ ] Migrate duck curve scoring to Python/pandas
-- [ ] Migrate CO2 analysis to Python scientific libraries
-- [ ] Create diff/baseline calculations using statistical methods
+### Phase 2: Data Processing (GRID-013) - Python Worker Service  
+- [ ] Create Python FastAPI worker service
+- [ ] Implement EIA API ingestion with pandas (18.8 records/hour/BA)
+- [ ] Add APScheduler for reliable job processing
+- [ ] Implement Daily Pulse computation and caching
+- [ ] Create duck curve scoring with scientific libraries
+- [ ] Add CO2 analysis with statsmodels
 
-### Phase 3: UI Integration (GRID-010) - Full Python Migration
+### Phase 3: UI Integration (GRID-015) - Full Stack Integration
+- [ ] Complete REST API implementation
 - [ ] Connect React Router v7 frontend to cached data
-- [ ] Implement freshness indicators
+- [ ] Implement freshness indicators  
 - [ ] Add anonymous preference system
 - [ ] Create embeddable components
-- [ ] Complete migration to Python data processing services
-- [ ] Enable advanced ML features (demand forecasting, anomaly detection)
+- [ ] Enable advanced analytics features
 
 ## Design Acceptance Criteria
 
@@ -265,8 +268,8 @@ When node-cron becomes insufficient:
 ### Python Migration Strategy (Long-term)
 Strategic migration to Python/FastAPI for advanced data processing:
 
-#### Phase 1: MVP Foundation (Current)
-- Continue with Node.js worker as planned
+#### Phase 1: MVP Foundation (Current)  
+- Start directly with Python worker service (GRID-013)
 - Design language-agnostic REST APIs
 - Establish database-centric architecture patterns
 

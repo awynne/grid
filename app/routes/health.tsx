@@ -4,7 +4,8 @@ export async function loader() {
     service: "web",
     status: "healthy",
     version: process.env.npm_package_version || "unknown",
-    environment: process.env.NODE_ENV || "unknown"
+    environment: process.env.NODE_ENV || "unknown",
+    deployment_test: "option_b_workflow"
   };
 
   // Database connection status (will implement actual testing later)

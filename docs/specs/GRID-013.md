@@ -9,7 +9,7 @@
 
 ## Overview
 
-Implement the Node.js worker service for automated EIA-930 data ingestion, including hourly cron jobs, API integration, data normalization, and error handling.
+Implement the Python worker service for automated EIA-930 data ingestion, including hourly scheduled jobs, API integration, data processing with pandas, and error handling.
 
 ## Problem Statement
 
@@ -24,9 +24,9 @@ GridPulse requires reliable, automated ingestion of EIA-930 data with:
 
 ### In Scope
 - EIA v2 API integration and authentication
-- Hourly cron job scheduling with node-cron
+- Hourly job scheduling with APScheduler  
 - Data fetching for 5 MVP Balancing Authorities
-- Data normalization and TimescaleDB insertion
+- Data processing with pandas and TimescaleDB insertion
 - Error handling, logging, and monitoring
 - Idempotency and duplicate prevention
 - Basic retry logic and rate limiting
@@ -45,47 +45,61 @@ GridPulse requires reliable, automated ingestion of EIA-930 data with:
 Based on GridPulse product research, target these EIA-930 endpoints:
 
 #### Primary Data Series
-```typescript
-interface EIADataSeries {
-  // Demand data (most reliable, near real-time)
-  demand: '/electricity/rto/region-data/';
-  
-  // Generation by fuel type (12+ hour lag in some regions)
-  fuelMix: '/electricity/rto/fuel-type-data/';
-  
-  // Interchange between BAs
-  interchange: '/electricity/rto/interchange-data/';
-  
-  // Day-ahead demand forecasts
-  forecast: '/electricity/rto/demand-forecast/';
+```python
+# EIA v2 API endpoints for time-series data
+EIA_DATA_SERIES = {
+    # Demand data (most reliable, near real-time)
+    'demand': '/electricity/rto/region-data/',
+    
+    # Generation by fuel type (12+ hour lag in some regions)
+    'fuel_mix': '/electricity/rto/fuel-type-data/',
+    
+    # Interchange between BAs  
+    'interchange': '/electricity/rto/interchange-data/',
+    
+    # Day-ahead demand forecasts
+    'forecast': '/electricity/rto/demand-forecast/',
 }
 ```
 
 #### MVP Balancing Authorities
-```typescript
-const MVP_BALANCING_AUTHORITIES = [
-  'PJM',    // PJM Interconnection (Eastern)
-  'CAISO',  // California ISO (Western)  
-  'MISO',   // Midcontinent ISO (Central)
-  'ERCOT',  // Texas (separate grid)
-  'SPP'     // Southwest Power Pool (Central)
-];
+```python
+MVP_BALANCING_AUTHORITIES = [
+    'PJM',     # PJM Interconnection (Eastern)
+    'CAISO',   # California ISO (Western)
+    'MISO',    # Midcontinent ISO (Central)
+    'ERCOT',   # Texas (separate grid)
+    'SPP'      # Southwest Power Pool (Central)
+]
 ```
 
 ### Worker Service Architecture
 
-```typescript
-// Main worker service structure
-class EIAIngestionService {
-  private apiClient: EIAAPIClient;
-  private database: TimescaleDBClient;
-  private logger: Logger;
+```python
+# Main Python worker service structure
+from dataclasses import dataclass
+from typing import List, Dict, Any
+import pandas as pd
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+class EIAIngestionService:
+    def __init__(self, api_client, database, logger):
+        self.api_client = api_client
+        self.database = database  
+        self.logger = logger
+        self.scheduler = AsyncIOScheduler()
   
-  async startScheduledJobs(): Promise<void>;
-  async ingestLatestData(): Promise<void>;
-  async processBalancingAuthority(baCode: string): Promise<void>;
-  async normalizeAndStore(rawData: EIAResponse): Promise<void>;
-}
+    async def start_scheduled_jobs(self) -> None:
+        """Initialize APScheduler with hourly ingestion"""
+        
+    async def ingest_latest_data(self) -> None:
+        """Fetch latest data for all BAs"""
+        
+    async def process_balancing_authority(self, ba_code: str) -> None:
+        """Process data for single BA"""
+        
+    async def normalize_and_store(self, raw_data: Dict[str, Any]) -> None:
+        """Normalize with pandas and store in TimescaleDB"""
 ```
 
 ### Cron Job Configuration

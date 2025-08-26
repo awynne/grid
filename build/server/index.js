@@ -573,6 +573,36 @@ const route1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   default: home,
   meta: meta$4
 }, Symbol.toStringTag, { value: "Module" }));
+async function loader() {
+  const checks = {
+    timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+    service: "web",
+    status: "healthy",
+    version: process.env.npm_package_version || "unknown",
+    environment: process.env.NODE_ENV || "unknown"
+  };
+  if (process.env.DATABASE_URL) {
+    checks.database = "configured";
+  } else {
+    checks.database = "not_configured";
+  }
+  if (process.env.REDIS_URL) {
+    checks.redis = "configured";
+  } else {
+    checks.redis = "not_configured";
+  }
+  return new Response(JSON.stringify(checks), {
+    status: checks.status === "healthy" ? 200 : 503,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache"
+    }
+  });
+}
+const route2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  loader
+}, Symbol.toStringTag, { value: "Module" }));
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
@@ -693,7 +723,7 @@ const daily = UNSAFE_withComponentProps(function DailyPulse() {
     })
   });
 });
-const route2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: daily,
   meta: meta$3
@@ -873,7 +903,7 @@ const wpm = UNSAFE_withComponentProps(function WhatsPoweringMe() {
     })
   });
 });
-const route3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: wpm,
   meta: meta$2
@@ -1014,7 +1044,7 @@ const ducks = UNSAFE_withComponentProps(function DuckDays() {
     })
   });
 });
-const route4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: ducks,
   meta: meta$1
@@ -1256,12 +1286,12 @@ const diff = UNSAFE_withComponentProps(function WhatChanged() {
     })
   });
 });
-const route5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: diff,
   meta
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-Cwr43O1x.js", "imports": ["/assets/chunk-PVWAREVJ-Bh48qBmg.js", "/assets/index-C-yfcg0x.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": true, "module": "/assets/root-D7CqCh8y.js", "imports": ["/assets/chunk-PVWAREVJ-Bh48qBmg.js", "/assets/index-C-yfcg0x.js"], "css": ["/assets/root-D7AxmYF6.css"], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/home": { "id": "routes/home", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": false, "module": "/assets/home-CojrwGWM.js", "imports": ["/assets/chunk-PVWAREVJ-Bh48qBmg.js", "/assets/card-CwDTKlRs.js", "/assets/index-C-yfcg0x.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/daily": { "id": "routes/daily", "parentId": "root", "path": "daily", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": false, "module": "/assets/daily-B3ZOq1gw.js", "imports": ["/assets/chunk-PVWAREVJ-Bh48qBmg.js", "/assets/card-CwDTKlRs.js", "/assets/button-BTtPfneW.js", "/assets/trending-up-rLNNQsZy.js", "/assets/index-C-yfcg0x.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/wpm": { "id": "routes/wpm", "parentId": "root", "path": "wpm", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": false, "module": "/assets/wpm-CMS1iYmm.js", "imports": ["/assets/chunk-PVWAREVJ-Bh48qBmg.js", "/assets/card-CwDTKlRs.js", "/assets/button-BTtPfneW.js", "/assets/index-C-yfcg0x.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/ducks": { "id": "routes/ducks", "parentId": "root", "path": "ducks", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": false, "module": "/assets/ducks-DfNDBXQZ.js", "imports": ["/assets/chunk-PVWAREVJ-Bh48qBmg.js", "/assets/card-CwDTKlRs.js", "/assets/button-BTtPfneW.js", "/assets/trending-down-BGs6jAih.js", "/assets/index-C-yfcg0x.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/diff": { "id": "routes/diff", "parentId": "root", "path": "diff", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": false, "module": "/assets/diff-DDOJIQA0.js", "imports": ["/assets/chunk-PVWAREVJ-Bh48qBmg.js", "/assets/card-CwDTKlRs.js", "/assets/button-BTtPfneW.js", "/assets/trending-up-rLNNQsZy.js", "/assets/trending-down-BGs6jAih.js", "/assets/index-C-yfcg0x.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 } }, "url": "/assets/manifest-2773bcdb.js", "version": "2773bcdb", "sri": void 0 };
+const serverManifest = { "entry": { "module": "/assets/entry.client-Cd5FAxoU.js", "imports": ["/assets/chunk-PVWAREVJ-CzKxsr-o.js", "/assets/index-by0GzymM.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": true, "module": "/assets/root-DVLBR0-z.js", "imports": ["/assets/chunk-PVWAREVJ-CzKxsr-o.js", "/assets/index-by0GzymM.js"], "css": ["/assets/root-D7AxmYF6.css"], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/home": { "id": "routes/home", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": false, "module": "/assets/home-oP4d-HYP.js", "imports": ["/assets/chunk-PVWAREVJ-CzKxsr-o.js", "/assets/card-BwhYhYdg.js", "/assets/index-by0GzymM.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/health": { "id": "routes/health", "parentId": "root", "path": "health", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": false, "module": "/assets/health-l0sNRNKZ.js", "imports": [], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/daily": { "id": "routes/daily", "parentId": "root", "path": "daily", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": false, "module": "/assets/daily-BQz_8wAY.js", "imports": ["/assets/chunk-PVWAREVJ-CzKxsr-o.js", "/assets/card-BwhYhYdg.js", "/assets/button-BPyiinNK.js", "/assets/trending-up-91bA6oDQ.js", "/assets/index-by0GzymM.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/wpm": { "id": "routes/wpm", "parentId": "root", "path": "wpm", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": false, "module": "/assets/wpm-DJiqqR8H.js", "imports": ["/assets/chunk-PVWAREVJ-CzKxsr-o.js", "/assets/card-BwhYhYdg.js", "/assets/button-BPyiinNK.js", "/assets/index-by0GzymM.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/ducks": { "id": "routes/ducks", "parentId": "root", "path": "ducks", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": false, "module": "/assets/ducks-CFFbay81.js", "imports": ["/assets/chunk-PVWAREVJ-CzKxsr-o.js", "/assets/card-BwhYhYdg.js", "/assets/button-BPyiinNK.js", "/assets/trending-down-BbvKeqbA.js", "/assets/index-by0GzymM.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "routes/diff": { "id": "routes/diff", "parentId": "root", "path": "diff", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasErrorBoundary": false, "module": "/assets/diff-Ce-nD1Nx.js", "imports": ["/assets/chunk-PVWAREVJ-CzKxsr-o.js", "/assets/card-BwhYhYdg.js", "/assets/button-BPyiinNK.js", "/assets/trending-up-91bA6oDQ.js", "/assets/trending-down-BbvKeqbA.js", "/assets/index-by0GzymM.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 } }, "url": "/assets/manifest-457baf55.js", "version": "457baf55", "sri": void 0 };
 const assetsBuildDirectory = "build/client";
 const basename = "/";
 const future = { "unstable_middleware": false, "unstable_optimizeDeps": false, "unstable_splitRouteModules": false, "unstable_subResourceIntegrity": false, "unstable_viteEnvironmentApi": false };
@@ -1288,13 +1318,21 @@ const routes = {
     caseSensitive: void 0,
     module: route1
   },
+  "routes/health": {
+    id: "routes/health",
+    parentId: "root",
+    path: "health",
+    index: void 0,
+    caseSensitive: void 0,
+    module: route2
+  },
   "routes/daily": {
     id: "routes/daily",
     parentId: "root",
     path: "daily",
     index: void 0,
     caseSensitive: void 0,
-    module: route2
+    module: route3
   },
   "routes/wpm": {
     id: "routes/wpm",
@@ -1302,7 +1340,7 @@ const routes = {
     path: "wpm",
     index: void 0,
     caseSensitive: void 0,
-    module: route3
+    module: route4
   },
   "routes/ducks": {
     id: "routes/ducks",
@@ -1310,7 +1348,7 @@ const routes = {
     path: "ducks",
     index: void 0,
     caseSensitive: void 0,
-    module: route4
+    module: route5
   },
   "routes/diff": {
     id: "routes/diff",
@@ -1318,7 +1356,7 @@ const routes = {
     path: "diff",
     index: void 0,
     caseSensitive: void 0,
-    module: route5
+    module: route6
   }
 };
 export {
