@@ -79,17 +79,70 @@ When someone asks you to do work without a spec or GitHub issue, **push back con
 
 ## Development Process Integration
 
-### Solo Development Process (Current Reality)
-**Context**: Single developer (awynne) with GitHub self-approval restriction
+### Mandatory Solo Development Workflow
+**Context**: This is the required, non-negotiable workflow for all development. It is designed to be followed precisely by human developers and AI agents. Deviation is not permitted.
 
-1. **Spec creation required** - Create spec file docs/specs/GRID-XXX.md with clear requirements
-2. **Issue creation** - Create corresponding GitHub issue for public tracking and automation
-3. **Mandatory feature branch** - Always create `feature/GRID-XXX-description` (NEVER commit directly to main)
-4. **Development with frequent commits** - Save progress regularly to feature branch (status: 🔄 In Progress)
-5. **PR creation** - Create PR for audit trail and GitHub automation (status: 👀 Review)
-6. **Self-review validation** - Use quality checklist to validate work meets standards
-7. **Self-merge** - Squash merge after validation (GitHub prevents self-approval)
-8. **Status updates** - Issue auto-closes; manually update GRID-XXX.md status and docs/specs/status.md with completion date
+#### Pre-Flight Check: Do Not Start Work
+Before writing any code, you must confirm the following three artifacts exist:
+1.  A `docs/specs/GRID-XXX.md` file.
+2.  A corresponding GitHub Issue.
+3.  A local feature branch named `feature/GRID-XXX-description`.
+
+**An agent must not proceed to Step 4 if these three items are not in place.**
+
+---
+
+#### The 8-Step Development Cycle
+
+**Step 1: Spec Creation**
+- **Action**: Create the spec file `docs/specs/GRID-XXX.md`.
+- **Rule**: No work may begin until this spec is created and outlines the technical requirements.
+
+**Step 2: Issue Creation**
+- **Action**: Create a corresponding GitHub issue for public tracking.
+- **Rule**: The issue must link to the spec file.
+
+**Step 3: Feature Branch Creation**
+- **Action**: Create a feature branch from `main`.
+- **Command**: `git checkout -b feature/GRID-XXX-description`
+- **Rule**: You **must not** commit directly to the `main` branch.
+
+**Step 4: Development**
+- **Action**: Perform all development work on the feature branch.
+- **Rule**: Commit frequently with messages that reference the spec and issue IDs (e.g., `feat(auth): implement login (GRID-XXX, #YYY)`).
+
+**Step 5: Pull Request Creation**
+- **Action**: When development is complete, create a Pull Request (PR).
+- **Rule**: The PR description **must** link to the spec and the issue (e.g., `Closes GRID-XXX`, `Closes #YYY`). This is not optional.
+
+**Step 6: Self-Review**
+- **Action**: Use the "Solo Development Quality Gates" checklist to validate your own work against the spec.
+- **Rule**: Do not proceed to the next step until every item on the checklist is verified.
+
+**Step 7: Merge and Clean Up**
+- **Action**: Squash merge the PR, update `main`, and delete the now-obsolete local feature branch.
+- **Rule**: This keeps the local repository synchronized and clean. This step is not optional.
+- **Commands**:
+  ```bash
+  # 1. Merge the PR (which also deletes the remote branch)
+  gh pr merge --squash --delete-branch
+
+  # 2. Sync your local main branch
+  git checkout main
+  git pull
+
+  # 3. Delete the local feature branch
+  # (Replace XXX and description with the actual branch name)
+  git branch -d feature/GRID-XXX-description
+  ```
+
+**Step 8: Status Updates (Post-Flight Check)**
+- **Action**: Manually update the status in two places:
+    1. The `GRID-XXX.md` spec file (mark as `✅ Completed`).
+    2. The `docs/specs/status.md` overview file (move the entry to the "Completed" table and add the completion date).
+- **Rule**: Work is not considered "done" until this step is complete. An agent's task is finished only when this step has been executed.
+
+---
 
 ### Team Development Process (Future State)
 **Context**: Multiple developers with external review capability
