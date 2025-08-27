@@ -4,7 +4,7 @@
 
 -- Enable TimescaleDB extension (requires superuser privileges)
 -- NOTE: This should be done by Railway/database admin, included for completeness
--- CREATE EXTENSION IF NOT EXISTS timescaledb;
+CREATE EXTENSION IF NOT EXISTS timescaledb;
 
 -- Convert observations table to hypertable after Prisma migration
 -- This will be run after `prisma migrate deploy`

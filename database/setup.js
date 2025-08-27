@@ -22,6 +22,16 @@ async function runMigrations() {
     await client.connect();
     console.log('✅ Connected to database');
 
+    // First, try to enable TimescaleDB extension
+    console.log('🔧 Enabling TimescaleDB extension...');
+    try {
+      await client.query('CREATE EXTENSION IF NOT EXISTS timescaledb;');
+      console.log('✅ TimescaleDB extension enabled');
+    } catch (error) {
+      console.log('⚠️ Could not enable TimescaleDB extension (may require superuser privileges)');
+      console.log(`   Error: ${error.message.substring(0, 100)}...`);
+    }
+
     // Read and execute migration files in order
     const migrations = [
       '001_timescaledb_setup.sql',
