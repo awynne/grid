@@ -1,5 +1,27 @@
 # Project Management Guidelines
 
+## Core Development Principles
+
+### 🎯 "Done Means Done" - Production Deployment Required
+
+> **"It's not done until it's running in prod"**
+
+**Definition**: No feature, spec, or implementation is considered complete until it has been successfully deployed and validated in the production environment.
+
+**This means:**
+- ❌ **Not Done**: Code merged to main branch  
+- ❌ **Not Done**: Local testing passed
+- ❌ **Not Done**: Test environment deployed
+- ✅ **Done**: Production deployment successful and validated
+
+**Why This Matters:**
+- **Real Value**: Features only provide user value when accessible in production
+- **Quality Assurance**: Full deployment pipeline validates complete functionality
+- **Risk Management**: Issues are caught and resolved before they impact users
+- **Accountability**: Clear completion criteria prevent "almost done" syndrome
+
+**Documentation**: See [docs/deployment.md](./deployment.md) for complete deployment procedures and validation requirements.
+
 ## Spec-First Development Rule
 
 ### ❗ MANDATORY: No Work Without a Technical Spec
@@ -92,7 +114,7 @@ Before writing any code, you must confirm the following three artifacts exist:
 
 ---
 
-#### The 8-Step Development Cycle
+#### The 9-Step Development Cycle
 
 **Step 1: Spec Creation**
 - **Action**: Create the spec file `docs/specs/GRID-XXX.md`.
@@ -136,11 +158,33 @@ Before writing any code, you must confirm the following three artifacts exist:
   git branch -d feature/GRID-XXX-description
   ```
 
-**Step 8: Status Updates (Post-Flight Check)**
-- **Action**: Manually update the status in two places:
-    1. The `GRID-XXX.md` spec file (mark as `✅ Completed`).
-    2. The `docs/specs/status.md` overview file (move the entry to the "Completed" table and add the completion date).
-- **Rule**: Work is not considered "done" until this step is complete. An agent's task is finished only when this step has been executed.
+**Step 8: Deployment Pipeline (Post-Merge)**
+- **Action**: Deploy to test environment and validate, then deploy to production.
+- **Rule**: **"Done means done"** - Features are not complete until running in production.
+  
+**Sub-steps:**
+  1. **Deploy to Test Environment**:
+     ```bash
+     npm run deploy:test
+     ```
+  2. **Validate Test Deployment**:
+     ```bash
+     npm run test:remote:test
+     ```
+  3. **Deploy to Production** (only after test passes):
+     ```bash
+     npm run deploy:prod  
+     ```
+  4. **Validate Production Deployment**:
+     ```bash
+     npm run test:remote:prod
+     ```
+
+**Step 9: Final Status Updates (Completion Confirmation)**
+- **Action**: Update spec status to ✅ Completed only after successful production deployment:
+    1. The `GRID-XXX.md` spec file (mark as `✅ Completed` with production deployment confirmation).
+    2. The `docs/specs/status.md` overview file (move to "Completed" with deployment date).
+- **Rule**: Work is not considered "done" until deployed and validated in production. **No exceptions.**
 
 ---
 
@@ -345,24 +389,50 @@ Since no external reviewer is available in solo development, use this checklist 
 - [ ] GitHub issue properly linked
 - [ ] Status updates prepared for post-merge
 
+**Deployment & Production Readiness:**
+- [ ] Test environment deployment successful
+- [ ] Test environment validation passed
+- [ ] Production deployment successful  
+- [ ] Production environment validation passed
+- [ ] Health checks responding correctly
+- [ ] Performance meets production requirements
+
+**"Done Means Done" Confirmation:**
+- [ ] Feature accessible and functional in production
+- [ ] No rollback required after deployment
+- [ ] Monitoring confirms stable operation
+- [ ] Spec marked ✅ Completed only after production validation
+
 ## Spec Management Process
 
 ### Spec Status Legend
 - 🆕 **New** - Spec created, not yet assigned
 - 🔄 **In Progress** - Currently being worked on
 - 👀 **Review** - Definition of done achieved, PR created, awaiting review
-- ✅ **Completed** - PR merged to main branch
+- 🚀 **Ready for Test** - PR merged, ready for test environment deployment
+- 🧪 **Testing** - Deployed to test environment, undergoing validation
+- 🎯 **Ready for Prod** - Test validation passed, ready for production deployment
+- ✅ **Completed** - Successfully deployed and validated in production
 - ❌ **Cancelled** - Spec cancelled or no longer needed
 - 🔴 **Blocked** - Cannot proceed due to dependencies
 
+**Important**: Only ✅ **Completed** means "done" - all other statuses indicate work in progress.
+
 ### Solo Development Completion Workflow
-**Current Reality**: Specs are marked ✅ Completed after self-validation and merge:
+**Updated Process**: Specs are marked ✅ Completed only after successful production deployment:
 
 1. **Developer completes work** - All acceptance criteria and definition of done satisfied
-2. **Move to 👀 Review** - Create PR and update spec status
+2. **Move to 👀 Review** - Create PR and update spec status  
 3. **Self-validation** - Complete quality checklist and verify all requirements met
-4. **Self-merge** - Squash merge after validation (GitHub prevents self-approval)
-5. **Spec marked ✅ Completed** - Update status and link merged PR
+4. **Self-merge** - Squash merge after validation
+5. **Move to 🚀 Ready for Test** - Update spec status, prepare for deployment
+6. **Deploy to Test** - Run `npm run deploy:test` and validate with `npm run test:remote:test`
+7. **Move to 🧪 Testing** - Update spec status during test validation
+8. **Move to 🎯 Ready for Prod** - After successful test validation
+9. **Deploy to Production** - Run `npm run deploy:prod` and validate with `npm run test:remote:prod`
+10. **Spec marked ✅ Completed** - Only after successful production deployment and validation
+
+**Rule**: No spec is considered "done" until step 10 is complete and production is stable.
 
 ### Team Development Completion Workflow
 **Future State**: Specs are marked ✅ Completed after external review cycle:
