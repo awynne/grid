@@ -61,6 +61,10 @@
     "typescript": "^5.0.0",
     "vite": "^5.0.0"
   },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   }

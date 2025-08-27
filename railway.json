@@ -3,7 +3,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "./scripts/deploy.sh",
+    "startCommand": "./scripts/start.sh",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60
   }
