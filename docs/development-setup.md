@@ -17,7 +17,7 @@
    cp .env.example .env
    
    # Get DATABASE_URL from Railway dev project dashboard
-   # Use: postgresql://postgres:aWkrFQXRAyvixRAAHkEPayguehQyXtIF@gondola.proxy.rlwy.net:16812/railway
+   # Contact team lead or check Railway dev project for actual DATABASE_URL
    
    # Update .env with the actual DATABASE_URL
    # SECURITY: Never commit .env file to git!
