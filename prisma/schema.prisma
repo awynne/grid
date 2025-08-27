@@ -1,5 +1,5 @@
-// GridPulse Prisma Schema for Development
-// Basic schema for minimal UI - will be expanded in GRID-012
+// GridPulse Prisma Schema with TimescaleDB Integration
+// Expanded schema for GRID-012: TimescaleDB Schema Implementation
 
 generator client {
   provider = "prisma-client-js"
@@ -10,15 +10,58 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Basic schema for GRID-017 minimal UI
+// Balancing Authorities (Enhanced from GRID-017)
 model BalancingAuthority {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   code      String   @unique // "PJM", "CAISO", "MISO"
   name      String   // "PJM Interconnection"
   timezone  String   // "America/New_York"
   region    String?  // "Eastern", "Western", "Texas"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // Relationships
+  series    Series[]
 
   @@map("balancing_authorities")
+}
+
+// Series Definition for Time-Series Data
+model Series {
+  id           String   @id @default(uuid())
+  baId         String   @map("ba_id")
+  type         String   // "demand", "generation", "interchange", "co2"
+  subtype      String?  // "coal", "gas", "solar", "wind", "nuclear", etc.
+  units        String   // "MW", "MWh", "g/kWh"
+  description  String?
+  eiaSeriesId  String?  @map("eia_series_id") // Original EIA series identifier
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  
+  // Relationships
+  balancingAuthority BalancingAuthority @relation(fields: [baId], references: [id], onDelete: Cascade)
+  observations       Observation[]
+  
+  @@unique([baId, type, subtype])
+  @@index([baId, type])
+  @@index([isActive])
+  @@map("series")
+}
+
+// Time-Series Observations (Will be converted to TimescaleDB hypertable)
+model Observation {
+  seriesId    String   @map("series_id")
+  ts          DateTime
+  value       Decimal  @db.Decimal(12, 3) // Supports MW precision
+  qualityFlag String   @default("good") @map("quality_flag") // "good", "estimated", "missing"
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  // Relationships
+  series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  
+  @@id([seriesId, ts])
+  @@index([ts, seriesId])
+  @@index([value])
+  @@map("observations")
 }
