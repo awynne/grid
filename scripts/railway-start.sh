@@ -12,7 +12,9 @@ echo "📍 Environment: $ENVIRONMENT"
 
 # Quick environment validation
 if [[ -z "$DATABASE_URL" ]]; then
-    echo "❌ DATABASE_URL missing"
+    echo "❌ DATABASE_URL missing - check Railway service connections"
+    echo "Available environment variables:"
+    env | grep -E "(RAILWAY|DATABASE|POSTGRES)" | sort
     exit 1
 fi
 
