@@ -24,22 +24,23 @@ echo "🔍 Database URL found: ${DATABASE_URL:0:20}... (truncated for security)"
 echo "🔧 Generating Prisma client..."
 npx prisma generate
 
-# Database migrations
+# Database migrations (critical - must succeed)
 echo "💾 Applying database migrations..."
 npx prisma migrate deploy
 
-# TimescaleDB features (if not already applied)
+# TimescaleDB features (non-blocking - allow failures)
 echo "⚡ Setting up TimescaleDB features..."
-node database/setup.js || echo "⚠️  TimescaleDB setup skipped (may already be configured)"
+timeout 30 node database/setup.js || echo "⚠️  TimescaleDB setup skipped (may already be configured or failed)"
 
-# Conditional seeding (dev/test only)
+# Conditional seeding (non-blocking for faster startup)
 if [[ "$ENVIRONMENT" == "dev" || "$ENVIRONMENT" == "test" ]]; then
-    echo "🌱 Seeding database with sample data..."
-    npx prisma db seed
+    echo "🌱 Seeding database with sample data (background)..."
+    # Run seeding in background to avoid blocking app startup
+    (timeout 60 npx prisma db seed || echo "⚠️  Database seeding failed or timed out") &
 else
     echo "📦 Production environment - skipping data seeding"
 fi
 
-# Start application
+# Start application immediately (don't wait for background processes)
 echo "✅ Starting GridPulse application..."
 exec npm start
