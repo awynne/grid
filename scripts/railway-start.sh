@@ -25,7 +25,13 @@ echo "🔧 Generating Prisma client..."
 npx prisma generate
 
 echo "💾 Applying database migrations..."
-npx prisma migrate deploy
+# Try migrations with timeout and fallback
+if timeout 30 npx prisma migrate deploy; then
+    echo "✅ Database migrations applied successfully"
+else
+    echo "⚠️ Database migrations failed or timed out - continuing startup"
+    echo "   App will start but may have limited functionality until database is available"
+fi
 
 # Start application immediately
 echo "✅ Starting GridPulse application..."
