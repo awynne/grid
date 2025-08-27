@@ -7,7 +7,7 @@ export async function loader() {
     status: "healthy",
     version: process.env.npm_package_version || "unknown",
     environment: process.env.NODE_ENV || "unknown",
-    deployment_test: "option_b_workflow",
+    deployment_test: "web-test_service_fix",
     railway_environment: process.env.RAILWAY_ENVIRONMENT || "unknown"
   };
 
