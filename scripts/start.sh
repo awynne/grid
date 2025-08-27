@@ -10,6 +10,20 @@ echo "🚀 Starting GridPulse runtime..."
 ENVIRONMENT=${RAILWAY_ENVIRONMENT:-"unknown"}
 echo "📍 Starting in environment: $ENVIRONMENT"
 
+# Environment validation
+if [[ -z "$DATABASE_URL" ]]; then
+    echo "❌ DATABASE_URL environment variable not found"
+    echo "Available environment variables:"
+    env | grep -E "(RAILWAY|DATABASE|NODE)" | sort
+    exit 1
+fi
+
+echo "🔍 Database URL found: ${DATABASE_URL:0:20}... (truncated for security)"
+
+# Generate Prisma client first
+echo "🔧 Generating Prisma client..."
+npx prisma generate
+
 # Database migrations
 echo "💾 Applying database migrations..."
 npx prisma migrate deploy
@@ -25,10 +39,6 @@ if [[ "$ENVIRONMENT" == "dev" || "$ENVIRONMENT" == "test" ]]; then
 else
     echo "📦 Production environment - skipping data seeding"
 fi
-
-# Health check preparation
-echo "🏥 Preparing health checks..."
-npx prisma generate
 
 # Start application
 echo "✅ Starting GridPulse application..."
