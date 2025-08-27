@@ -1,11 +1,13 @@
 # GRID-012: TimescaleDB Schema Implementation
 
-**Status**: 🔄 In Progress  
+**Status**: ✅ Completed  
 **Priority**: High  
 **Created**: 2025-08-22  
 **Updated**: 2025-08-27  
+**Completed**: 2025-08-27
 
-**GitHub Issue**: [#24](https://github.com/awynne/grid/issues/24)
+**GitHub Issue**: [#24](https://github.com/awynne/grid/issues/24) (Closed)
+**Pull Request**: [#25](https://github.com/awynne/grid/pull/25) (Merged)
 
 ## Overview
 
