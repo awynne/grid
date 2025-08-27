@@ -13,6 +13,9 @@ type Pages = {
   "/": {
     params: {};
   };
+  "/health": {
+    params: {};
+  };
   "/daily": {
     params: {};
   };
@@ -30,11 +33,15 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/daily" | "/wpm" | "/ducks" | "/diff";
+    page: "/" | "/health" | "/daily" | "/wpm" | "/ducks" | "/diff";
   };
   "routes/home.tsx": {
     id: "routes/home";
     page: "/";
+  };
+  "routes/health.tsx": {
+    id: "routes/health";
+    page: "/health";
   };
   "routes/daily.tsx": {
     id: "routes/daily";

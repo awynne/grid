@@ -13,14 +13,14 @@
 
 2. **Configure Environment Variables**
    ```bash
-   # Get database URL from Railway
-   railway service Postgres
-   railway variables
+   # Copy the template file
+   cp .env.example .env
    
-   # Generate session secret
-   openssl rand -base64 32
+   # Get DATABASE_URL from Railway dev project dashboard
+   # Use: postgresql://postgres:aWkrFQXRAyvixRAAHkEPayguehQyXtIF@gondola.proxy.rlwy.net:16812/railway
    
-   # Create .env.local (see template below)
+   # Update .env with the actual DATABASE_URL
+   # SECURITY: Never commit .env file to git!
    ```
 
 3. **Setup Database**
@@ -96,7 +96,7 @@ openssl rand -base64 32
 
 ## Database Operations
 
-### Initial Setup
+### Initial Setup (GRID-012 Enhanced)
 ```bash
 # Generate Prisma client
 npx prisma generate
@@ -104,8 +104,14 @@ npx prisma generate
 # Push schema to Railway database
 npx prisma db push
 
-# Seed development data
+# Apply TimescaleDB features (hypertables, aggregates)
+npm run db:timescale
+
+# Seed development data (5 BAs, 40 series, sample observations)
 npx prisma db seed
+
+# OR run complete setup in one command:
+npm run db:setup
 ```
 
 ### Daily Development
@@ -159,21 +165,21 @@ railway run 'echo $DATABASE_URL'
 
 ## Current Architecture Status
 
-### ✅ Completed (GRID-017)
+### ✅ Completed (GRID-017 + GRID-012)
 - React Router v7 application with TypeScript
 - shadcn/ui component library
-- Basic Prisma schema with `BalancingAuthority` model
+- **TimescaleDB schema** with BalancingAuthority, Series, and Observation models
+- **Time-series optimization** with hypertables and continuous aggregates
 - Railway production database connection configured
-- Local development environment setup and tested
-- Database seeded with 5 balancing authorities (PJM, CAISO, MISO, ERCOT, SPP)
+- **Local development environment** setup and tested with dev database
+- Database seeded with 5 BAs, 40 series, 120 sample observations
 - Development server running on http://localhost:5173
 
 ### 🔄 Next Steps
-- **GRID-011**: Production Railway infrastructure setup
-- **GRID-012**: Full TimescaleDB schema with hypertables
 - **GRID-013**: EIA data ingestion service
 - **GRID-014**: Redis caching layer
 - **GRID-015**: REST API design
+- **GRID-018**: F1 Daily Pulse feature implementation
 
 ## Troubleshooting
 

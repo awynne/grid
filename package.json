@@ -18,7 +18,8 @@
     "db:studio": "prisma studio",
     "db:reset": "prisma db push --force-reset && prisma db seed",
     "db:setup": "./scripts/setup-database.sh",
-    "db:timescale": "node database/setup.js"
+    "db:timescale": "node database/setup.js",
+    "test:local": "node scripts/test-local-setup.js"
   },
   "dependencies": {
     "@prisma/client": "^5.0.0",
