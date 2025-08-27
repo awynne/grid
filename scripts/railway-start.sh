@@ -7,7 +7,7 @@ set -e
 echo "🚀 Railway-optimized GridPulse startup..."
 
 # Environment detection
-ENVIRONMENT=${RAILWAY_ENVIRONMENT:-"unknown"}
+ENVIRONMENT=${RAILWAY_ENVIRONMENT_NAME:-${RAILWAY_ENVIRONMENT:-"unknown"}}
 echo "📍 Environment: $ENVIRONMENT"
 
 # Quick environment validation

@@ -7,7 +7,7 @@ set -e
 echo "🚀 Starting GridPulse runtime..."
 
 # Environment detection
-ENVIRONMENT=${RAILWAY_ENVIRONMENT:-"unknown"}
+ENVIRONMENT=${RAILWAY_ENVIRONMENT_NAME:-${RAILWAY_ENVIRONMENT:-"unknown"}}
 echo "📍 Starting in environment: $ENVIRONMENT"
 
 # Environment validation
