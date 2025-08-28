@@ -1,0 +1,5 @@
+# Terraform variables for Railway infrastructure
+# Copy this file to terraform.tfvars and update with your values
+
+postgres_password = "your-secure-postgres-password-here"
+session_secret   = "your-32-character-session-secret-here"
