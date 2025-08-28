@@ -17,7 +17,7 @@ echo "👤 Logged in as: $(railway whoami)"
 
 # Link to gridpulse project and test environment
 echo "🔗 Linking to gridpulse project (test environment)..."
-railway link gridpulse --environment test
+railway link --project gridpulse --environment test
 
 echo "📊 Current project status:"
 railway status
