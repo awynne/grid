@@ -1,23 +1,17 @@
----
-title: Basics
-toc: false
-order: 1
----
+# GridPulse
 
-# Basic Example
+Electric grid data visualization platform providing near real-time insights from EIA-930 hourly electric grid data.
 
-This example demonstrates some of the basic features of React Router, including:
+## Documentation
 
-- Layouts and nested `<Route>`s
-- Index `<Route>`s
-- Catch-all `<Route>`s
-- Using `<Outlet>` as a placeholder for child routes
-- Using `<Link>`s for navigation
+All project documentation is located in the [`docs/`](./docs/) directory.
 
-## Preview
+**Start here:** [docs/README.md](./docs/README.md)
 
-Open this example on [StackBlitz](https://stackblitz.com):
+The documentation includes:
+- Development workflows and coding standards
+- Technical specifications and implementation status  
+- Product requirements and feature definitions
+- Setup guides and deployment instructions
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router/tree/main/examples/basic?file=src/App.tsx)
-
-## END
+For complete navigation and detailed information, see [docs/README.md](./docs/README.md).
