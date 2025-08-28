@@ -20,13 +20,24 @@ fi
 
 echo "🔍 Database URL configured"
 
+# Wait for database to be ready
+echo "⏳ Waiting for database to be ready..."
+for i in {1..30}; do
+    if npx prisma db execute --stdin <<< "SELECT 1;" > /dev/null 2>&1; then
+        echo "✅ Database is ready"
+        break
+    fi
+    echo "   Attempt $i/30: Database not ready, waiting 2 seconds..."
+    sleep 2
+done
+
 # Essential operations only (fast)
 echo "🔧 Generating Prisma client..."
 npx prisma generate
 
 echo "💾 Applying database migrations..."
 # Try migrations with timeout and fallback
-if timeout 30 npx prisma migrate deploy; then
+if timeout 60 npx prisma migrate deploy; then
     echo "✅ Database migrations applied successfully"
 else
     echo "⚠️ Database migrations failed or timed out - continuing startup"
