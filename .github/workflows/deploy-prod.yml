@@ -14,6 +14,7 @@ env:
   IMAGE_TAG: v${{ github.run_number }}-${{ github.sha }}
   DEPLOY_WITH_CDKTF: 'false'
   RAILWAY_TRIGGER_REDEPLOY: 'true'
+  RAILWAY_USE_API: 'true'
 
 jobs:
   build-and-deploy:
@@ -46,8 +47,8 @@ jobs:
           docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
           docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
 
-      - name: Trigger Railway redeploy (registry)
-        if: env.RAILWAY_TRIGGER_REDEPLOY == 'true'
+      - name: Trigger Railway redeploy (registry - CLI)
+        if: env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.RAILWAY_USE_API != 'true'
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
@@ -77,6 +78,16 @@ jobs:
             railway service restart || railway up --detach
             set -e
           fi
+
+      - name: Trigger Railway redeploy (registry - API)
+        if: env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.RAILWAY_USE_API == 'true'
+        env:
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+          RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
+          RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
+        run: |
+          node --version
+          node scripts/railway-redeploy.js
 
       - name: Install CDKTF deps
         if: env.DEPLOY_WITH_CDKTF == 'true'
