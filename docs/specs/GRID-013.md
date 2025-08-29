@@ -1,15 +1,24 @@
 # GRID-013: EIA Data Ingestion Service
 
-**Status**: 🆕 New  
+**Status**: 🔄 In Progress  
 **Priority**: High  
 **Created**: 2025-08-22  
-**Updated**: 2025-08-22  
+**Updated**: 2025-08-29  
 
 **Issue Link**: *To be created*
 
 ## Overview
 
-Implement the Python worker service for automated EIA-930 data ingestion, including hourly scheduled jobs, API integration, data processing with pandas, and error handling.
+Implement a standalone Python data ingestion service running from home network infrastructure, with scheduled EIA-930 data fetching that communicates with the GridPulse application via REST API rather than direct database access. This maintains true microservice architecture with proper API boundaries.
+
+## ⚠️ ARCHITECTURE DECISION REQUIRED
+
+**Critical architectural change**: Worker service will run as **external standalone service** (not Railway-hosted) and communicate via **REST API** rather than direct database access. This requires:
+
+1. **Service Design Pattern**: True microservice with API-first data ingestion
+2. **Network Architecture**: Home network → Railway API communication
+3. **Scheduling Strategy**: External cron/Dagster vs. Railway-hosted timer service
+4. **Data Flow**: Worker → GridPulse API → TimescaleDB (not Worker → TimescaleDB direct)
 
 ## Problem Statement
 
@@ -23,49 +32,90 @@ GridPulse requires reliable, automated ingestion of EIA-930 data with:
 ## Scope
 
 ### In Scope
-- EIA v2 API integration and authentication
-- Hourly job scheduling with APScheduler  
-- Data fetching for 5 MVP Balancing Authorities
-- Data processing with pandas and TimescaleDB insertion
-- Error handling, logging, and monitoring
-- Idempotency and duplicate prevention
-- Basic retry logic and rate limiting
+- **External Python Service**: Standalone worker running on home network
+- **EIA v2 API Integration**: Authentication and data fetching
+- **GridPulse API Integration**: REST API calls for data submission (not direct DB)
+- **Data Processing**: pandas normalization and validation  
+- **Scheduling Strategy**: External scheduling mechanism (Dagster vs. cron TBD)
+- **Error Handling**: Network failures, API errors, retry logic
+- **Authentication**: API key management for both EIA and GridPulse APIs
+- **Data Quality**: Validation before API submission
 
 ### Out of Scope
-- Complex queue systems (BullMQ upgrade path in future specs)
-- Real-time data streaming (hourly batch is sufficient for MVP)
-- Data analytics and calculations (separate specs)
-- UI integration (future specs)
-- Advanced monitoring (basic logging only)
+- **Railway Hosting**: Worker runs externally, not on Railway infrastructure
+- **Direct Database Access**: All data goes through GridPulse REST API
+- **Complex Queue Systems**: Simple request/response pattern for MVP
+- **Real-time Streaming**: Hourly batch processing sufficient
+- **GridPulse API Implementation**: API endpoints assumed to exist (separate spec)
+- **Advanced Monitoring**: Basic logging only, no complex observability
 
-## Architecture Decision: Dagster for Pipeline Orchestration
+## 🔬 RESEARCH REQUIRED: Orchestration Strategy
 
-### Research and Analysis
+### Decision Point: Dagster vs. Simple Cron
 
-In evaluating frameworks for data pipeline orchestration, we considered Prefect, Apache Airflow, and Dagster. The key requirements were:
-- Clear data architecture visibility
-- Support for parallel execution  
-- Low overhead in setup and maintenance
-- Data lineage and validation capabilities
+**Current assumption**: Dagster provides orchestration, monitoring, and data lineage benefits.
 
-### Decision: Dagster Selected
+**New constraint**: External service running on home network changes requirements:
 
-**Rationale:**
-- **Architecture-First Approach**: Dagster aligns with our desire for intuitive, visual understanding of data flow
-- **Strong Data Lineage**: Native tracking of data dependencies and asset versioning
-- **Efficient Parallelism**: Supports concurrent task execution natively
-- **Data-Centric Design**: Asset-based model fits EIA data series perfectly
-- **Developer Experience**: Clear, Pythonic APIs and good documentation
+#### Option 1: Dagster on Home Network
+**Pros**: Asset lineage, web UI, sophisticated scheduling, data validation
+**Cons**: Additional infrastructure, resource usage, complexity for simple hourly jobs
 
-**Why Not Alternatives:**
-- **Prefect**: Less architectural transparency, fewer data-centric features
-- **Airflow**: Higher operational complexity even in lightweight variants, task-focused rather than asset-focused
+#### Option 2: Simple Cron + Python Scripts  
+**Pros**: Minimal overhead, simple deployment, standard Unix scheduling
+**Cons**: No pipeline visibility, basic error handling, manual monitoring
 
-### Consequences
-- **Positive**: Better maintainability, improved debugging/observability, native scaling for asset-driven workflows
-- **Tradeoffs**: Learning curve for team, may require custom integrations for legacy systems
+### 🚨 RESEARCH QUESTIONS:
+
+1. **Dagster Resource Requirements**: What are minimum system requirements for Dagster daemon?
+2. **Dagster Web UI**: Can it be accessed securely from external network? Required?
+3. **Dagster Storage**: What persistent storage does Dagster need for metadata?
+4. **Network Connectivity**: Can Dagster assets make HTTPS calls to Railway API reliably?
+5. **Cost/Benefit**: Does Dagster complexity justify benefits for simple hourly API calls?
+
+### 🎯 DECISION CRITERIA:
+- **Reliability**: Can we achieve 99%+ uptime for hourly jobs?
+- **Operational Overhead**: How much maintenance does each approach require?
+- **Debugging**: How easy is it to troubleshoot failed runs?
+- **Cost**: Power/resource usage on home network infrastructure
 
 ## Technical Requirements
+
+### New Architecture: External Worker → GridPulse API
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│  Home Network   │    │   Railway Cloud  │    │  TimescaleDB    │
+│                 │    │                  │    │                 │
+│  Python Worker  │───▶│  GridPulse API   │───▶│  observations   │
+│  - EIA API      │    │  - REST endpoints│    │  - series data  │
+│  - Scheduling   │    │  - Authentication│    │  - time-series  │
+│  - Data Proc    │    │  - Validation    │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### 🚨 MISSING DEPENDENCY: GridPulse REST API
+
+**Critical Gap**: This spec assumes GridPulse application has REST API endpoints for data ingestion.
+
+**Required API Endpoints** (to be implemented):
+```
+POST /api/v1/data/observations
+  - Accept batch observation data
+  - Validate data quality and format
+  - Handle duplicate detection/upserts
+  - Return success/error status
+
+GET /api/v1/data/series/{series_id}/latest
+  - Return latest timestamp for incremental fetches
+  - Support for multiple series query
+
+POST /api/v1/auth/worker
+  - Worker authentication endpoint
+  - API key validation
+```
+
+**⚠️ REQUIRES SEPARATE SPEC**: GridPulse API implementation (GRID-015 or new spec)
 
 ### EIA API Integration
 
@@ -100,98 +150,80 @@ MVP_BALANCING_AUTHORITIES = [
 ]
 ```
 
-### Dagster Pipeline Architecture
+### 🔬 RESEARCH REQUIRED: Service Implementation Strategy
 
+**Decision Point**: Dagster assets vs. simple Python scripts
+
+#### Option A: Dagster Asset-Based Architecture
 ```python
-# Dagster assets for EIA data ingestion
-from dagster import asset, AssetIn, Config, get_dagster_logger
-from typing import List, Dict, Any
-import pandas as pd
-import requests
-from datetime import datetime, timedelta
-
-class EIAConfig(Config):
-    api_key: str
-    base_url: str = "https://api.eia.gov/v2"
-    rate_limit_per_hour: int = 5000
-
-MVP_BALANCING_AUTHORITIES = ['PJM', 'CAISO', 'MISO', 'ERCOT', 'SPP']
-
+# If using Dagster - asset pipeline approach
 @asset(group_name="eia_raw_data")
 def eia_demand_data(config: EIAConfig) -> Dict[str, pd.DataFrame]:
-    """Fetch hourly demand data for all MVP balancing authorities"""
-    logger = get_dagster_logger()
-    
-    demand_data = {}
-    for ba_code in MVP_BALANCING_AUTHORITIES:
-        df = fetch_eia_data(config, ba_code, 'demand')
-        demand_data[ba_code] = df
-        logger.info(f"Fetched {len(df)} demand records for {ba_code}")
-    
-    return demand_data
-
-@asset(group_name="eia_raw_data") 
-def eia_fuel_mix_data(config: EIAConfig) -> Dict[str, pd.DataFrame]:
-    """Fetch hourly fuel mix data for all MVP balancing authorities"""
-    logger = get_dagster_logger()
-    
-    fuel_mix_data = {}
-    for ba_code in MVP_BALANCING_AUTHORITIES:
-        df = fetch_eia_data(config, ba_code, 'fuel_mix')
-        fuel_mix_data[ba_code] = df
-        logger.info(f"Fetched {len(df)} fuel mix records for {ba_code}")
-    
-    return fuel_mix_data
-
-@asset(group_name="eia_processed")
-def normalized_observations(
-    eia_demand_data: Dict[str, pd.DataFrame],
-    eia_fuel_mix_data: Dict[str, pd.DataFrame]
-) -> pd.DataFrame:
-    """Normalize and combine all EIA data into standardized observations"""
-    logger = get_dagster_logger()
-    
-    all_observations = []
-    
-    # Process demand data
-    for ba_code, df in eia_demand_data.items():
-        normalized = normalize_demand_data(df, ba_code)
-        all_observations.append(normalized)
-        
-    # Process fuel mix data  
-    for ba_code, df in eia_fuel_mix_data.items():
-        normalized = normalize_fuel_mix_data(df, ba_code)
-        all_observations.append(normalized)
-    
-    combined_df = pd.concat(all_observations, ignore_index=True)
-    logger.info(f"Normalized {len(combined_df)} total observations")
-    
-    return combined_df
-
-@asset(group_name="timescaledb")
-def stored_observations(normalized_observations: pd.DataFrame) -> int:
-    """Store normalized observations in TimescaleDB"""
-    logger = get_dagster_logger()
-    
-    # Validate data quality
-    valid_observations = validate_observations(normalized_observations)
-    
-    # Batch insert to database with upsert logic
-    records_inserted = batch_upsert_observations(valid_observations)
-    
-    logger.info(f"Successfully stored {records_inserted} observations")
-    return records_inserted
-
-def fetch_eia_data(config: EIAConfig, ba_code: str, data_type: str) -> pd.DataFrame:
-    """Fetch data from EIA API with rate limiting and error handling"""
-    # Implementation details for API calls with pandas DataFrame return
+    """Fetch from EIA API"""
+    # EIA API calls
     pass
 
-def normalize_demand_data(raw_df: pd.DataFrame, ba_code: str) -> pd.DataFrame:
-    """Transform raw EIA demand data into normalized observation format"""
-    # Implementation details for pandas transformation
-    pass
+@asset(group_name="gridpulse_api")  
+def submitted_observations(normalized_observations: pd.DataFrame) -> int:
+    """Submit to GridPulse API instead of direct DB"""
+    response = requests.post(
+        f"{GRIDPULSE_BASE_URL}/api/v1/data/observations",
+        json=normalized_observations.to_dict('records'),
+        headers={"Authorization": f"Bearer {API_KEY}"}
+    )
+    return response.json()['records_processed']
 ```
+
+#### Option B: Simple Script Architecture  
+```python
+# If using cron - simple function approach
+def main():
+    # 1. Fetch from EIA API
+    raw_data = fetch_eia_data()
+    
+    # 2. Process and normalize  
+    normalized = process_data(raw_data)
+    
+    # 3. Submit to GridPulse API
+    submit_to_api(normalized)
+```
+
+### 🚨 ARCHITECTURE QUESTIONS:
+
+1. **API Authentication**: How should worker authenticate with GridPulse API?
+   - API key in headers?
+   - JWT tokens with refresh?
+   - Service-to-service authentication?
+
+2. **Batch Size**: What's optimal batch size for API submissions?
+   - Single large POST with all data?
+   - Multiple smaller batches?
+   - Streaming approach?
+
+3. **Error Handling**: How should API failures be handled?
+   - Retry logic for transient failures?
+   - Dead letter queue for permanent failures?
+   - Partial batch success handling?
+
+4. **Rate Limiting**: Does GridPulse API need rate limiting?
+   - Worker is controlled environment, but API might have limits
+   - Coordinate with EIA API rate limiting
+
+### ⚠️ VARIABLE PATTERN PROBLEMS
+
+**Home Network Configuration Challenges**:
+```python
+# These patterns need research:
+EIA_API_KEY = os.getenv('EIA_API_KEY')              # ✅ Standard
+GRIDPULSE_API_KEY = os.getenv('GRIDPULSE_API_KEY')  # ⚠️  How generated?
+GRIDPULSE_BASE_URL = os.getenv('GRIDPULSE_BASE_URL') # ⚠️  Railway dynamic URLs?
+```
+
+**Questions**:
+1. How are Railway URLs discovered? (https://xyz-production.up.railway.app)
+2. How is GridPulse API key generated and rotated?
+3. Should config be file-based vs. environment variables?
+4. How to handle Railway service restarts/URL changes?
 
 ### Dagster Scheduling Configuration
 
@@ -563,11 +595,35 @@ def get_latest_timestamp_for_series(series_id: str, connection_string: str) -> O
 
 ## Dependencies
 
-- **GRID-011**: ✅ Railway worker service deployed (update to Python environment)
-- **GRID-012**: ✅ TimescaleDB schema implemented
-- EIA API key obtained and configured in Dagster environment
-- Python 3.9+ environment with Dagster, pandas, psycopg2, sqlalchemy packages
-- Dagster daemon running for schedule and sensor execution
+### ✅ Completed Dependencies
+- **GRID-011**: Railway infrastructure setup 
+- **GRID-012**: TimescaleDB schema implemented
+- **GRID-012A**: Docker deployment pipeline established
+
+### 🚨 MISSING DEPENDENCIES
+
+#### Critical Blockers:
+1. **GridPulse API Implementation** (GRID-015 or new spec required)
+   - POST /api/v1/data/observations endpoint
+   - Authentication system for worker services  
+   - Batch data ingestion with validation
+   - Error handling and response formatting
+
+2. **Service Discovery & Configuration**
+   - Railway URL discovery mechanism
+   - API key generation and management system
+   - Home network → Railway connectivity validation
+
+#### Technical Dependencies:
+- **EIA API Key**: Obtained and configured for external service
+- **Home Network Infrastructure**: Python 3.9+, scheduling system
+- **Network Access**: Outbound HTTPS to EIA and Railway APIs
+- **Configuration Management**: Secure storage of API keys and URLs
+
+#### Decision Dependencies:
+- **Orchestration Choice**: Dagster vs. cron scheduling decision
+- **Authentication Strategy**: API key vs. JWT token approach
+- **Batch Size Strategy**: Optimal API payload size determination
 
 ## Monitoring and Alerting
 
@@ -629,29 +685,95 @@ def pipeline_failure_sensor(context):
 - **Asset Checks**: Data quality validation results and trends
 - **Performance Metrics**: Execution times, resource usage, and throughput
 
+## 🎯 KEY DECISIONS NEEDED
+
+### 1. Orchestration Framework
+**Question**: Dagster vs. simple cron + Python scripts?
+**Impact**: Resource usage, complexity, monitoring capabilities
+**Research Required**: 
+- Dagster minimum system requirements
+- Home network resource constraints  
+- Monitoring and alerting needs
+
+### 2. API Design Patterns
+**Question**: How should GridPulse API handle batch data ingestion?
+**Impact**: Performance, error handling, data consistency
+**Research Required**:
+- Optimal batch sizes for TimescaleDB
+- API authentication patterns
+- Error response formats and retry strategies
+
+### 3. Service Discovery
+**Question**: How does home worker discover Railway service URLs?
+**Impact**: Reliability, configuration management
+**Research Required**:
+- Railway URL patterns and stability
+- Configuration distribution mechanisms
+- Network connectivity requirements
+
+### 4. Dagster Web UI Requirements
+**Question**: Is Dagster Web UI necessary and how to access securely?
+
+**If Web UI Required**:
+- **Security**: VPN, reverse proxy, or public access?
+- **Authentication**: Built-in auth vs. external auth provider?
+- **Network Access**: Port forwarding, dynamic DNS requirements?
+- **Resource Usage**: Additional memory/CPU requirements on home network
+
+**If Web UI Not Required**:
+- **Alternative Monitoring**: Log files, external monitoring services?
+- **Debugging**: How to troubleshoot failed runs without UI?
+- **Operational Visibility**: Pipeline status and health monitoring?
+
+**Research Needed**:
+1. Can Dagster run without Web UI (daemon-only mode)?
+2. What are minimum viable monitoring requirements?
+3. How critical is visual pipeline monitoring for simple hourly jobs?
+4. What are security implications of exposing Dagster UI?
+
 ## Future Enhancements
 
-### Advanced Dagster Features
-- **Asset Partitioning**: Time-based partitioning for efficient historical processing
-- **Asset Selection**: Selective re-processing of specific data ranges or BAs
-- **Multi-Asset Jobs**: Optimized parallel processing across multiple BAs
-- **Asset Checks**: Comprehensive data quality scoring and anomaly detection
+### If Dagster Selected
+- **Asset Partitioning**: Historical data processing optimization
+- **Advanced Monitoring**: Integration with external monitoring systems
+- **Multi-Service Integration**: Additional data sources beyond EIA
 
-### Dagster+ Cloud Features (Optional)
-- **Branch Deployments**: Isolated testing of pipeline changes
-- **Monitoring & Alerting**: Advanced notification integrations
-- **Insights**: Performance analytics and optimization recommendations
-- **Role-Based Access Control**: Team collaboration with appropriate permissions
+### If Simple Scripts Selected  
+- **Enhanced Logging**: Structured logging with external aggregation
+- **Health Monitoring**: External service monitoring integration
+- **Configuration Management**: Centralized configuration service
+
+## Research Tasks
+
+### Phase 1: Architecture Research
+- [ ] **Dagster Requirements Analysis**: Resource usage, storage needs, network requirements
+- [ ] **API Design Research**: Best practices for batch data ingestion APIs
+- [ ] **Railway Service Discovery**: URL patterns, stability, configuration methods
+- [ ] **Authentication Strategy**: API key vs. JWT comparison for service-to-service auth
+
+### Phase 2: Implementation Strategy  
+- [ ] **Orchestration Decision**: Based on Phase 1 research, choose Dagster vs. cron
+- [ ] **API Specification**: Design GridPulse data ingestion API (separate spec)
+- [ ] **Configuration Management**: Secure, reliable config distribution design
+- [ ] **Monitoring Strategy**: Determine monitoring approach based on orchestration choice
 
 ## Notes
 
-This implementation leverages Dagster's asset-centric architecture for reliability and observability. The pipeline is designed to be stateless and idempotent through Dagster's materialization system, making it safe to restart and re-run without data corruption.
+**Critical Architectural Shift**: Moving from direct database access to API-first microservice pattern requires fundamental changes to data ingestion strategy. This affects:
 
-The 15-minute offset in Dagster schedules accounts for EIA's typical publication delay, ensuring data is available when assets are materialized.
+- **Performance**: API calls vs. direct DB inserts
+- **Error Handling**: Network failures become more common failure mode
+- **Authentication**: New security boundary requiring API authentication
+- **Monitoring**: Additional layer requiring monitoring (API availability, response times)
 
-Key advantages of the Dagster approach:
-- **Asset lineage** provides clear visibility into data dependencies and transformations
-- **Native retry policies** handle transient failures gracefully  
-- **Pandas integration** enables efficient data processing and validation
-- **Built-in monitoring** through Dagster Web UI reduces operational overhead
-- **Sensor-based backfilling** automatically handles data gaps without manual intervention
+**Benefits of API-First Approach**:
+- True microservice isolation
+- API can serve multiple consumers (worker, UI, future services)
+- Better security boundaries
+- Independent scaling of ingestion and API services
+
+**Tradeoffs**:
+- Additional network calls and latency
+- More complex error handling
+- API becomes critical path for data ingestion
+- Additional authentication and authorization complexity

@@ -27,10 +27,10 @@ GridPulse is an electric grid data visualization platform built with React Route
 ```bash
 # Infrastructure management (CDKTF)
 cd infrastructure/cdktf
-yes | ./scripts/manage-environments.sh destroy test
-yes | ./scripts/manage-environments.sh deploy test  
-yes | ./scripts/manage-environments.sh recreate test
-yes | ./scripts/manage-environments.sh plan test
+yes | ./scripts/manage-environments.sh destroy prod
+yes | ./scripts/manage-environments.sh deploy prod  
+yes | ./scripts/manage-environments.sh recreate prod
+yes | ./scripts/manage-environments.sh plan prod
 ```
 
 **Deployment Method**: Docker-based deployment using `railway.json` with `"builder": "DOCKERFILE"`

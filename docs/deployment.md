@@ -17,11 +17,12 @@ Dev Environment → Test Environment → Production Environment
 
 ### Environment Purposes
 
+**Note**: For cost optimization, the current deployment uses a single "prod" environment instead of the full 3-environment pipeline.
+
 | Environment | Purpose | Validation Level | Access |
 |------------|---------|------------------|---------|
 | **Dev** | Development and initial testing | Basic functionality | Development team |
-| **Test** | Pre-production validation | Full acceptance testing | QA and stakeholders |
-| **Prod** | Live user-facing system | Production monitoring | End users |
+| **Prod** | Production deployment | Full validation and monitoring | End users |
 
 ## Deployment Pipeline
 
@@ -80,8 +81,8 @@ npx prisma migrate deploy
 echo "⚡ Setting up TimescaleDB features..."
 node database/setup.js || echo "⚠️  TimescaleDB setup skipped (may already be configured)"
 
-# Conditional seeding (dev/test only)
-if [[ "$ENVIRONMENT" == "dev" || "$ENVIRONMENT" == "test" ]]; then
+# Conditional seeding (dev only - prod skips seeding for live data)
+if [[ "$ENVIRONMENT" == "dev" ]]; then
     echo "🌱 Seeding database with sample data..."
     npx prisma db seed
 else
@@ -99,49 +100,14 @@ exec npm start
 
 ### Environment-Specific Deployment
 
-**File: `scripts/deploy-to-test.sh`**
+**File: `scripts/deploy-to-prod.sh`** (Simplified for single-environment deployment)
 ```bash
 #!/bin/bash
-# Deploy GRID-012 TimescaleDB schema to test environment
+# Deploy to production environment
 
 set -e
 
-echo "🧪 Deploying to TEST environment..."
-
-# Ensure we're on main branch with latest changes
-git checkout main
-git pull origin main
-
-# Note: This script assumes the app is already linked to the correct Railway
-# project/environment and that DATABASE_URL is configured.
-
-# Deploy database changes
-echo "💾 Applying database schema to TEST..."
-npx prisma migrate deploy
-
-# Apply TimescaleDB features
-echo "⚡ Setting up TimescaleDB in TEST..."
-npm run db:timescale
-
-# Seed test data
-echo "🌱 Seeding TEST database..."
-npm run db:seed
-
-# Validate deployment
-echo "✅ Validating TEST deployment..."
-npm run test:remote:test
-
-echo "🎉 TEST deployment completed successfully!"
-```
-
-**File: `scripts/deploy-to-prod.sh`**
-```bash
-#!/bin/bash
-# Deploy to production environment (only after test validation)
-
-set -e
-
-echo "🚨 Deploying to PRODUCTION environment..."
+echo "🚀 Deploying to PRODUCTION environment..."
 
 # Confirmation required for production
 read -p "⚠️  Are you sure you want to deploy to PRODUCTION? (yes/no): " confirm
@@ -150,17 +116,9 @@ if [[ $confirm != "yes" ]]; then
     exit 1
 fi
 
-# Ensure test environment passed
-echo "🧪 Validating test environment first..."
-npm run test:remote:test || {
-    echo "❌ Test environment validation failed - cannot deploy to production"
-    exit 1
-}
-
-# Switch to production environment
-echo "🔗 Linking to production environment..."
-railway environment prod
-railway service postgres-prod
+# Ensure we're on main branch with latest changes
+git checkout main
+git pull origin main
 
 # Deploy database changes (NO SEEDING in production)
 echo "💾 Applying database schema to PRODUCTION..."
@@ -177,6 +135,7 @@ npm run test:remote:prod
 echo "🎉 PRODUCTION deployment completed successfully!"
 ```
 
+
 ## Testing & Validation Scripts
 
 ### Remote Environment Testing
@@ -189,7 +148,7 @@ echo "🎉 PRODUCTION deployment completed successfully!"
 import { Client } from 'pg';
 import { PrismaClient } from '@prisma/client';
 
-const environment = process.argv[2] || 'test';
+const environment = process.argv[2] || 'prod';
 const prisma = new PrismaClient();
 
 async function validateDeployment() {
@@ -282,14 +241,7 @@ A feature is only considered complete when it passes all stages:
 - [ ] All spec requirements satisfied
 - [ ] Local development environment validated
 
-#### 2. Test Environment Deployed ✅
-- [ ] Schema migrations applied successfully
-- [ ] Database features configured (TimescaleDB, etc.)
-- [ ] Sample data seeded and validated
-- [ ] Performance tests pass
-- [ ] Health checks respond correctly
-
-#### 3. Production Environment Deployed ✅
+#### 2. Production Environment Deployed ✅
 - [ ] Production deployment successful
 - [ ] Database migrations applied without errors
 - [ ] No data seeding (production data preserved)
@@ -386,18 +338,14 @@ The spec completion process now includes deployment validation:
 
 1. **Implementation Complete** - Code satisfies spec requirements
 2. **Development Validated** - Local testing passes
-3. **Test Environment Deployed** - Schema and features work in test
-4. **Test Environment Validated** - Acceptance testing passes
-5. **Production Environment Deployed** - Live deployment successful
-6. **Production Environment Validated** - Monitoring confirms stability
+3. **Production Environment Deployed** - Live deployment successful
+4. **Production Environment Validated** - Monitoring confirms stability
 
 ### Spec Status Updates
 
 Spec statuses now reflect deployment state:
 - **🔄 In Progress** - Implementation underway
-- **👀 Ready for Test** - Code complete, ready for test deployment
-- **🧪 Testing** - Deployed to test, undergoing validation
-- **🚀 Ready for Prod** - Test passed, ready for production
+- **🚀 Ready for Prod** - Code complete, ready for production deployment
 - **✅ Completed** - Successfully deployed and validated in production
 
 Only when a spec reaches **✅ Completed** with production deployment is it truly "done."
@@ -415,8 +363,7 @@ Only when a spec reaches **✅ Completed** with production deployment is it trul
 - Manage rollbacks and incident response
 
 ### QA/Testing
-- Validate test environment deployments
-- Approve production deployments after acceptance testing
+- Validate production deployments after local testing
 - Report deployment issues and validation failures
 
 ---

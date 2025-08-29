@@ -1,6 +1,6 @@
 # GRID-012A: CDKTF Infrastructure as Code Implementation
 
-**Status**: ✅ Implemented  
+**Status**: 🔄 In Progress  
 **Priority**: High  
 **Created**: 2025-08-28  
 **Updated**: 2025-08-29  
@@ -195,6 +195,26 @@ new Variable(this, "postgres_db", {
   - API-based via GraphQL when `RAILWAY_TOKEN`, `RAILWAY_ENVIRONMENT_ID`, and `RAILWAY_SERVICE_ID` are provided
 - CDKTF infra updates are gated behind `DEPLOY_WITH_CDKTF` to avoid creating existing environments; image deployment is decoupled.
 
+### Post-Deployment Database Migrations (Pending Implementation)
+
+**Requirement**: Automatic database schema updates must execute after successful Railway deployment to ensure production database stays synchronized with application code.
+
+**Integration Point**: Add migration trigger step in `.github/workflows/deploy-prod.yml` after Railway redeploy completion (line 95-104).
+
+**Implementation Approach**:
+- Execute `scripts/setup-database.sh` remotely on Railway service after successful deployment
+- Use Railway CLI or API to run migration commands in production environment  
+- Implement proper error handling - deployment should fail if migrations fail
+- Add migration status verification to ensure schema changes applied correctly
+
+**Error Handling Requirements**:
+- Migration failures must cause CI pipeline to fail and notify developers
+- Include migration logs in CI output for debugging
+- Implement rollback strategy for failed schema changes
+- Verify database connectivity before attempting migrations
+
+**Dependencies**: Requires Railway service to be successfully deployed and responding to health checks before migration execution.
+
 ## Success Criteria
 
 ### Functional Requirements
@@ -238,12 +258,19 @@ new Variable(this, "postgres_db", {
 - [x] Configuration and documentation
 
 ### Phase 2: Validation and Testing
-- [ ] Deploy test environment using CDKTF
-- [ ] Validate service connectivity and functionality
-- [ ] Test complete destroy/recreate workflow
-- [ ] Verify idempotency by running recreate multiple times
+- [x] Deploy prod environment using CDKTF (single env for cost optimization)
+- [x] Validate service connectivity and functionality
+- [x] Test complete destroy/recreate workflow
+- [x] Verify idempotency by running recreate multiple times
 
-### Phase 3: Migration Completion
+### Phase 3: Post-Deployment Migration Integration
+- [ ] Add migration trigger step to CI workflow after Railway redeploy
+- [ ] Implement Railway CLI/API integration for remote migration execution
+- [ ] Add migration failure handling and CI pipeline integration  
+- [ ] Test migration workflow on prod environment (single env deployment)
+- [ ] Verify database schema synchronization across deployments
+
+### Phase 4: Migration Completion
 - [ ] Archive old infrastructure/terraform/ directory
 - [ ] Update project documentation to reference CDKTF approach
 - [ ] Train team on new management workflows

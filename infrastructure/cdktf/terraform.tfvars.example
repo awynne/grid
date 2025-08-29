@@ -1,5 +1,7 @@
 # GridPulse Infrastructure Variables
 # Copy this file to terraform.tfvars and update with your values
+#
+# NOTE: This configuration deploys to a single "prod" environment for cost optimization.
 
 # Railway Configuration
 railway_token = "your-railway-api-token-here"

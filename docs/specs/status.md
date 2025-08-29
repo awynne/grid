@@ -10,6 +10,7 @@
 ### Infrastructure Specs (Foundation)
 | Spec ID | Title | Status | Priority | Created | Target | Dependencies |
 |---------|-------|--------|----------|---------|--------|--------------|
+| [GRID-012A](./GRID-012A.md) | CDKTF Infrastructure as Code Implementation | 🔄 In Progress | High | 2025-08-28 | 2025-08-30 | GRID-011, GRID-012 |
 
 ## Implementation Backlog
 
@@ -33,7 +34,6 @@
 ### Infrastructure Specs (Foundation)
 | Spec ID | Title | Status | Priority | Created | Completed |
 |---------|-------|--------|----------|---------|-----------|
-| [GRID-012A](./GRID-012A.md) | CDKTF Infrastructure as Code Implementation | ✅ Implemented | High | 2025-08-28 | 2025-08-29 |
 | [GRID-001](./GRID-001.md) | Documentation Structure Foundation | ✅ Implemented | High | 2025-08-20 | 2025-08-20 |
 | [GRID-002](./GRID-002.md) | Development Activity Logging System | ✅ Implemented | Medium | 2025-08-20 | 2025-08-20 |
 | [GRID-003](./GRID-003.md) | Coding Standards Architecture Separation | ✅ Implemented | Medium | 2025-08-21 | 2025-08-21 |
@@ -57,12 +57,12 @@
 
 ## Implementation Statistics
 - **Total Specs**: 17
-  - **Infrastructure**: 15 (12 completed, 0 active, 3 backlog)
+  - **Infrastructure**: 15 (11 completed, 1 active, 3 backlog)
   - **Application**: 2 (2 completed, 0 backlog)
-- **Active**: 0 (0 infrastructure, 0 application)
+- **Active**: 1 (1 infrastructure, 0 application)
 - **Backlog**: 3 (3 infrastructure, 0 application)
 - **In Review**: 0
-- **Completed**: 14 (12 infrastructure, 2 application)
+- **Completed**: 13 (11 infrastructure, 2 application)
 - **Cancelled**: 0
 
 ## Quick Actions
@@ -85,7 +85,8 @@
 - **Application**: User features, business logic, UI components, analytics
 
 ## Recent Activity
-- **2025-08-29**: GRID-012A completed - CDKTF infra with Docker-based CI deploy to Railway and auto-redeploy
+- **2025-08-29**: GRID-012A completed - CDKTF infra with Docker-based CI deploy to Railway "prod" environment (single env for cost optimization)
+- **2025-08-29**: Infrastructure environment naming updated - deployed environment is "prod" (not "test" or "test2") for cost reasons
 - **2025-08-27**: GRID-012 completed - TimescaleDB Schema Implementation with dev environment and local testing setup
 - **2025-08-26**: GRID-011 completed - Railway Infrastructure Setup with Option B deployment workflow
 - **2025-08-25**: GRID-017 completed - Minimal GridPulse UI Setup with React Router v7

@@ -172,21 +172,15 @@ INGEST_SCHEDULE="15 * * * *"  # Every hour at 15 minutes past
 ### Phase 2: Manual Railway Setup (IN PROGRESS)
 **See [docs/railway-setup-guide.md](../railway-setup-guide.md) for detailed instructions**
 
-#### Test Environment:
-- [ ] Create web-test service from GitHub repo
-- [ ] Create worker-test service from GitHub repo  
-- [ ] Add postgres-test database with TimescaleDB extension
-- [ ] Add redis-test cache (Upstash)
-- [ ] Configure environment variables for test environment
-- [ ] Verify health endpoints respond correctly
+#### Production Environment (Single Environment for Cost Optimization):
+- [x] Create web service from GitHub repo
+- [x] Create worker service from GitHub repo (if needed)
+- [x] Add postgres database with TimescaleDB extension  
+- [x] Add redis cache (Upstash)
+- [x] Configure environment variables for production environment
+- [x] Verify health endpoints respond correctly
 
-#### Production Environment:
-- [ ] Create web-prod service from GitHub repo
-- [ ] Create worker-prod service from GitHub repo
-- [ ] Add postgres-prod database with TimescaleDB extension  
-- [ ] Add redis-prod cache (Upstash)
-- [ ] Configure environment variables for production environment
-- [ ] Verify health endpoints respond correctly
+**Note**: Services deployed without environment suffixes in the "prod" environment for cost optimization.
 
 ### Phase 3: Service Integration
 - [ ] Test database connectivity from both services
@@ -264,21 +258,16 @@ INGEST_SCHEDULE="15 * * * *"  # Every hour at 15 minutes past
 **Railway Project:** `gridpulse`  
 **Project URL:** https://railway.com/project/10593acb-4a7a-4331-a993-52d24860d1fa
 
-### Test Environment Services
-- `web-test` - React Router v7 web application service 
-- `postgres-test` - PostgreSQL database with TimescaleDB extension
-- `redis-test` - Redis cache database
-
-### Production Environment Services  
-- `web-prod` - React Router v7 web application service
-- `postgres-prod` - PostgreSQL database with TimescaleDB extension  
-- `redis-prod` - Redis cache database
+### Production Environment Services (Single Environment Deployment)
+- `web` - React Router v7 web application service
+- `postgres` - PostgreSQL database with TimescaleDB extension  
+- `redis` - Redis cache database
 
 ### Naming Rationale
-- **Environment suffix required** - Railway requires unique service names across entire project
-- **Consistent pattern** - All services follow `{service-name}-{environment}` format
-- **Clear identification** - Easy to distinguish between test and production resources
-- **Configuration alignment** - Environment variables and deployment configs can reference services clearly
+- **Single environment deployment** - For cost optimization, only "prod" environment is deployed
+- **Clean service names** - Services use simple names without environment suffixes
+- **Railway internal networking** - Services communicate via `postgres.railway.internal` and `redis.railway.internal`
+- **Cost optimization** - Single environment reduces infrastructure costs
 
 ## Implementation Notes
 

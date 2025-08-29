@@ -106,7 +106,7 @@ The repository contains the necessary configuration files:
 - Wait for CI enabled
 
 **Production Environment (Manual Deploy):**
-- Keep web-prod service repository disconnected
+- Keep web service repository disconnected
 - Manual deployments only via Railway CLI
 
 ### 7. Deploy and Test

@@ -25,9 +25,11 @@ export class GridPulseEnvironment extends Construct {
   public readonly postgresService: Service;
   public readonly redisService: Service;
   public dataService?: Service;
+  private readonly config: GridPulseEnvironmentConfig;
 
   constructor(scope: Construct, id: string, config: GridPulseEnvironmentConfig) {
     super(scope, id);
+    this.config = config;
 
     // Railway Provider
     new RailwayProvider(this, "railway", {
@@ -157,26 +159,26 @@ export class GridPulseEnvironment extends Construct {
   }
 
   // Method to add data service (for future use with GRID-013)
-  public addDataService(config: { cronSchedule?: string }): Service {
+  public addDataService(serviceConfig: { cronSchedule?: string }): Service {
     if (this.dataService) {
       return this.dataService;
     }
 
     this.dataService = new Service(this, "data", {
-      name: `data-${this.environment.name}`,
+      name: "data",
       projectId: this.environment.projectId,
       sourceRepo: "awynne/grid",
       sourceRepoBranch: "main",
       rootDirectory: "worker",
-      cronSchedule: config.cronSchedule || "15 * * * *", // Hourly at 15 minutes past
+      cronSchedule: serviceConfig.cronSchedule || "15 * * * *", // Hourly at 15 minutes past
     });
 
     // Data service variables
     const dataVariables = [
       { name: "NODE_ENV", value: "production" },
-      { name: "EIA_API_KEY", value: "${var.eia_api_key}" },
-      { name: "DATABASE_URL", value: "postgresql://postgres:password@postgres-service:5432/railway" },
-      { name: "REDIS_URL", value: "redis://redis-service:6379" },
+      { name: "EIA_API_KEY", value: this.config.eiaApiKey || "" },
+      { name: "DATABASE_URL", value: `postgresql://postgres:${this.config.postgresPassword}@postgres.railway.internal:5432/railway` },
+      { name: "REDIS_URL", value: "redis://redis.railway.internal:6379" },
     ];
 
     dataVariables.forEach((variable, index) => {

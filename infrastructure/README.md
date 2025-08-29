@@ -65,9 +65,11 @@ infrastructure/
 ## 🔧 **Infrastructure Components**
 
 ### **Services Defined:**
-- **web-test** - React Router v7 application
-- **postgres-test** - TimescaleDB-enabled PostgreSQL  
-- **redis-test** - Redis cache
+- **web** - React Router v7 application
+- **postgres** - TimescaleDB-enabled PostgreSQL  
+- **redis** - Redis cache
+
+**Note**: Services are deployed in a single "prod" environment for cost optimization (no environment suffixes on service names).
 
 ### **Features:**
 - **Health checks** - Proper startup verification
