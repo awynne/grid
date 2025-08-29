@@ -6,6 +6,8 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CDKTF_DIR="$(dirname "$SCRIPT_DIR")"
+# Ensure local node_modules/.bin is on PATH for locally installed CLIs (cdktf, tsc, etc.)
+export PATH="$CDKTF_DIR/node_modules/.bin:$PATH"
 
 # Colors
 RED='\033[0;31m'
@@ -81,7 +83,7 @@ check_prerequisites() {
     fi
     
     if ! command -v cdktf &> /dev/null; then
-        log_error "CDKTF CLI not found. Install: npm install -g cdktf-cli"
+        log_error "CDKTF CLI not found. Install locally: npm i -D cdktf-cli (already handled in CI)"
         exit 1
     fi
     
