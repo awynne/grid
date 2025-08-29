@@ -171,11 +171,11 @@ jobs:
           echo "📦 Installing Railway CLI..."
           npm i -g @railway/cli
           
-          # Execute database migration script using Railway CLI with token authentication
-          echo "🚀 Executing database migration script on Railway service..."
-          echo "📍 Using direct service execution (no login required)"
+          # Execute database migration script on Railway service
+          echo "🚀 Executing database migration script with Railway CLI..."
+          echo "📍 Project: $RAILWAY_PROJECT_ID, Service: web, Environment: prod"
           set +e
-          RAILWAY_TOKEN="$RAILWAY_TOKEN" railway run --service web ./scripts/setup-database.sh
+          railway run --service web --environment prod --project "$RAILWAY_PROJECT_ID" ./scripts/setup-database.sh
           migration_exit_code=$?
           set -e
           
