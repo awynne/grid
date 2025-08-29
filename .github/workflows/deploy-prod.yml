@@ -171,14 +171,15 @@ jobs:
           echo "📦 Installing Railway CLI..."
           npm i -g @railway/cli
           
-          # Authenticate using token directly in command execution
-          echo "🔗 Linking to Railway project..."
-          export RAILWAY_TOKEN="${RAILWAY_TOKEN}"
+          # Authenticate and link to project
+          echo "🔗 Authenticating and linking to Railway project..."
+          echo "$RAILWAY_TOKEN" | railway login --token
+          railway link "$RAILWAY_PROJECT_ID"
           
           # Execute database migration script on Railway service
           echo "🚀 Executing database migration script..."
           set +e
-          railway run ./scripts/setup-database.sh --service web
+          railway run ./scripts/setup-database.sh --service web --environment prod
           migration_exit_code=$?
           set -e
           
