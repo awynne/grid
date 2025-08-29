@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 // Trigger a Railway redeploy via GraphQL API
 // Requires env vars:
-// - RAILWAY_API_TOKEN: Railway API token (Account Settings)
+// - RAILWAY_TOKEN (preferred) or RAILWAY_API_TOKEN: Railway API token (Account Settings)
 // - RAILWAY_ENVIRONMENT_ID: target environment ID
 // - RAILWAY_SERVICE_ID: target service ID
 
 const API_URL = 'https://backboard.railway.app/graphql/v2';
 
 async function main() {
-  const token = process.env.RAILWAY_API_TOKEN;
+  const token = process.env.RAILWAY_API_TOKEN || process.env.RAILWAY_TOKEN;
   const environmentId = process.env.RAILWAY_ENVIRONMENT_ID;
   const serviceId = process.env.RAILWAY_SERVICE_ID;
 
   if (!token) {
-    console.error('Missing RAILWAY_API_TOKEN');
+    console.error('Missing RAILWAY_TOKEN (or RAILWAY_API_TOKEN)');
     process.exit(1);
   }
   if (!environmentId || !serviceId) {
@@ -57,4 +57,3 @@ async function main() {
 }
 
 main();
-
