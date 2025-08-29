@@ -57,22 +57,20 @@ jobs:
           set -euo pipefail
           echo "Installing Railway CLI..."
           npm i -g @railway/cli || npm i -g railway
-          echo "Logging into Railway..."
-          railway login --token "$RAILWAY_TOKEN"
           echo "Linking project..."
           railway link --project "$RAILWAY_PROJECT_ID"
           echo "Selecting environment/service..."
-          railway environment "$RAILWAY_ENV"
-          railway service "$RAILWAY_SERVICE"
-          echo "Attempting service restart (preferred for registry deploys)..."
+          railway environment "$RAILWAY_ENV" || true
+          railway service "$RAILWAY_SERVICE" || true
+          echo "Triggering redeploy..."
           set +e
-          railway service restart
+          railway redeploy
           code=$?
           set -e
           if [ "$code" -ne 0 ]; then
-            echo "Restart failed or unsupported. Trying redeploy..."
+            echo "Redeploy command unavailable; attempting service restart or up..."
             set +e
-            railway redeploy || railway up --detach
+            railway service restart || railway up --detach
             set -e
           fi
 
