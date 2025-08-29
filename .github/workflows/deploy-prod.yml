@@ -139,6 +139,22 @@ jobs:
           echo "This ensures the new container is running before executing migrations."
           sleep 45
 
+      - name: Check migration prerequisites
+        run: |
+          echo "🔍 Migration Prerequisites Check:"
+          echo "  RAILWAY_TRIGGER_REDEPLOY: ${{ env.RAILWAY_TRIGGER_REDEPLOY }}"
+          echo "  HAS_CLI_SECRET: ${{ env.HAS_CLI_SECRET }}"
+          echo "  Will run migrations: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.HAS_CLI_SECRET == 'true' }}"
+
+      - name: Skip migrations (missing prerequisites)
+        if: ${{ env.RAILWAY_TRIGGER_REDEPLOY != 'true' || env.HAS_CLI_SECRET != 'true' }}
+        run: |
+          echo "⏭️ Skipping database migrations"
+          echo "Reason: Missing required secrets or RAILWAY_TRIGGER_REDEPLOY disabled"
+          echo "To enable migrations:"
+          echo "  1. Set RAILWAY_TOKEN secret in repository settings"
+          echo "  2. Ensure RAILWAY_TRIGGER_REDEPLOY=true in workflow"
+
       - name: Run post-deployment database migrations
         if: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.HAS_CLI_SECRET == 'true' }}
         env:
