@@ -13,6 +13,7 @@ env:
   REGISTRY: ghcr.io/${{ github.repository_owner }}
   IMAGE_TAG: v${{ github.run_number }}-${{ github.sha }}
   DEPLOY_WITH_CDKTF: 'false'
+  RAILWAY_TRIGGER_REDEPLOY: 'true'
 
 jobs:
   build-and-deploy:
@@ -44,6 +45,36 @@ jobs:
         run: |
           docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
           docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+
+      - name: Trigger Railway redeploy (registry)
+        if: env.RAILWAY_TRIGGER_REDEPLOY == 'true'
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_ENV: prod
+          RAILWAY_SERVICE: web
+        run: |
+          set -euo pipefail
+          echo "Installing Railway CLI..."
+          npm i -g @railway/cli || npm i -g railway
+          echo "Logging into Railway..."
+          railway login --token "$RAILWAY_TOKEN"
+          echo "Linking project..."
+          railway link --project "$RAILWAY_PROJECT_ID"
+          echo "Selecting environment/service..."
+          railway environment "$RAILWAY_ENV"
+          railway service "$RAILWAY_SERVICE"
+          echo "Attempting service restart (preferred for registry deploys)..."
+          set +e
+          railway service restart
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ]; then
+            echo "Restart failed or unsupported. Trying redeploy..."
+            set +e
+            railway redeploy || railway up --detach
+            set -e
+          fi
 
       - name: Install CDKTF deps
         if: env.DEPLOY_WITH_CDKTF == 'true'
