@@ -173,7 +173,7 @@ jobs:
           
           # Authenticate and link to project
           echo "🔗 Authenticating and linking to Railway project..."
-          echo "$RAILWAY_TOKEN" | railway login --token
+          railway login --browserless
           railway link "$RAILWAY_PROJECT_ID"
           
           # Execute database migration script on Railway service
