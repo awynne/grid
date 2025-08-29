@@ -175,7 +175,7 @@ jobs:
           echo "🚀 Executing database migration script with Railway CLI..."
           echo "📍 Project: $RAILWAY_PROJECT_ID, Service: web, Environment: prod"
           set +e
-          railway run --service web --environment prod --project "$RAILWAY_PROJECT_ID" ./scripts/setup-database.sh
+          railway run --service web --environment prod -- --project "$RAILWAY_PROJECT_ID" ./scripts/setup-database.sh
           migration_exit_code=$?
           set -e
           
