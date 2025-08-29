@@ -167,19 +167,16 @@ jobs:
           echo "🔄 Running database migrations on Railway prod environment..."
           echo "📍 Target: Railway service 'web' in 'prod' environment"
           
-          # Install and authenticate Railway CLI
+          # Install Railway CLI
           echo "📦 Installing Railway CLI..."
           npm i -g @railway/cli
           
-          # Authenticate and link to project
-          echo "🔗 Authenticating and linking to Railway project..."
-          railway login --browserless
-          railway link "$RAILWAY_PROJECT_ID"
-          
           # Execute database migration script on Railway service
-          echo "🚀 Executing database migration script..."
+          # Note: RAILWAY_TOKEN env var is automatically used by Railway CLI
+          echo "🚀 Executing database migration script with Railway CLI..."
+          echo "📍 Using RAILWAY_TOKEN for authentication (no login required)"
           set +e
-          railway run ./scripts/setup-database.sh --service web --environment prod
+          railway run --service web --environment prod ./scripts/setup-database.sh
           migration_exit_code=$?
           set -e
           
