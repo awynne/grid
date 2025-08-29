@@ -47,8 +47,22 @@ jobs:
           docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
           docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
 
+      - name: Resolve redeploy mode flags
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
+          RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
+        run: |
+          set -euo pipefail
+          HAS_CLI_SECRET=false
+          HAS_API_SECRETS=false
+          if [ -n "${RAILWAY_TOKEN:-}" ]; then HAS_CLI_SECRET=true; fi
+          if [ -n "${RAILWAY_TOKEN:-}" ] && [ -n "${RAILWAY_ENVIRONMENT_ID:-}" ] && [ -n "${RAILWAY_SERVICE_ID:-}" ]; then HAS_API_SECRETS=true; fi
+          echo "HAS_CLI_SECRET=$HAS_CLI_SECRET" >> "$GITHUB_ENV"
+          echo "HAS_API_SECRETS=$HAS_API_SECRETS" >> "$GITHUB_ENV"
+
       - name: Trigger Railway redeploy (registry - CLI)
-        if: env.RAILWAY_TRIGGER_REDEPLOY == 'true' && (env.RAILWAY_USE_API != 'true' || secrets.RAILWAY_ENVIRONMENT_ID == '' || secrets.RAILWAY_SERVICE_ID == '') && secrets.RAILWAY_TOKEN != ''
+        if: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && (env.RAILWAY_USE_API != 'true' || env.HAS_API_SECRETS != 'true') && env.HAS_CLI_SECRET == 'true' }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
@@ -80,7 +94,7 @@ jobs:
           fi
 
       - name: Trigger Railway redeploy (registry - API)
-        if: env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.RAILWAY_USE_API == 'true' && secrets.RAILWAY_TOKEN != '' && secrets.RAILWAY_ENVIRONMENT_ID != '' && secrets.RAILWAY_SERVICE_ID != ''
+        if: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.RAILWAY_USE_API == 'true' && env.HAS_API_SECRETS == 'true' }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
