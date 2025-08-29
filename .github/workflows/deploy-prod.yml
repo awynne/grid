@@ -171,11 +171,16 @@ jobs:
           echo "📦 Installing Railway CLI..."
           npm i -g @railway/cli
           
+          # Debug Railway environment
+          echo "🔍 Railway CLI Debug Info:"
+          echo "  RAILWAY_TOKEN: ${RAILWAY_TOKEN:0:10}..."
+          echo "  RAILWAY_PROJECT_ID: $RAILWAY_PROJECT_ID"
+          echo "  Railway CLI version: $(railway --version)"
+          
           # Execute database migration script on Railway service
           echo "🚀 Executing database migration script with Railway CLI..."
-          echo "📍 Project: $RAILWAY_PROJECT_ID, Service: web, Environment: prod"
           set +e
-          railway run --service web --environment prod -- --project "$RAILWAY_PROJECT_ID" ./scripts/setup-database.sh
+          railway run --service web --environment prod ./scripts/setup-database.sh
           migration_exit_code=$?
           set -e
           
