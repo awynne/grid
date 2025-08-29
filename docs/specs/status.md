@@ -7,7 +7,10 @@
 
 ## Active Implementations
 
-*No active implementations*
+### Infrastructure Specs (Foundation)
+| Spec ID | Title | Status | Priority | Created | Target | Dependencies |
+|---------|-------|--------|----------|---------|--------|--------------|
+| [GRID-012A](./GRID-012A.md) | CDKTF Infrastructure as Code Implementation | 🔄 In Progress | High | 2025-08-28 | 2025-08-28 | GRID-012 |
 
 ## Implementation Backlog
 

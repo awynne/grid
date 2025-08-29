@@ -1,0 +1,47 @@
+# GridPulse Infrastructure Variables
+# Copy this file to terraform.tfvars and update with your values
+
+# Railway Configuration
+railway_token = "your-railway-api-token-here"
+project_id = "10593acb-4a7a-4331-a993-52d24860d1fa"
+
+# Database Configuration
+postgres_password = "your-secure-postgres-password"
+
+# Application Configuration  
+session_secret = "your-32-character-session-secret-here"
+
+# Data Pipeline Configuration (optional)
+eia_api_key = "your-eia-api-key-for-data-ingestion"
+
+# ==============================================================================
+# DEPLOYMENT CONFIGURATION
+# ==============================================================================
+
+# Docker Deployment (RECOMMENDED)
+# Use Docker images for fast, reliable, consistent deployments
+docker_image = "ghcr.io/awynne/grid:latest"        # Docker image with tag
+docker_username = "your-github-username"           # GitHub username  
+docker_password = "your-github-token"              # GitHub personal access token
+
+# Git Deployment (FALLBACK/DEVELOPMENT)
+# Use Git source for development or when Docker images aren't available
+source_repo = "awynne/grid"                        # Git repository
+source_repo_branch = "main"                        # Git branch
+
+# ==============================================================================
+# DEPLOYMENT METHOD SELECTION
+# ==============================================================================
+# 
+# If docker_image is provided, Docker deployment will be used (recommended)
+# If docker_image is empty, Git deployment will be used as fallback
+#
+# PRODUCTION: Always use Docker deployment with specific tags (not :latest)
+# DEVELOPMENT: Can use either method, Git is acceptable for rapid iteration
+# 
+# Benefits of Docker deployment:
+# - Faster deployments (no build time on Railway)
+# - Consistent environments (same image across test/prod) 
+# - Easy rollbacks (pin to specific image tags)
+# - Better reliability (pre-tested images)
+#

@@ -1,0 +1,67 @@
+name: Deploy Prod (Docker + CDKTF)
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: grid
+  REGISTRY: ghcr.io/${{ github.repository_owner }}
+  IMAGE_TAG: v${{ github.run_number }}-${{ github.sha }}
+  FULL_IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME || github.actor }}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build -t "${{ env.FULL_IMAGE }}" .
+          docker tag "${{ env.FULL_IMAGE }}" "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+
+      - name: Push Docker image
+        run: |
+          docker push "${{ env.FULL_IMAGE }}"
+          docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+
+      - name: Install CDKTF deps
+        working-directory: infrastructure/cdktf
+        run: |
+          npm ci
+          npm run get
+          npm run compile
+
+      - name: Prepare terraform.tfvars
+        working-directory: infrastructure/cdktf
+        run: |
+          cat > terraform.tfvars << 'EOF'
+          railway_token     = "${{ secrets.RAILWAY_TOKEN }}"
+          project_id        = "${{ secrets.RAILWAY_PROJECT_ID }}"
+          postgres_password = "${{ secrets.POSTGRES_PASSWORD }}"
+          session_secret    = "${{ secrets.SESSION_SECRET }}"
+          eia_api_key       = "${{ secrets.EIA_API_KEY }}"
+
+          docker_image      = "${{ env.FULL_IMAGE }}"
+          docker_username   = "${{ secrets.GHCR_USERNAME || github.actor }}"
+          docker_password   = "${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}"
+          EOF
+
+      - name: Deploy prod via CDKTF
+        working-directory: infrastructure/cdktf
+        run: ./scripts/manage-environments.sh deploy prod
+

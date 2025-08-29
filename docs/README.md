@@ -46,8 +46,8 @@ This directory contains all project documentation for the GridPulse electric gri
 
 **Use this when:** Researching implementation details, checking development status, or understanding technical requirements.
 
-### 🎨 [design.md](./design.md) *(To be created)*
-**Design System & UI Guidelines**
+### 🎨 [product/design.md](./product/design.md)
+**Design System & UI Guidelines (Primary Design Doc)**
 - Visual design standards and brand guidelines
 - Component design patterns and usage
 - Color palettes, typography, and spacing
@@ -106,7 +106,7 @@ This directory contains all project documentation for the GridPulse electric gri
 - Create specs following [process.md](./process.md) guidelines
 - Follow universal standards in [coding.md](./coding.md)
 - Apply technology-specific patterns from [coding-react-router.md](./coding-react-router.md)
-- Reference [design.md](./design.md) for UI consistency *(to be created)*
+- Reference [product/design.md](./product/design.md) for UI consistency
 - Update progress in [specs/status.md](./specs/status.md) and individual spec files
 - Log daily activities in [activity/daily.md](./activity/daily.md)
 
@@ -114,7 +114,7 @@ This directory contains all project documentation for the GridPulse electric gri
 - Verify spec completion in [specs/status.md](./specs/status.md)
 - Check code against universal standards in [coding.md](./coding.md)
 - Verify technology-specific patterns in [coding-react-router.md](./coding-react-router.md)
-- Ensure design consistency with [design.md](./design.md) *(to be created)*
+- Ensure design consistency with [product/design.md](./product/design.md)
 
 ## Contributing to Documentation
 

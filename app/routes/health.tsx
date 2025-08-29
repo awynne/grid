@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
 export async function loader() {
-  const checks: Record<string, any> = {
+  const checks: Record<string, unknown> = {
     timestamp: new Date().toISOString(),
     service: "web",
     status: "healthy",
@@ -17,7 +17,7 @@ export async function loader() {
       const prisma = new PrismaClient();
       
       // Quick connection test with 5-second timeout
-      const dbTest = await Promise.race([
+      await Promise.race([
         prisma.$queryRaw`SELECT 1 as test`,
         new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Database timeout')), 5000)

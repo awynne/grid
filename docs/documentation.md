@@ -34,6 +34,7 @@ From high-level product strategy to detailed coding standards, documentation cov
 #### Code Blocks
 ```markdown
 # ✅ Use descriptive comments
+```
 ```typescript
 // ✅ Good example with context
 export function UserService() {
@@ -41,6 +42,7 @@ export function UserService() {
 }
 ```
 
+```markdown
 # ❌ Avoid uncommented code blocks
 ```
 

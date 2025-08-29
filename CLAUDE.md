@@ -19,3 +19,18 @@ This repository uses comprehensive documentation in `docs/` to guide development
 
 ## Project Overview
 GridPulse is an electric grid data visualization platform built with React Router stack, providing near real-time insights from EIA-930 hourly electric grid data. The platform follows spec-first development methodology with comprehensive documentation standards.
+
+## Infrastructure Commands
+
+**IMPORTANT**: All Railway CLI commands require auto-confirmation. Always prefix with `yes |`:
+
+```bash
+# Infrastructure management (CDKTF)
+cd infrastructure/cdktf
+yes | ./scripts/manage-environments.sh destroy test
+yes | ./scripts/manage-environments.sh deploy test  
+yes | ./scripts/manage-environments.sh recreate test
+yes | ./scripts/manage-environments.sh plan test
+```
+
+**Deployment Method**: Docker-based deployment using `railway.json` with `"builder": "DOCKERFILE"`

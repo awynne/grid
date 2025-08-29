@@ -1,0 +1,64 @@
+# Docker ignore file - exclude unnecessary files from build context
+
+# Dependencies
+node_modules/
+npm-debug.log*
+.npm
+
+# Build outputs
+build/
+dist/
+*.tsbuildinfo
+
+# Development
+.env
+.env.*
+!.env.example
+
+# Testing
+coverage/
+.nyc_output
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation (not needed in container)
+docs/
+*.md
+!README.md
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Infrastructure
+infrastructure/
+scripts/
+
+# Temporary files
+tmp/
+temp/
