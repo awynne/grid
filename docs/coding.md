@@ -105,6 +105,15 @@ MAX_LOGIN_ATTEMPTS = 3;
 - **Clean state** - Ensure tests start with a known, clean state
 - **Deterministic tests** - Tests should produce the same results every time they run
 
+### Testing in This Repository
+- A unit test runner is not yet configured. Validate changes with:
+  - `npm run typecheck` and `npm run lint`
+  - Manual validation via dev server (`npm run dev`)
+  - DB checks: `npm run db:studio`, `node scripts/test-local-setup.js`
+- For environment validation: `npm run test:remote:test` or `npm run test:remote:prod`.
+
+> Roadmap: Add Vitest + React Testing Library for unit/integration tests.
+
 ## Git Workflow
 
 > **📋 Project Management**: See [process.md](./process.md) for spec creation, workflow processes, and project management guidelines.
@@ -296,6 +305,7 @@ gh pr list                              # See open PRs
 gh pr checkout 123                      # Checkout PR to test locally
 npm test                                # Run tests
 npm run typecheck                       # Check types
+npm run test:local                      # Validate DB/dev env (this repo)
 
 # ✅ Add review comments (don't approve yet)
 gh pr review 123 --comment --body "Consider extracting this logic into a reusable hook for better testing"

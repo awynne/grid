@@ -1,4 +1,3 @@
-import type { Route } from "./+types/diff";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router";
 import { ArrowLeft, GitCompare, TrendingUp, TrendingDown } from "lucide-react";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "What Changed - GridPulse" },
     { name: "description", content: "Daily diff cards vs baseline metrics" },
@@ -134,7 +133,7 @@ export default function WhatChanged() {
         {/* Summary Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Yesterday's Notable Changes</CardTitle>
+            <CardTitle>Yesterday&apos;s Notable Changes</CardTitle>
             <CardDescription>
               Key deviations from baseline patterns
             </CardDescription>

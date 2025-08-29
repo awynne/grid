@@ -1,0 +1,27 @@
+# CDKTF
+cdktf.out/
+.cdktf/
+terraform.*.tfstate*
+terraform.tfvars
+.terraform/
+.terraform.lock.hcl
+
+# Node.js
+node_modules/
+*.log
+npm-debug.log*
+.npm
+
+# TypeScript
+*.tsbuildinfo
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

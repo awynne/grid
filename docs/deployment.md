@@ -34,37 +34,21 @@ Each deployment includes:
 4. **Health Validation** - Verify deployment success
 5. **Performance Testing** - Ensure acceptable performance
 
-### Railway Configuration Enhancement
+### Railway (Docker) Configuration
 
-The current Railway configuration needs enhancement to include database migrations:
+Deployments use the repository `Dockerfile`. Railway builds the image using the Dockerfile and runs it directly. Health checks are defined via Dockerfile `HEALTHCHECK`.
 
-**Current (`railway.json`):**
-```json
-{
-  "build": {
-    "builder": "NIXPACKS"
-  },
-  "deploy": {
-    "startCommand": "npm start",
-    "healthcheckPath": "/health",
-    "healthcheckTimeout": 30
-  }
-}
+Typical local flow:
+```bash
+docker build -t gridpulse:local .
+docker run --rm -p 3000:3000 \
+  -e NODE_ENV=production \
+  -e DATABASE_URL=postgresql://user:pass@host:5432/db \
+  -e SESSION_SECRET="$(openssl rand -base64 32)" \
+  gridpulse:local
 ```
 
-**Enhanced Configuration Needed:**
-```json
-{
-  "build": {
-    "builder": "NIXPACKS"
-  },
-  "deploy": {
-    "startCommand": "./scripts/deploy.sh",
-    "healthcheckPath": "/health",
-    "healthcheckTimeout": 60
-  }
-}
-```
+On Railway, configure the project to use the Dockerfile builder. Set environment variables in the dashboard. No separate start command is required.
 
 ## Deployment Scripts
 
@@ -128,11 +112,8 @@ echo "🧪 Deploying to TEST environment..."
 git checkout main
 git pull origin main
 
-# Switch to test environment
-echo "🔗 Linking to test environment..."
-railway link 10593acb-4a7a-4331-a993-52d24860d1fa  # gridpulse project
-railway environment test
-railway service Postgres-test
+# Note: This script assumes the app is already linked to the correct Railway
+# project/environment and that DATABASE_URL is configured.
 
 # Deploy database changes
 echo "💾 Applying database schema to TEST..."
@@ -179,7 +160,7 @@ npm run test:remote:test || {
 # Switch to production environment
 echo "🔗 Linking to production environment..."
 railway environment prod
-railway service Postgres-prod
+railway service postgres-prod
 
 # Deploy database changes (NO SEEDING in production)
 echo "💾 Applying database schema to PRODUCTION..."
@@ -368,30 +349,14 @@ A feature is only considered complete when it passes all stages:
    npm run test:remote:<environment>
    ```
 
-## Environment Variables by Environment
+## Environment Variables
 
-### Development
+These are the primary variables used by the app and scripts:
 ```bash
-DATABASE_URL="<dev-database-url>"
-NODE_ENV="development"
-LOG_LEVEL="debug"
-```
-
-### Test  
-```bash
-DATABASE_URL="<test-database-url>"
-NODE_ENV="test"
-LOG_LEVEL="info"
-SEED_DATA="true"
-```
-
-### Production
-```bash
-DATABASE_URL="<prod-database-url>"
-NODE_ENV="production"
-LOG_LEVEL="warn"
-SEED_DATA="false"
-ENABLE_MONITORING="true"
+DATABASE_URL="postgresql://..."   # Required
+NODE_ENV="development|test|production"
+SESSION_SECRET="<32+ char secret>" # Required for session cookies
+PORT=3000                          # Optional; defaults vary by host
 ```
 
 ## Monitoring & Alerting

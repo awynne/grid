@@ -1,0 +1,19 @@
+{
+  "app": "npm run --silent compile && node main.js",
+  "language": "typescript",
+  "terraformProviders": [
+    {
+      "name": "railway",
+      "source": "terraform-community-providers/railway",
+      "version": "~> 0.1"
+    }
+  ],
+  "codeMakerOutput": ".gen",
+  "context": {
+    "excludeStackIdFromLogicalIds": "true",
+    "allowSepCharsInLogicalIds": "true"
+  },
+  "projectId": "3de3cc90-ab9b-4fa8-8092-66467840077b",
+  "terraformModules": [],
+  "sendCrashReports": "false"
+}

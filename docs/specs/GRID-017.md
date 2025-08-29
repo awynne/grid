@@ -10,7 +10,7 @@
 
 ## Overview
 
-Initialize the minimal GridPulse UI application with React Router v7 (formerly Remix), TypeScript, shadcn/ui, and basic dashboard structure to enable local development and Railway deployment.
+Initialize the minimal GridPulse UI application with React Router v7, TypeScript, shadcn/ui, and basic dashboard structure to enable local development and Railway deployment.
 
 ## Problem Statement
 

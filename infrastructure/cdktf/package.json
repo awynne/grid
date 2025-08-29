@@ -1,0 +1,27 @@
+{
+  "name": "gridpulse-infrastructure",
+  "version": "1.0.0",
+  "description": "GridPulse Infrastructure as Code with CDKTF",
+  "main": "main.js",
+  "scripts": {
+    "get": "cdktf get",
+    "build": "tsc",
+    "synth": "cdktf synth",
+    "compile": "tsc --pretty",
+    "watch": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "cdktf deploy",
+    "destroy": "cdktf destroy",
+    "diff": "cdktf diff"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^24.3.0",
+    "cdktf": "^0.21.0",
+    "constructs": "^10.4.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}

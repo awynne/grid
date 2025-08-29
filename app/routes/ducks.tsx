@@ -1,11 +1,10 @@
-import type { Route } from "./+types/ducks";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import { ArrowLeft, Sun, TrendingDown } from "lucide-react";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "Duck Days - GridPulse" },
     { name: "description", content: "Discoverable gallery of duck curve patterns" },
@@ -50,7 +49,7 @@ export default function DuckDays() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              The "duck curve" describes the daily pattern of electricity demand minus 
+              The &quot;duck curve&quot; describes the daily pattern of electricity demand minus 
               solar generation. As solar adoption increases, this curve becomes more 
               pronounced, creating challenges for grid operators.
             </p>
@@ -74,9 +73,9 @@ export default function DuckDays() {
               <CardHeader>
                 <CardTitle className="text-lg">{title}</CardTitle>
                 <CardDescription>
-                  {index === 0 && "Classic duck curve pattern"}
-                  {index === 1 && "Deep midday solar generation"}  
-                  {index === 2 && "Unusual reverse pattern"}
+                  {index === 0 && 'Classic duck curve pattern'}
+                  {index === 1 && 'Deep midday solar generation'}  
+                  {index === 2 && 'Unusual reverse pattern'}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -111,7 +110,7 @@ export default function DuckDays() {
               <h3 className="font-semibold mb-3">Duck Days will include:</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>• Searchable gallery of historical duck curves</li>
-                <li>• "Duckiness" scoring algorithm and rankings</li>
+                <li>• &quot;Duckiness&quot; scoring algorithm and rankings</li>
                 <li>• Seasonal patterns and renewable energy correlation</li>
                 <li>• Interactive comparisons across different grid operators</li>
                 <li>• Educational content about grid flexibility challenges</li>

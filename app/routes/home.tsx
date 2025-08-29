@@ -1,9 +1,8 @@
-import type { Route } from "./+types/home";
 import { Layout } from "@/components/layout";
 import { DashboardCard } from "@/components/gridpulse";
 import { FEATURE_CARDS } from "@/lib/constants";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "GridPulse - Electric Grid Data Visualization" },
     { name: "description", content: "Real-time electric grid data analysis and visualization platform" },

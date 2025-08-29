@@ -1,11 +1,10 @@
-import type { Route } from "./+types/daily";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import { ArrowLeft, TrendingUp } from "lucide-react";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "Daily Pulse - GridPulse" },
     { name: "description", content: "Auto-generated daily narrative with annotated chart" },
@@ -49,7 +48,7 @@ export default function DailyPulse() {
             <div className="p-6 bg-muted/30 rounded-lg">
               <h3 className="font-semibold mb-3">What Daily Pulse will include:</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• Auto-generated narrative describing the day's grid activity</li>
+                <li>• Auto-generated narrative describing the day&apos;s grid activity</li>
                 <li>• Annotated charts highlighting peaks, troughs, and ramp events</li>
                 <li>• Key metrics and comparisons to historical averages</li>
                 <li>• Renewable energy highlights and grid stability insights</li>

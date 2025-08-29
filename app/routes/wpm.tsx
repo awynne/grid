@@ -1,4 +1,3 @@
-import type { Route } from "./+types/wpm";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router";
 import { ArrowLeft, Zap, Leaf } from "lucide-react";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "What's Powering Me - GridPulse" },
     { name: "description", content: "Current CO₂ intensity and next clean window" },
@@ -31,7 +30,7 @@ export default function WhatsPoweringMe() {
         <div className="space-y-2">
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <Zap className="h-8 w-8 text-primary" />
-            What's Powering Me
+            What&apos;s Powering Me
           </h1>
           <p className="text-lg text-muted-foreground">
             Current CO₂ intensity and next clean window
@@ -128,7 +127,7 @@ export default function WhatsPoweringMe() {
           </CardHeader>
           <CardContent>
             <div className="p-4 bg-muted/30 rounded-lg">
-              <h3 className="font-semibold mb-3">What's Powering Me will include:</h3>
+              <h3 className="font-semibold mb-3">What&apos;s Powering Me will include:</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>• Real-time CO₂ intensity with historical context</li>
                 <li>• 24-hour clean energy windows and recommendations</li>

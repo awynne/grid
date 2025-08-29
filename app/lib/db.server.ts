@@ -1,19 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 
-let db: PrismaClient;
+// Ensure a single PrismaClient instance across reloads in development
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-declare global {
-  var __db__: PrismaClient;
+export const db: PrismaClient =
+  globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = db;
 }
-
-// Prevent multiple instances in development
-if (process.env.NODE_ENV === 'production') {
-  db = new PrismaClient();
-} else {
-  if (!global.__db__) {
-    global.__db__ = new PrismaClient();
-  }
-  db = global.__db__;
-}
-
-export { db };

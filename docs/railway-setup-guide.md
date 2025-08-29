@@ -36,13 +36,8 @@ Each environment needs these services:
 
 1. **Add Service** → **GitHub Repo** → Select `awynne/grid`
 2. **Service name:** `web-test`
-3. **Settings:**
-   - **Branch:** `main`
-   - **Root Directory:** `.` (default)
-   - **Build Command:** `npm run build`
-   - **Start Command:** `npm start`
-   - **Healthcheck Path:** `/health`
-   - **Port:** `3000`
+3. **Builder:** Use repository Dockerfile (no build/start commands needed)
+4. **Health checks:** Dockerfile defines `HEALTHCHECK`
 
 #### B. PostgreSQL Database (postgres-test)
 
@@ -118,12 +113,12 @@ The repository contains the necessary configuration files:
 
 **Test Environment:**
 1. Push code to main branch → Automatic deployment to test
-2. Test health endpoint: `https://web-test-xxx.up.railway.app/health`
+2. Test health: service should pass Docker `HEALTHCHECK` (app `/health` endpoint)
 3. Verify database connections in health endpoint response
 
 **Production Environment:**
 1. Manual deployment: `railway deploy --environment prod`
-2. Test health endpoint: `https://web-prod-xxx.up.railway.app/health`
+2. Test health: service should pass Docker `HEALTHCHECK` (app `/health` endpoint)
 3. Verify database connections in health endpoint response
 
 ### 8. Deployment Workflow
