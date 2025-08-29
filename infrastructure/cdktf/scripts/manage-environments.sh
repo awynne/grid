@@ -86,6 +86,11 @@ check_prerequisites() {
         log_error "CDKTF CLI not found. Install locally: npm i -D cdktf-cli (already handled in CI)"
         exit 1
     fi
+
+    if ! command -v terraform &> /dev/null; then
+        log_error "Terraform CLI not found. Install from https://developer.hashicorp.com/terraform/install"
+        exit 1
+    fi
     
     if [[ ! -f "$CDKTF_DIR/terraform.tfvars" ]]; then
         log_warning "terraform.tfvars not found. Copy from terraform.tfvars.example and edit with your values"
