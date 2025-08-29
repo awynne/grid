@@ -48,7 +48,7 @@ jobs:
           docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
 
       - name: Trigger Railway redeploy (registry - CLI)
-        if: env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.RAILWAY_USE_API != 'true'
+        if: env.RAILWAY_TRIGGER_REDEPLOY == 'true' && (env.RAILWAY_USE_API != 'true' || secrets.RAILWAY_ENVIRONMENT_ID == '' || secrets.RAILWAY_SERVICE_ID == '') && secrets.RAILWAY_TOKEN != ''
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
@@ -80,9 +80,9 @@ jobs:
           fi
 
       - name: Trigger Railway redeploy (registry - API)
-        if: env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.RAILWAY_USE_API == 'true'
+        if: env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.RAILWAY_USE_API == 'true' && secrets.RAILWAY_TOKEN != '' && secrets.RAILWAY_ENVIRONMENT_ID != '' && secrets.RAILWAY_SERVICE_ID != ''
         env:
-          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
           RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
         run: |
