@@ -25,6 +25,11 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.7.5'
+
       - name: Log in to GHCR
         run: echo "${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME || github.actor }}" --password-stdin
 
