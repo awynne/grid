@@ -12,6 +12,7 @@ env:
   IMAGE_NAME: grid
   REGISTRY: ghcr.io/${{ github.repository_owner }}
   IMAGE_TAG: v${{ github.run_number }}-${{ github.sha }}
+  DEPLOY_WITH_CDKTF: 'false'
 
 jobs:
   build-and-deploy:
@@ -26,6 +27,7 @@ jobs:
           node-version: '20'
 
       - name: Set up Terraform
+        if: env.DEPLOY_WITH_CDKTF == 'true'
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: '1.7.5'
@@ -44,6 +46,7 @@ jobs:
           docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
 
       - name: Install CDKTF deps
+        if: env.DEPLOY_WITH_CDKTF == 'true'
         working-directory: infrastructure/cdktf
         run: |
           npm ci
@@ -51,6 +54,7 @@ jobs:
           npm run compile
 
       - name: Prepare terraform.tfvars
+        if: env.DEPLOY_WITH_CDKTF == 'true'
         working-directory: infrastructure/cdktf
         run: |
           cat > terraform.tfvars << 'EOF'
@@ -66,5 +70,12 @@ jobs:
           EOF
 
       - name: Deploy prod via CDKTF
+        if: env.DEPLOY_WITH_CDKTF == 'true'
         working-directory: infrastructure/cdktf
         run: ./scripts/manage-environments.sh deploy prod
+
+      - name: Post-push note
+        if: env.DEPLOY_WITH_CDKTF != 'true'
+        run: |
+          echo "Docker image pushed: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+          echo "Ensure Railway service source is 'Docker Registry' and tracks this tag (or :latest) to auto-deploy."
