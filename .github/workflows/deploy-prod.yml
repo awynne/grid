@@ -57,6 +57,10 @@ jobs:
           set -euo pipefail
           echo "Installing Railway CLI..."
           npm i -g @railway/cli || npm i -g railway
+          echo "Seeding Railway CLI auth config..."
+          mkdir -p "$HOME/.config/railway" "$HOME/.railway"
+          printf '{"token":"%s"}' "$RAILWAY_TOKEN" > "$HOME/.config/railway/config.json"
+          cp "$HOME/.config/railway/config.json" "$HOME/.railway/config.json"
           echo "Linking project..."
           railway link --project "$RAILWAY_PROJECT_ID"
           echo "Selecting environment/service..."
