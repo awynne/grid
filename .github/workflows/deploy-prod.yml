@@ -132,6 +132,65 @@ jobs:
         working-directory: infrastructure/cdktf
         run: ./scripts/manage-environments.sh deploy prod
 
+      - name: Wait for deployment readiness
+        if: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.HAS_CLI_SECRET == 'true' }}
+        run: |
+          echo "⏳ Waiting for Railway deployment to be ready..."
+          echo "This ensures the new container is running before executing migrations."
+          sleep 45
+
+      - name: Run post-deployment database migrations
+        if: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.HAS_CLI_SECRET == 'true' }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_ENV: prod
+          RAILWAY_SERVICE: web
+        run: |
+          set -euo pipefail
+          echo "🔄 Running database migrations on Railway prod environment..."
+          echo "📍 Target: Railway service 'web' in 'prod' environment"
+          
+          # Verify Railway CLI is available and configured
+          if ! command -v railway >/dev/null 2>&1; then
+            echo "📦 Installing Railway CLI..."
+            npm i -g @railway/cli || npm i -g railway
+            
+            echo "🔧 Configuring Railway CLI authentication..."
+            mkdir -p "$HOME/.config/railway" "$HOME/.railway"
+            printf '{"token":"%s"}' "$RAILWAY_TOKEN" > "$HOME/.config/railway/config.json"
+            cp "$HOME/.config/railway/config.json" "$HOME/.railway/config.json"
+          fi
+          
+          # Link and select environment/service
+          echo "🔗 Linking to Railway project and selecting environment..."
+          railway link --project "$RAILWAY_PROJECT_ID" || true
+          railway environment "$RAILWAY_ENV" || echo "⚠️ Environment selection may not be needed"
+          railway service "$RAILWAY_SERVICE" || echo "⚠️ Service selection may not be needed"
+          
+          # Execute database migration script on Railway service
+          echo "🚀 Executing database migration script..."
+          set +e
+          railway run --service web ./scripts/setup-database.sh
+          migration_exit_code=$?
+          set -e
+          
+          # Handle migration results
+          if [ "$migration_exit_code" -eq 0 ]; then
+            echo "✅ Database migrations completed successfully"
+            echo "📊 Migration process executed all steps without errors"
+          else
+            echo "❌ Database migrations failed with exit code $migration_exit_code"
+            echo "🔍 Troubleshooting information:"
+            echo "  - Check Railway service logs: railway logs --service web"
+            echo "  - Verify database connectivity and TimescaleDB extension availability"
+            echo "  - Check for schema conflicts or database locks"
+            echo "  - Ensure all required environment variables are set"
+            echo ""
+            echo "🚨 Deployment considered failed due to migration issues"
+            exit 1
+          fi
+
       - name: Post-push note
         if: env.DEPLOY_WITH_CDKTF != 'true'
         run: |
