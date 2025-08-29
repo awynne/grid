@@ -151,27 +151,18 @@ jobs:
           echo "🔄 Running database migrations on Railway prod environment..."
           echo "📍 Target: Railway service 'web' in 'prod' environment"
           
-          # Verify Railway CLI is available and configured
-          if ! command -v railway >/dev/null 2>&1; then
-            echo "📦 Installing Railway CLI..."
-            npm i -g @railway/cli || npm i -g railway
-            
-            echo "🔧 Configuring Railway CLI authentication..."
-            mkdir -p "$HOME/.config/railway" "$HOME/.railway"
-            printf '{"token":"%s"}' "$RAILWAY_TOKEN" > "$HOME/.config/railway/config.json"
-            cp "$HOME/.config/railway/config.json" "$HOME/.railway/config.json"
-          fi
+          # Install and authenticate Railway CLI
+          echo "📦 Installing Railway CLI..."
+          npm i -g @railway/cli
           
-          # Link and select environment/service
-          echo "🔗 Linking to Railway project and selecting environment..."
-          railway link --project "$RAILWAY_PROJECT_ID" || true
-          railway environment "$RAILWAY_ENV" || echo "⚠️ Environment selection may not be needed"
-          railway service "$RAILWAY_SERVICE" || echo "⚠️ Service selection may not be needed"
+          # Authenticate using token directly in command execution
+          echo "🔗 Linking to Railway project..."
+          export RAILWAY_TOKEN="${RAILWAY_TOKEN}"
           
           # Execute database migration script on Railway service
           echo "🚀 Executing database migration script..."
           set +e
-          railway run --service web ./scripts/setup-database.sh
+          railway run ./scripts/setup-database.sh --service web
           migration_exit_code=$?
           set -e
           
