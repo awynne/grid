@@ -1,16 +1,16 @@
 # GRID-012A: CDKTF Infrastructure as Code Implementation
 
-**Status**: 🔄 In Progress  
+**Status**: ✅ Implemented  
 **Priority**: High  
 **Created**: 2025-08-28  
-**Updated**: 2025-08-28  
+**Updated**: 2025-08-29  
 
 **Parent**: [GRID-012](./GRID-012.md) - TimescaleDB Schema Implementation  
 **GitHub Issue**: [#26](https://github.com/awynne/grid/issues/26)
 
 ## Overview
 
-Replace non-idempotent bash scripts with declarative, type-safe Infrastructure as Code using CDK for Terraform (CDKTF) with TypeScript, providing true idempotent environment lifecycle management for Railway deployments.
+Replaced non-idempotent bash scripts with declarative, type-safe Infrastructure as Code using CDK for Terraform (CDKTF) with TypeScript, enabling idempotent environment lifecycle management for Railway deployments. Added a Docker-first CI workflow that publishes images to GHCR and triggers automated redeploys on Railway.
 
 ## Problem Statement
 
@@ -115,16 +115,22 @@ class GridPulseEnvironment extends Construct {
 ### React Router 7 Service Configuration
 
 ```typescript
-// React Router 7-specific service definition
-this.webService = new Service(this, "web", {
-  name: `web-${config.environmentName}`,
-  projectId: config.projectId,
-  sourceRepo: "awynne/grid",
-  sourceRepoBranch: "main",
-  // React Router 7 build process handled by Railway's Nixpacks
-});
+// Web service configuration prefers Docker image if provided; otherwise Git build
+this.webService = new Service(this, "web", config.dockerImage
+  ? {
+      name: "web",
+      projectId: config.projectId,
+      sourceImage: config.dockerImage,
+      sourceImageRegistryUsername: config.dockerUsername,
+      sourceImageRegistryPassword: config.dockerPassword,
+    }
+  : {
+      name: "web",
+      projectId: config.projectId,
+    }
+);
 
-// React Router 7 environment variables
+// Web environment variables (PORT, SESSION_SECRET, DATABASE_URL, REDIS_URL, etc.)
 const webVariables = [
   { name: "NODE_ENV", value: "production" },
   { name: "PORT", value: "3000" },
@@ -180,6 +186,14 @@ new Variable(this, "postgres_db", {
 ./scripts/manage-environments.sh plan test
 ./scripts/manage-environments.sh deploy test
 ```
+
+## CI/CD Outcome
+
+- GitHub Actions workflow `.github/workflows/deploy-prod.yml` builds and pushes GHCR images on `main`.
+- Railway redeploy is triggered automatically after image push:
+  - CLI-based via `RAILWAY_TOKEN` (default/fallback)
+  - API-based via GraphQL when `RAILWAY_TOKEN`, `RAILWAY_ENVIRONMENT_ID`, and `RAILWAY_SERVICE_ID` are provided
+- CDKTF infra updates are gated behind `DEPLOY_WITH_CDKTF` to avoid creating existing environments; image deployment is decoupled.
 
 ## Success Criteria
 
