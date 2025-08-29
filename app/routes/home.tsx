@@ -20,7 +20,7 @@ export default function Home() {
           </h1>
           <div className="inline-flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <span className="px-2 py-0.5 rounded-md bg-muted">Deployment check</span>
-            <span className="font-mono">v1</span>
+            <span className="font-mono">v2</span>
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Real-time insights from EIA-930 hourly electric grid data. 
