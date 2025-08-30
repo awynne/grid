@@ -2,9 +2,10 @@
 
 **GitHub Issue**: #50 (public tracking)
 **Spec Purpose**: Evaluate and select an open source license, add LICENSE and notices, and update repository metadata to reflect the chosen license.
-**Status**: 🔄 In Progress
+**Status**: ✅ Implemented
 **Priority**: Medium
 **Created**: 2025-08-30
+**Completed**: 2025-08-30
 
 ## Technical Overview
 This spec defines how GridPulse will adopt an open source license. It evaluates candidate licenses, documents decision criteria, and outlines the implementation steps to add a LICENSE file, update repository metadata, and communicate the choice. The selection should align with project goals: open collaboration, community contributions, compatibility with common JS/TS ecosystems, and clarity on permissions, conditions, and patent grants.
