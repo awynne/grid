@@ -49,6 +49,7 @@ jobs:
 
       - name: Resolve redeploy mode flags
         env:
+          # RAILWAY_TOKEN should be a Railway Project Token (preferred). Account API tokens may not work in CI paths that require project tokens.
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
           RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
@@ -64,6 +65,7 @@ jobs:
       - name: Trigger Railway redeploy (registry - CLI)
         if: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && (env.RAILWAY_USE_API != 'true' || env.HAS_API_SECRETS != 'true') && env.HAS_CLI_SECRET == 'true' }}
         env:
+          # Expect a Railway Project Token here; see Project → Settings → Tokens
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
           RAILWAY_ENV: prod
@@ -72,7 +74,7 @@ jobs:
           set -euo pipefail
           echo "Installing Railway CLI..."
           npm i -g @railway/cli || npm i -g railway
-          echo "Seeding Railway CLI auth config..."
+          echo "Seeding Railway CLI auth config (using Project Token)..."
           mkdir -p "$HOME/.config/railway" "$HOME/.railway"
           printf '{"token":"%s"}' "$RAILWAY_TOKEN" > "$HOME/.config/railway/config.json"
           cp "$HOME/.config/railway/config.json" "$HOME/.railway/config.json"
@@ -96,6 +98,7 @@ jobs:
       - name: Trigger Railway redeploy (registry - API)
         if: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.RAILWAY_USE_API == 'true' && env.HAS_API_SECRETS == 'true' }}
         env:
+          # Prefer a Project Token; some API flows accept account tokens but project tokens are more reliable in CI
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
           RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
@@ -158,6 +161,7 @@ jobs:
       - name: Run post-deployment database migrations
         if: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.HAS_CLI_SECRET == 'true' }}
         env:
+          # Project Token required for CLI auth in CI
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
           RAILWAY_ENV: prod

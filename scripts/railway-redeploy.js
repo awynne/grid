@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Trigger a Railway redeploy via GraphQL API
 // Requires env vars:
-// - RAILWAY_TOKEN (preferred) or RAILWAY_API_TOKEN: Railway API token (Account Settings)
+// - RAILWAY_TOKEN (preferred): Railway Project Token (Project → Settings → Tokens)
+//   Alternatively: RAILWAY_API_TOKEN (Account API Token). Note: some CI paths require a Project Token.
 // - RAILWAY_ENVIRONMENT_ID: target environment ID
 // - RAILWAY_SERVICE_ID: target service ID
 

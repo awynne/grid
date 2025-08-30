@@ -191,7 +191,7 @@ new Variable(this, "postgres_db", {
 
 - GitHub Actions workflow `.github/workflows/deploy-prod.yml` builds and pushes GHCR images on `main`.
 - Railway redeploy is triggered automatically after image push:
-  - CLI-based via `RAILWAY_TOKEN` (default/fallback)
+- CLI-based via `RAILWAY_TOKEN` (Project Token recommended)
   - API-based via GraphQL when `RAILWAY_TOKEN`, `RAILWAY_ENVIRONMENT_ID`, and `RAILWAY_SERVICE_ID` are provided
 - CDKTF infra updates are gated behind `DEPLOY_WITH_CDKTF` to avoid creating existing environments; image deployment is decoupled.
 

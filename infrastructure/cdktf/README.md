@@ -160,7 +160,7 @@ This repository includes a GitHub Actions workflow that builds a Docker image, p
 - Services: `web`, `postgres`, `redis` in a single Railway environment named `prod`
 
 Set these repository secrets (Settings → Secrets and variables → Actions):
-- `RAILWAY_TOKEN`: Railway API token
+- `RAILWAY_TOKEN`: Railway Project Token (Project → Settings → Tokens). Prefer this over account API tokens in CI.
 - `RAILWAY_PROJECT_ID`: Railway project UUID
 - `POSTGRES_PASSWORD`: DB password
 - `SESSION_SECRET`: 32+ char session secret
@@ -196,11 +196,11 @@ source_repo_branch = "main"
 - **Production**: Always use Docker with specific version tags
 - **Development**: Either method works, Git acceptable for iteration
 
-### Railway API Token
-Get your Railway API token from:
-1. Railway Dashboard → Account Settings → Tokens
-2. Create new token with project access
-3. Add to terraform.tfvars
+### Railway Token Types
+- Project Token (recommended for CI): Project → Settings → Tokens (scoped to a single project).
+- Account API Token (fallback for local CLI): Account Settings → API Tokens.
+
+In CI and CDKTF flows, prefer the Project Token. Set it as `RAILWAY_TOKEN`.
 
 ### GitHub Container Registry Setup
 For Docker deployments, set up GitHub Container Registry:
