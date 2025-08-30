@@ -58,6 +58,7 @@ docs/
 # Infrastructure
 infrastructure/
 scripts/
+!scripts/docker-entrypoint.sh
 
 # Temporary files
 tmp/

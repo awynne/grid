@@ -44,7 +44,7 @@ COPY --from=builder --chown=reactrouter:nodejs /app/build ./build
 # Copy necessary runtime files
 COPY --chown=reactrouter:nodejs prisma ./prisma
 COPY --chown=reactrouter:nodejs database ./database
-COPY --chown=reactrouter:nodejs scripts ./scripts
+COPY --chown=reactrouter:nodejs scripts/docker-entrypoint.sh ./scripts/docker-entrypoint.sh
 
 # Set permissions
 RUN chown -R reactrouter:nodejs /app
