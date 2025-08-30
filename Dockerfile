@@ -44,6 +44,7 @@ COPY --from=builder --chown=reactrouter:nodejs /app/build ./build
 # Copy necessary runtime files
 COPY --chown=reactrouter:nodejs prisma ./prisma
 COPY --chown=reactrouter:nodejs database ./database
+COPY --chown=reactrouter:nodejs scripts ./scripts
 
 # Set permissions
 RUN chown -R reactrouter:nodejs /app
@@ -57,10 +58,9 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 EXPOSE ${PORT:-3000}
 
 # Use dumb-init for proper signal handling
-ENTRYPOINT ["dumb-init", "--"]
+RUN chmod +x ./scripts/docker-entrypoint.sh
 
-# Default command - Railway can override this
-CMD ["npm", "start"]
+ENTRYPOINT ["dumb-init", "--", "/app/scripts/docker-entrypoint.sh"]
 
 # Metadata
 LABEL org.opencontainers.image.title="GridPulse"
