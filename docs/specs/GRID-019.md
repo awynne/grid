@@ -1,6 +1,6 @@
 ### GRID-019: Open Source License Selection and Implementation
 
-**GitHub Issue**: #TBD (public tracking)
+**GitHub Issue**: #50 (public tracking)
 **Spec Purpose**: Evaluate and select an open source license, add LICENSE and notices, and update repository metadata to reflect the chosen license.
 **Status**: 📋 Research
 **Priority**: Medium
@@ -63,4 +63,3 @@ Recommendation if no additional constraints from the owner document: Apache-2.0 
 - Confirm `package.json` license passes `npm`/GitHub detection
 - Verify README links and badges render correctly
 - Manual compliance review against OSI text and project files
-
