@@ -334,3 +334,28 @@ prodEnvironment.addDataService({
 - **Service Naming**: Consistent clean naming strategy implemented
 
 This CDKTF implementation provides **true Infrastructure as Code** with declarative, type-safe, idempotent environment management for GridPulse. 🚀
+## ☁️ Remote State (Terraform Cloud)
+
+To keep CI and local runs in sync, configure a remote backend with Terraform Cloud (TFC):
+
+1) Create TFC org and workspace
+- Create an organization in https://app.terraform.io
+- Create a workspace named `gridpulse-prod` (CLI-driven)
+- Set Execution Mode to Local (so runs execute in CI/local; TFC stores state)
+
+2) Create a TFC API token
+- User → Tokens → New token (or Team token)
+- In GitHub, add repository secret `TF_API_TOKEN` with the token value
+- Optionally run `terraform login` locally or export `TF_TOKEN_app_terraform_io`
+
+3) Wire env vars in CI
+- Add repository secrets: `TF_CLOUD_ORG` (your TFC org), `TF_API_TOKEN`
+- Workflows already set:
+  - `TF_CLOUD_ORG`, `TF_CLOUD_WORKSPACE=gridpulse-prod`
+  - `TF_TOKEN_app_terraform_io` from `TF_API_TOKEN`
+
+4) CDKTF auto-detects backend
+- The stack configures a CloudBackend only when both `TF_CLOUD_ORG` and
+  `TF_CLOUD_WORKSPACE` are present. Otherwise it uses local state.
+
+After this, CI and local share state, avoiding drift between environments.

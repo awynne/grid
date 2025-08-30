@@ -13,6 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: gridpulse/prod
+    env:
+      TF_CLOUD_ORG: ${{ secrets.TF_CLOUD_ORG }}
+      TF_CLOUD_WORKSPACE: gridpulse-prod
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
     steps:
       - name: Guard confirmation
         run: |
@@ -89,9 +93,52 @@ jobs:
       - name: Destroy prod (cdktf)
         working-directory: infrastructure/cdktf
         run: |
-          set -e
-          echo "Destroying gridpulse-prod stack..."
+          set +e
+          echo "Destroying gridpulse-prod stack (ignoring failures if state is missing)..."
           npx cdktf destroy gridpulse-prod --auto-approve -var-file="terraform.tfvars"
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ]; then
+            echo "Destroy reported errors (likely due to missing state). Will attempt CLI force delete next."
+          fi
+
+      - name: Force delete Railway environment via CLI (best-effort)
+        env:
+          ENV_NAME: prod
+        run: |
+          set -euo pipefail
+          echo "Installing Railway CLI..."
+          npm i -g @railway/cli || npm i -g railway
+
+          echo "Extracting tokens and project_id from terraform.tfvars..."
+          # Prefer railway_project_token if present; else railway_token
+          RAILWAY_PROJECT_TOKEN=$(awk -F'=' '/^\s*railway_project_token\s*=/{gsub(/"| /, "", $2); print $2}' infrastructure/cdktf/terraform.tfvars || true)
+          RAILWAY_ACCOUNT_TOKEN=$(awk -F'=' '/^\s*railway_token\s*=/{gsub(/"| /, "", $2); print $2}' infrastructure/cdktf/terraform.tfvars || true)
+          PROJECT_ID=$(awk -F'=' '/^\s*project_id\s*=/{gsub(/"| /, "", $2); print $2}' infrastructure/cdktf/terraform.tfvars)
+          TOKEN_TO_USE=${RAILWAY_PROJECT_TOKEN:-}
+          if [ -z "$TOKEN_TO_USE" ]; then TOKEN_TO_USE="$RAILWAY_ACCOUNT_TOKEN"; fi
+          if [ -z "$TOKEN_TO_USE" ]; then
+            echo "No Railway token found in terraform.tfvars; skipping CLI force delete."
+            exit 0
+          fi
+
+          echo "Seeding Railway CLI auth config..."
+          mkdir -p "$HOME/.config/railway" "$HOME/.railway"
+          printf '{"token":"%s"}' "$TOKEN_TO_USE" > "$HOME/.config/railway/config.json"
+          cp "$HOME/.config/railway/config.json" "$HOME/.railway/config.json"
+
+          echo "Linking project $PROJECT_ID..."
+          railway link --project "$PROJECT_ID"
+          echo "Attempting to delete environment '$ENV_NAME'..."
+          set +e
+          railway environment delete "$ENV_NAME" -y
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ]; then
+            echo "Environment delete may have failed or not existed; proceeding."
+          else
+            echo "Environment '$ENV_NAME' delete requested."
+          fi
 
       - name: Deploy prod (cdktf)
         working-directory: infrastructure/cdktf
