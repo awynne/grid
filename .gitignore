@@ -16,3 +16,10 @@ build/
 
 # Railway setup files (local only)
 .railway-setup-checklist.md
+
+# SOPS / secrets
+secrets/*.tfvars
+!secrets/*.enc.tfvars
+
+# Local Terraform variables (never commit plaintext)
+infrastructure/cdktf/terraform.tfvars

@@ -1,0 +1,86 @@
+name: Infra Plan (CDKTF)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    environment:
+      name: gridpulse/prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.7.5'
+
+      - name: Install sops and age
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y age
+          SOPS_VERSION=v3.8.1
+          curl -Ls https://github.com/getsops/sops/releases/download/$SOPS_VERSION/sops-$SOPS_VERSION.linux.amd64 -o sops
+          sudo install -m 0755 sops /usr/local/bin/sops
+
+      - name: Decrypt or generate tfvars
+        env:
+          AGE_PRIVATE_KEY: ${{ secrets.AGE_PRIVATE_KEY }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.config/sops/age
+          if [ -n "${AGE_PRIVATE_KEY:-}" ]; then
+            printf "%s\n" "$AGE_PRIVATE_KEY" > ~/.config/sops/age/keys.txt
+          fi
+          if [ -f secrets/prod.enc.tfvars ]; then
+            echo "Preparing terraform.tfvars from secrets/prod.enc.tfvars"
+            if sops -d secrets/prod.enc.tfvars >/dev/null 2>&1; then
+              sops -d secrets/prod.enc.tfvars > infrastructure/cdktf/terraform.tfvars
+              exit 0
+            else
+              echo "Warning: prod.enc.tfvars not encrypted or decryption failed; will fall back to GH secrets."
+            fi
+          fi
+          echo "Generating terraform.tfvars from GitHub environment secrets..."
+          cat > infrastructure/cdktf/terraform.tfvars << 'EOF'
+          railway_token     = "${{ secrets.RAILWAY_TOKEN }}"
+          project_id        = "${{ secrets.RAILWAY_PROJECT_ID }}"
+          postgres_password = "${{ secrets.POSTGRES_PASSWORD }}"
+          session_secret    = "${{ secrets.SESSION_SECRET }}"
+          eia_api_key       = "${{ secrets.EIA_API_KEY }}"
+
+          docker_image    = ""
+          docker_username = ""
+          docker_password = ""
+          EOF
+
+      - name: Install CDKTF deps
+        working-directory: infrastructure/cdktf
+        run: |
+          npm ci
+          npm run get
+          npm run compile
+
+      - name: Plan infrastructure (cdktf)
+        working-directory: infrastructure/cdktf
+        run: |
+          set -e
+          npx cdktf plan gridpulse-prod -var-file="terraform.tfvars" | tee plan.txt
+
+      - name: Upload plan output
+        uses: actions/upload-artifact@v4
+        with:
+          name: cdktf-plan
+          path: infrastructure/cdktf/plan.txt

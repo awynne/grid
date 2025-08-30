@@ -3,6 +3,7 @@
 # Generate a key pair locally with: age-keygen -o ~/.config/sops/age/keys.txt
 creation_rules:
   - path_regex: secrets/.+\.enc\.tfvars$
-    age: ["age1q4qh3tay0jdchhcc5q0gkhhk7pdr2lx3dlpf5vpjsf69qen2g95sxmyfjh"]
+    # Encrypt entire file contents
     encrypted_regex: '^(.*)$'
-    # Treat entire file as sensitive; keep contents encrypted at rest
+    # Single age recipient (string form to satisfy sops parser)
+    age: "age1q4qh3tay0jdchhcc5q0gkhhk7pdr2lx3dlpf5vpjsf69qen2g95sxmyfjh"
