@@ -40,8 +40,8 @@ Tips
 ## Variables to Include
 Example keys for `prod.enc.tfvars` (replace values when editing with `sops`):
 ```
-railway_token     = "<Railway Project Token>"
-project_id        = "<Railway Project UUID>"
+railway_token       = "<Railway Account API Token>"   # used by CDKTF provider
+project_id          = "<Railway Project UUID>"
 postgres_password = "<password>"
 session_secret    = "<32+ chars>"
 eia_api_key       = "<optional>"
@@ -49,6 +49,10 @@ eia_api_key       = "<optional>"
 docker_image      = "ghcr.io/<owner>/grid:<tag>"
 docker_username   = "<GHCR username>"
 docker_password   = "<GHCR token>"
+
+# Optional: keep both token types for convenience (not consumed by CDKTF directly)
+# railway_api_token      = "<Railway Account API Token>"   # same as railway_token
+# railway_project_token  = "<Railway Project Token>"       # useful for CLI-only flows
 ```
 
 ## Key Rotation
@@ -60,4 +64,7 @@ docker_password   = "<GHCR token>"
 
 ## Notes
 - Railway tokens: Use a Project Token for CI. Store it encrypted in the tfvars file.
+- CDKTF uses the Account API token (`railway_token`). You can also store both
+  `railway_api_token` and `railway_project_token` in the encrypted file for
+  convenience, but do not commit plaintext.
 - Prefer GitHub Environment secrets for `AGE_PRIVATE_KEY` (prod/test) with protection rules.
