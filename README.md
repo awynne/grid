@@ -35,3 +35,10 @@ The documentation includes:
 - Setup guides and deployment instructions
 
 <!-- Removed redundant link to docs/README.md to avoid duplication. -->
+
+## Releases
+
+For the GitOps release flow (build image → PR bump → apply infra), see `infrastructure/cdktf/README.md` (Release Flow). In short:
+- Publish Image (GHCR): builds/pushes the container image (no deploy).
+- Release Build: builds/pushes and opens a PR to bump `docker_image` in SOPS tfvars.
+- Plan + Apply Prod (CDKTF): applies the tag change to deploy; container runs migrations on startup.
