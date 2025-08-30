@@ -359,3 +359,16 @@ To keep CI and local runs in sync, configure a remote backend with Terraform Clo
   `TF_CLOUD_WORKSPACE` are present. Otherwise it uses local state.
 
 After this, CI and local share state, avoiding drift between environments.
+
+## 🧭 Railway Project vs Environment
+
+Railway models services at the project level, and environments primarily scope variables and deployments:
+
+- Services (e.g., `web`, `postgres`, `redis`) are project-level and appear under every environment in that project.
+- Environment variables are environment-scoped (we set `environmentId` on variables via IaC).
+- It’s normal to see the same services under multiple environments in the same project.
+
+Recommendations:
+- Delete placeholder environments (e.g., `default`) once your target environment (e.g., `prod`) is created, to reduce confusion.
+- For strict separation between environments, use separate Railway projects per env (e.g., one project for prod, another for dev/test).
+- If Postgres starts before its password variable is present, restart the service once after variables are applied.
