@@ -1,8 +1,12 @@
 name: Deploy Prod (Docker + CDKTF)
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type DEPLOY to build/push image and trigger Railway redeploy"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -22,6 +26,12 @@ jobs:
     environment:
       name: gridpulse/prod
     steps:
+      - name: Guard confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "DEPLOY" ]; then
+            echo "Confirmation mismatch. Type DEPLOY exactly to proceed." >&2
+            exit 1
+          fi
       - name: Checkout
         uses: actions/checkout@v4
 
