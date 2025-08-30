@@ -1,0 +1,15 @@
+GridPulse
+Copyright (c) 2025 Adam Wynne
+
+This product includes software developed by the GridPulse contributors.
+
+Attribution and Citation
+- Please preserve this NOTICE file in redistributions, as required by Apache-2.0 §4(d).
+- Citation request: If you use this software or derivative works in either:
+  • Distributed software (open source or commercial), or
+  • Academic, scientific, or technical publications,
+  please include the following citation where appropriate (e.g., product documentation, about pages, acknowledgments, or publications):
+  Adam Wynne. "GridPulse: Electric grid data visualization platform." https://github.com/awynne/grid (2025).
+
+Third-party Notices
+- This project may include third-party components under their own licenses. See respective LICENSE/NOTICE files where applicable.
