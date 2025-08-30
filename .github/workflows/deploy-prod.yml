@@ -1,4 +1,4 @@
-name: Deploy Prod (Docker + CDKTF)
+name: Publish Image (GHCR)
 
 on:
   workflow_dispatch:
@@ -16,15 +16,10 @@ env:
   IMAGE_NAME: grid
   REGISTRY: ghcr.io/${{ github.repository_owner }}
   IMAGE_TAG: v${{ github.run_number }}-${{ github.sha }}
-  DEPLOY_WITH_CDKTF: 'false'
-  RAILWAY_TRIGGER_REDEPLOY: 'true'
-  RAILWAY_USE_API: 'true'
 
 jobs:
-  build-and-deploy:
+  publish-image:
     runs-on: ubuntu-latest
-    environment:
-      name: gridpulse/prod
     steps:
       - name: Guard confirmation
         run: |
@@ -40,12 +35,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Set up Terraform
-        if: env.DEPLOY_WITH_CDKTF == 'true'
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: '1.7.5'
-
       - name: Log in to GHCR
         run: echo "${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME || github.actor }}" --password-stdin
 
@@ -59,198 +48,8 @@ jobs:
           docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
           docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
 
-      - name: Resolve redeploy mode flags
-        env:
-          # RAILWAY_TOKEN should be a Railway Project Token (preferred). Account API tokens may not work in CI paths that require project tokens.
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
-          RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
+      - name: Summary
         run: |
-          set -euo pipefail
-          HAS_CLI_SECRET=false
-          HAS_API_SECRETS=false
-          if [ -n "${RAILWAY_TOKEN:-}" ]; then HAS_CLI_SECRET=true; fi
-          if [ -n "${RAILWAY_TOKEN:-}" ] && [ -n "${RAILWAY_ENVIRONMENT_ID:-}" ] && [ -n "${RAILWAY_SERVICE_ID:-}" ]; then HAS_API_SECRETS=true; fi
-          echo "HAS_CLI_SECRET=$HAS_CLI_SECRET" >> "$GITHUB_ENV"
-          echo "HAS_API_SECRETS=$HAS_API_SECRETS" >> "$GITHUB_ENV"
-
-      - name: Trigger Railway redeploy (registry - CLI)
-        if: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && (env.RAILWAY_USE_API != 'true' || env.HAS_API_SECRETS != 'true') && env.HAS_CLI_SECRET == 'true' }}
-        env:
-          # Expect a Railway Project Token here; see Project → Settings → Tokens
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-          RAILWAY_ENV: prod
-          RAILWAY_SERVICE: web
-        run: |
-          set -euo pipefail
-          echo "Installing Railway CLI..."
-          npm i -g @railway/cli || npm i -g railway
-          echo "Seeding Railway CLI auth config (using Project Token)..."
-          mkdir -p "$HOME/.config/railway" "$HOME/.railway"
-          printf '{"token":"%s"}' "$RAILWAY_TOKEN" > "$HOME/.config/railway/config.json"
-          cp "$HOME/.config/railway/config.json" "$HOME/.railway/config.json"
-          echo "Linking project..."
-          railway link --project "$RAILWAY_PROJECT_ID"
-          echo "Selecting environment/service..."
-          railway environment "$RAILWAY_ENV" || true
-          railway service "$RAILWAY_SERVICE" || true
-          echo "Triggering redeploy..."
-          set +e
-          railway redeploy
-          code=$?
-          set -e
-          if [ "$code" -ne 0 ]; then
-            echo "Redeploy command unavailable; attempting service restart or up..."
-            set +e
-            railway service restart || railway up --detach
-            set -e
-          fi
-
-      - name: Trigger Railway redeploy (registry - API)
-        if: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.RAILWAY_USE_API == 'true' && env.HAS_API_SECRETS == 'true' }}
-        env:
-          # Prefer a Project Token; some API flows accept account tokens but project tokens are more reliable in CI
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
-          RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
-        run: |
-          node --version
-          node scripts/railway-redeploy.js
-
-      - name: Install CDKTF deps
-        if: env.DEPLOY_WITH_CDKTF == 'true'
-        working-directory: infrastructure/cdktf
-        run: |
-          npm ci
-          npm run get
-          npm run compile
-
-      - name: Install sops and age (for secrets decryption)
-        if: env.DEPLOY_WITH_CDKTF == 'true'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y age
-          SOPS_VERSION=v3.8.1
-          curl -Ls https://github.com/getsops/sops/releases/download/$SOPS_VERSION/sops-$SOPS_VERSION.linux.amd64 -o sops
-          sudo install -m 0755 sops /usr/local/bin/sops
-
-      - name: Decrypt terraform.tfvars with SOPS (prod)
-        if: env.DEPLOY_WITH_CDKTF == 'true'
-        env:
-          AGE_PRIVATE_KEY: ${{ secrets.AGE_PRIVATE_KEY }}
-        run: |
-          set -euo pipefail
-          if [ -z "${AGE_PRIVATE_KEY:-}" ]; then
-            echo "No AGE_PRIVATE_KEY secret provided; skipping SOPS decryption."
-            exit 0
-          fi
-          mkdir -p ~/.config/sops/age
-          printf "%s\n" "$AGE_PRIVATE_KEY" > ~/.config/sops/age/keys.txt
-          # Decrypt to terraform.tfvars only if encrypted file exists
-          if [ -f secrets/prod.enc.tfvars ]; then
-            echo "Decrypting secrets/prod.enc.tfvars → infrastructure/cdktf/terraform.tfvars"
-            sops -d secrets/prod.enc.tfvars > infrastructure/cdktf/terraform.tfvars
-          else
-            echo "secrets/prod.enc.tfvars not found; skipping decryption."
-          fi
-
-      - name: Prepare terraform.tfvars (fallback without SOPS)
-        if: env.DEPLOY_WITH_CDKTF == 'true'
-        working-directory: infrastructure/cdktf
-        run: |
-          if [ -f terraform.tfvars ]; then
-            echo "terraform.tfvars already present (from SOPS). Skipping fallback generation."
-            exit 0
-          fi
-          cat > terraform.tfvars << 'EOF'
-          railway_token     = "${{ secrets.RAILWAY_TOKEN }}"
-          project_id        = "${{ secrets.RAILWAY_PROJECT_ID }}"
-          postgres_password = "${{ secrets.POSTGRES_PASSWORD }}"
-          session_secret    = "${{ secrets.SESSION_SECRET }}"
-          eia_api_key       = "${{ secrets.EIA_API_KEY }}"
-
-          docker_image      = "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
-          docker_username   = "${{ secrets.GHCR_USERNAME || github.actor }}"
-          docker_password   = "${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}"
-          EOF
-
-      - name: Deploy prod via CDKTF
-        if: env.DEPLOY_WITH_CDKTF == 'true'
-        working-directory: infrastructure/cdktf
-        run: ./scripts/manage-environments.sh deploy prod
-
-      - name: Wait for deployment readiness
-        if: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.HAS_CLI_SECRET == 'true' }}
-        run: |
-          echo "⏳ Waiting for Railway deployment to be ready..."
-          echo "This ensures the new container is running before executing migrations."
-          sleep 45
-
-      - name: Check migration prerequisites
-        run: |
-          echo "🔍 Migration Prerequisites Check:"
-          echo "  RAILWAY_TRIGGER_REDEPLOY: ${{ env.RAILWAY_TRIGGER_REDEPLOY }}"
-          echo "  HAS_CLI_SECRET: ${{ env.HAS_CLI_SECRET }}"
-          echo "  Will run migrations: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.HAS_CLI_SECRET == 'true' }}"
-
-      - name: Skip migrations (missing prerequisites)
-        if: ${{ env.RAILWAY_TRIGGER_REDEPLOY != 'true' || env.HAS_CLI_SECRET != 'true' }}
-        run: |
-          echo "⏭️ Skipping database migrations"
-          echo "Reason: Missing required secrets or RAILWAY_TRIGGER_REDEPLOY disabled"
-          echo "To enable migrations:"
-          echo "  1. Set RAILWAY_TOKEN secret in repository settings"
-          echo "  2. Ensure RAILWAY_TRIGGER_REDEPLOY=true in workflow"
-
-      - name: Run post-deployment database migrations
-        if: ${{ env.RAILWAY_TRIGGER_REDEPLOY == 'true' && env.HAS_CLI_SECRET == 'true' }}
-        env:
-          # Project Token required for CLI auth in CI
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-          RAILWAY_ENV: prod
-          RAILWAY_SERVICE: web
-        run: |
-          set -euo pipefail
-          echo "🔄 Running database migrations on Railway prod environment..."
-          echo "📍 Target: Railway service 'web' in 'prod' environment"
-          
-          # Install Railway CLI
-          echo "📦 Installing Railway CLI..."
-          npm i -g @railway/cli
-          
-          # Debug Railway environment
-          echo "🔍 Railway CLI Debug Info:"
-          echo "  RAILWAY_TOKEN: ${RAILWAY_TOKEN:0:10}..."
-          echo "  RAILWAY_PROJECT_ID: $RAILWAY_PROJECT_ID"
-          echo "  Railway CLI version: $(railway --version)"
-          
-          # Execute database migration script on Railway service
-          echo "🚀 Executing database migration script with Railway CLI..."
-          set +e
-          railway run --service web --environment prod ./scripts/setup-database.sh
-          migration_exit_code=$?
-          set -e
-          
-          # Handle migration results
-          if [ "$migration_exit_code" -eq 0 ]; then
-            echo "✅ Database migrations completed successfully"
-            echo "📊 Migration process executed all steps without errors"
-          else
-            echo "❌ Database migrations failed with exit code $migration_exit_code"
-            echo "🔍 Troubleshooting information:"
-            echo "  - Check Railway service logs: railway logs --service web"
-            echo "  - Verify database connectivity and TimescaleDB extension availability"
-            echo "  - Check for schema conflicts or database locks"
-            echo "  - Ensure all required environment variables are set"
-            echo ""
-            echo "🚨 Deployment considered failed due to migration issues"
-            exit 1
-          fi
-
-      - name: Post-push note
-        if: env.DEPLOY_WITH_CDKTF != 'true'
-        run: |
-          echo "Docker image pushed: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
-          echo "Ensure Railway service source is 'Docker Registry' and tracks this tag (or :latest) to auto-deploy."
+          echo "## Published Images" >> $GITHUB_STEP_SUMMARY
+          echo "- ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}" >> $GITHUB_STEP_SUMMARY
+          echo "- ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
