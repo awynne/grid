@@ -1,9 +1,9 @@
 # Secrets Management (SOPS + age)
 
-This repo uses SOPS with age to store environment secrets in Git as encrypted files you can still view and edit locally.
+This repo uses SOPS with age to store secrets in Git as encrypted files you can still view and edit locally.
 
 ## What’s Encrypted
-- `secrets/prod.enc.tfvars` and `secrets/test.enc.tfvars` (Terraform/CDKTF variables)
+- `secrets/prod.enc.tfvars` (Terraform/CDKTF variables for production)
 - Plain `.tfvars` are ignored by Git via `.gitignore`.
 
 ## One‑Time Setup
@@ -18,7 +18,7 @@ This repo uses SOPS with age to store environment secrets in Git as encrypted fi
 ## Editing and Encrypting
 - Edit and auto-encrypt on save:
   - `sops secrets/prod.enc.tfvars`
-  - `sops secrets/test.enc.tfvars`
+  - For additional environments in the future, create corresponding `secrets/<env>.enc.tfvars` files and encrypt with `sops`.
 - View plaintext (without editing):
   - `sops -d secrets/prod.enc.tfvars | less`
 
@@ -37,7 +37,7 @@ Tips
   4. Run CDKTF with those variables
 
 ## Variables to Include
-Example keys for `*.enc.tfvars` (replace values when editing with `sops`):
+Example keys for `prod.enc.tfvars` (replace values when editing with `sops`):
 ```
 railway_token     = "<Railway Project Token>"
 project_id        = "<Railway Project UUID>"
@@ -55,10 +55,8 @@ docker_password   = "<GHCR token>"
 2. Update `.sops.yaml` with the new public key (you can list multiple recipients during transition)
 3. Re-encrypt files:
    - `sops --encrypt --in-place secrets/prod.enc.tfvars`
-   - `sops --encrypt --in-place secrets/test.enc.tfvars`
 4. Update `AGE_PRIVATE_KEY` secret in GitHub Environments
 
 ## Notes
 - Railway tokens: Use a Project Token for CI. Store it encrypted in the tfvars file.
 - Prefer GitHub Environment secrets for `AGE_PRIVATE_KEY` (prod/test) with protection rules.
-
