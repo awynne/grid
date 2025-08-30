@@ -1,4 +1,4 @@
-import { App, CloudBackend } from "cdktf";
+import { App, CloudBackend, NamedCloudWorkspace } from "cdktf";
 import { ProductionEnvironmentStack } from "./stacks/ProductionEnvironmentStack";
 
 const app = new App();
@@ -13,7 +13,7 @@ if (org && workspace) {
   new CloudBackend(prod, {
     hostname: "app.terraform.io",
     organization: org,
-    workspaces: { name: workspace },
+    workspaces: new NamedCloudWorkspace(workspace),
   });
 }
 
