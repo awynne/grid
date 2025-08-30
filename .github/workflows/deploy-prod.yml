@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: "Type DEPLOY to build/push image and trigger Railway redeploy"
+        description: "Type PUBLISH to build and push the image"
         required: true
         type: string
 
@@ -23,8 +23,8 @@ jobs:
     steps:
       - name: Guard confirmation
         run: |
-          if [ "${{ github.event.inputs.confirm }}" != "DEPLOY" ]; then
-            echo "Confirmation mismatch. Type DEPLOY exactly to proceed." >&2
+          if [ "${{ github.event.inputs.confirm }}" != "PUBLISH" ]; then
+            echo "Confirmation mismatch. Type PUBLISH exactly to proceed." >&2
             exit 1
           fi
       - name: Checkout
