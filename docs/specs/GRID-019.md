@@ -2,7 +2,7 @@
 
 **GitHub Issue**: #50 (public tracking)
 **Spec Purpose**: Evaluate and select an open source license, add LICENSE and notices, and update repository metadata to reflect the chosen license.
-**Status**: 📋 Research
+**Status**: 🔄 In Progress
 **Priority**: Medium
 **Created**: 2025-08-30
 
@@ -10,13 +10,13 @@
 This spec defines how GridPulse will adopt an open source license. It evaluates candidate licenses, documents decision criteria, and outlines the implementation steps to add a LICENSE file, update repository metadata, and communicate the choice. The selection should align with project goals: open collaboration, community contributions, compatibility with common JS/TS ecosystems, and clarity on permissions, conditions, and patent grants.
 
 ## Implementation Requirements
-- [ ] Select an OSI-approved license based on criteria below
-- [ ] Add root-level `LICENSE` file with the exact approved text
-- [ ] Update `package.json` `license` field to SPDX identifier
-- [ ] Update `README.md` with license badge/section and link to `LICENSE`
+- [x] Select an OSI-approved license based on criteria below
+- [x] Add root-level `LICENSE` file with the exact approved text
+- [x] Update `package.json` `license` field to SPDX identifier
+- [x] Update `README.md` with license badge/section and link to `LICENSE`
 - [ ] Add copyright notice and year in `LICENSE` name section
 - [ ] Add `NOTICE` file if required by selected license (e.g., Apache-2.0)
-- [ ] Create `docs/legal/` with brief rationale and obligations summary
+- [x] Create `docs/legal/` with brief rationale and obligations summary
 - [ ] Add PR/issue templates guidance to reference license obligations if needed
 - [ ] Verify third-party dependencies’ license compatibility
 - [ ] Confirm CI and distribution artifacts include license where appropriate
