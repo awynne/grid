@@ -27,3 +27,6 @@ Recommended Attribution
 Suggested Academic Citation
 Adam Wynne. "GridPulse: Electric grid data visualization platform." https://github.com/awynne/grid (2025).
 
+Citation Request Scope (Non-Binding)
+- Software distributions (open source or commercial) and academic/scientific/technical publications are requested to include the citation above.
+- This request is communicated via the Apache-2.0 NOTICE file and does not add additional legal obligations beyond the license terms.

@@ -15,7 +15,7 @@ This spec defines how GridPulse will adopt an open source license. It evaluates 
 - [x] Update `package.json` `license` field to SPDX identifier
 - [x] Update `README.md` with license badge/section and link to `LICENSE`
 - [ ] Add copyright notice and year in `LICENSE` name section
-- [ ] Add `NOTICE` file if required by selected license (e.g., Apache-2.0)
+- [x] Add `NOTICE` file if required by selected license (e.g., Apache-2.0) with non-binding citation request for distributed software and publications
 - [x] Create `docs/legal/` with brief rationale and obligations summary
 - [ ] Add PR/issue templates guidance to reference license obligations if needed
 - [ ] Verify third-party dependencies’ license compatibility
