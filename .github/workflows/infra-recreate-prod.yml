@@ -121,11 +121,11 @@ jobs:
             echo "No Railway token found in terraform.tfvars; skipping CLI force delete."
             exit 0
           fi
-
-          echo "Seeding Railway CLI auth config..."
-          mkdir -p "$HOME/.config/railway" "$HOME/.railway"
-          printf '{"token":"%s"}' "$TOKEN_TO_USE" > "$HOME/.config/railway/config.json"
-          cp "$HOME/.config/railway/config.json" "$HOME/.railway/config.json"
+          # Export token for CLI to use (preferred over writing config files)
+          export RAILWAY_TOKEN="$TOKEN_TO_USE"
+          echo "Railway CLI version: $(railway --version)"
+          # Optional sanity: whoami (won't print token)
+          railway whoami || true
 
           echo "Linking project $PROJECT_ID..."
           railway link --project "$PROJECT_ID"
