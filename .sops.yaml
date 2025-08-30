@@ -1,0 +1,8 @@
+# SOPS configuration for managing encrypted tfvars files
+# Replace the age recipient below with your actual public key (age1...)
+# Generate a key pair locally with: age-keygen -o ~/.config/sops/age/keys.txt
+creation_rules:
+  - path_regex: secrets/.+\.enc\.tfvars$
+    age: ["age1q4qh3tay0jdchhcc5q0gkhhk7pdr2lx3dlpf5vpjsf69qen2g95sxmyfjh"]
+    encrypted_regex: '^(.*)$'
+    # Treat entire file as sensitive; keep contents encrypted at rest
