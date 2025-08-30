@@ -66,17 +66,17 @@ jobs:
           fi
           if [ ! -f infrastructure/cdktf/terraform.tfvars ]; then
             echo "Generating terraform.tfvars from GitHub environment secrets..."
-            cat > infrastructure/cdktf/terraform.tfvars << 'EOF'
-            railway_token     = "${{ secrets.RAILWAY_TOKEN }}"
-            project_id        = "${{ secrets.RAILWAY_PROJECT_ID }}"
-            postgres_password = "${{ secrets.POSTGRES_PASSWORD }}"
-            session_secret    = "${{ secrets.SESSION_SECRET }}"
-            eia_api_key       = "${{ secrets.EIA_API_KEY }}"
-
-            docker_image    = ""
-            docker_username = ""
-            docker_password = ""
-            EOF
+            {
+              echo "railway_token     = \"${{ secrets.RAILWAY_TOKEN }}\""
+              echo "project_id        = \"${{ secrets.RAILWAY_PROJECT_ID }}\""
+              echo "postgres_password = \"${{ secrets.POSTGRES_PASSWORD }}\""
+              echo "session_secret    = \"${{ secrets.SESSION_SECRET }}\""
+              echo "eia_api_key       = \"${{ secrets.EIA_API_KEY }}\""
+              echo
+              echo "docker_image    = \"\""
+              echo "docker_username = \"\""
+              echo "docker_password = \"\""
+            } > infrastructure/cdktf/terraform.tfvars
           fi
 
       - name: Install CDKTF deps
@@ -99,4 +99,3 @@ jobs:
           set -e
           echo "Re-deploying gridpulse-prod stack..."
           npx cdktf deploy gridpulse-prod --auto-approve -var-file="terraform.tfvars"
-
