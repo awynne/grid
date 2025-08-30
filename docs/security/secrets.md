@@ -27,9 +27,10 @@ Tips
 - Only commit the `*.enc.tfvars` files.
 
 ## CI/CD Decryption (GitHub Actions)
-- Add the private key to GitHub Environment secrets (recommended):
+- Add the private key to GitHub Environment secrets for the environment used by the workflow job.
   - Name: `AGE_PRIVATE_KEY`
   - Value: full contents of `~/.config/sops/age/keys.txt`
+  - Example: if your environment is named `gridpulse/prod`, add `AGE_PRIVATE_KEY` under that environment.
 - The deploy workflow will:
   1. Install age + sops
   2. Write `AGE_PRIVATE_KEY` to `~/.config/sops/age/keys.txt`

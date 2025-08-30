@@ -19,6 +19,8 @@ env:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: gridpulse/prod
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -114,10 +116,43 @@ jobs:
           npm run get
           npm run compile
 
-      - name: Prepare terraform.tfvars
+      - name: Install sops and age (for secrets decryption)
+        if: env.DEPLOY_WITH_CDKTF == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y age
+          SOPS_VERSION=v3.8.1
+          curl -Ls https://github.com/getsops/sops/releases/download/$SOPS_VERSION/sops-$SOPS_VERSION.linux.amd64 -o sops
+          sudo install -m 0755 sops /usr/local/bin/sops
+
+      - name: Decrypt terraform.tfvars with SOPS (prod)
+        if: env.DEPLOY_WITH_CDKTF == 'true'
+        env:
+          AGE_PRIVATE_KEY: ${{ secrets.AGE_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${AGE_PRIVATE_KEY:-}" ]; then
+            echo "No AGE_PRIVATE_KEY secret provided; skipping SOPS decryption."
+            exit 0
+          fi
+          mkdir -p ~/.config/sops/age
+          printf "%s\n" "$AGE_PRIVATE_KEY" > ~/.config/sops/age/keys.txt
+          # Decrypt to terraform.tfvars only if encrypted file exists
+          if [ -f secrets/prod.enc.tfvars ]; then
+            echo "Decrypting secrets/prod.enc.tfvars → infrastructure/cdktf/terraform.tfvars"
+            sops -d secrets/prod.enc.tfvars > infrastructure/cdktf/terraform.tfvars
+          else
+            echo "secrets/prod.enc.tfvars not found; skipping decryption."
+          fi
+
+      - name: Prepare terraform.tfvars (fallback without SOPS)
         if: env.DEPLOY_WITH_CDKTF == 'true'
         working-directory: infrastructure/cdktf
         run: |
+          if [ -f terraform.tfvars ]; then
+            echo "terraform.tfvars already present (from SOPS). Skipping fallback generation."
+            exit 0
+          fi
           cat > terraform.tfvars << 'EOF'
           railway_token     = "${{ secrets.RAILWAY_TOKEN }}"
           project_id        = "${{ secrets.RAILWAY_PROJECT_ID }}"
