@@ -372,3 +372,25 @@ Recommendations:
 - Delete placeholder environments (e.g., `default`) once your target environment (e.g., `prod`) is created, to reduce confusion.
 - For strict separation between environments, use separate Railway projects per env (e.g., one project for prod, another for dev/test).
 - If Postgres starts before its password variable is present, restart the service once after variables are applied.
+
+## 🚢 Release Flow (GitOps)
+
+This project uses a GitOps deployment model where the Docker image tag is managed in IaC (SOPS‑encrypted tfvars) and applied via CDKTF.
+
+Workflows
+- Publish Image (GHCR): Builds and pushes the container image (versioned tag and latest). Does not deploy.
+- Release Build: Builds/pushes the image, then opens a PR that bumps `docker_image` in `secrets/prod.enc.tfvars` (SOPS).
+- Plan + Apply Prod (CDKTF): Applies the tag change to Railway using Terraform Cloud remote state (requires confirmation + environment approval).
+
+Typical release
+1) Run “Release Build” to produce an image and open a PR that bumps `docker_image`.
+2) Review and merge the PR.
+3) Run “Plan + Apply Prod (CDKTF)”, review the plan, then re‑run with confirm=APPLY and approve the environment to deploy.
+
+Migrations
+- The container runs Prisma migrations and Timescale setup on startup via `scripts/docker-entrypoint.sh`.
+- Ensure migrations are forward‑only and idempotent.
+
+Rollbacks
+- Change `docker_image` back to a previous known‑good tag and apply.
+- Prefer immutable, descriptive tags (e.g., `vNNN-SHORTSHA`); avoid `latest` for prod deployments.
