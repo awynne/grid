@@ -7,7 +7,6 @@ Electric grid data visualization platform providing near real-time insights from
 [![Software: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Docs/Data: CC BY 4.0](https://img.shields.io/badge/Docs%2FData-CC--BY_4.0-green.svg)](https://creativecommons.org/licenses/by/4.0/)
 
-
 ### TL;DR
 
 This repository uses a multi-license structure depending on content type:
@@ -18,7 +17,7 @@ This repository uses a multi-license structure depending on content type:
 
 ### Details
 
-- Code (everything except `docs/` and `data/`): Apache License 2.0. See [LICENSE](LICENSE).
+- Software (everything except `docs/` and `data/`): Apache License 2.0. See [LICENSE](LICENSE).
 - Documentation (`docs/`): Creative Commons Attribution 4.0 International (CC BY 4.0). See [docs/LICENSE](docs/LICENSE).
 - Datasets (`data/`): CC BY 4.0. See [data/LICENSE](data/LICENSE).
 - NOTICE: See [NOTICE](NOTICE) (must be preserved per Apache-2.0 §4(d)). It includes a non-binding citation request for both distributed software and publications.
