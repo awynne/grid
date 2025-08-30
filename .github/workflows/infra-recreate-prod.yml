@@ -111,21 +111,34 @@ jobs:
           npm i -g @railway/cli || npm i -g railway
 
           echo "Extracting tokens and project_id from terraform.tfvars..."
-          # Prefer railway_project_token if present; else railway_token
+          # Prefer account token for CLI auth; else fall back to project token
+          RAILWAY_ACCOUNT_TOKEN=$(awk -F'=' '/^\s*railway_api_token\s*=/{gsub(/"| /, "", $2); print $2}' infrastructure/cdktf/terraform.tfvars || true)
+          if [ -z "$RAILWAY_ACCOUNT_TOKEN" ]; then
+            RAILWAY_ACCOUNT_TOKEN=$(awk -F'=' '/^\s*railway_token\s*=/{gsub(/"| /, "", $2); print $2}' infrastructure/cdktf/terraform.tfvars || true)
+          fi
           RAILWAY_PROJECT_TOKEN=$(awk -F'=' '/^\s*railway_project_token\s*=/{gsub(/"| /, "", $2); print $2}' infrastructure/cdktf/terraform.tfvars || true)
-          RAILWAY_ACCOUNT_TOKEN=$(awk -F'=' '/^\s*railway_token\s*=/{gsub(/"| /, "", $2); print $2}' infrastructure/cdktf/terraform.tfvars || true)
           PROJECT_ID=$(awk -F'=' '/^\s*project_id\s*=/{gsub(/"| /, "", $2); print $2}' infrastructure/cdktf/terraform.tfvars)
-          TOKEN_TO_USE=${RAILWAY_PROJECT_TOKEN:-}
-          if [ -z "$TOKEN_TO_USE" ]; then TOKEN_TO_USE="$RAILWAY_ACCOUNT_TOKEN"; fi
+          TOKEN_TO_USE=${RAILWAY_ACCOUNT_TOKEN:-}
+          if [ -z "$TOKEN_TO_USE" ]; then TOKEN_TO_USE="$RAILWAY_PROJECT_TOKEN"; fi
           if [ -z "$TOKEN_TO_USE" ]; then
             echo "No Railway token found in terraform.tfvars; skipping CLI force delete."
             exit 0
           fi
-          # Export token for CLI to use (preferred over writing config files)
-          export RAILWAY_TOKEN="$TOKEN_TO_USE"
+
           echo "Railway CLI version: $(railway --version)"
-          # Optional sanity: whoami (won't print token)
-          railway whoami || true
+          echo "Attempting non-interactive login with token..."
+          set +e
+          railway login --token "$TOKEN_TO_USE" >/dev/null 2>&1 || \
+          railway login --apiToken "$TOKEN_TO_USE" >/dev/null 2>&1
+          LOGIN_CODE=$?
+          set -e
+          if [ "$LOGIN_CODE" -ne 0 ]; then
+            echo "Login via flag failed; attempting to seed minimal config..."
+            mkdir -p "$HOME/.railway"
+            printf '{"user":{"token":"%s"}}' "$TOKEN_TO_USE" > "$HOME/.railway/config.json"
+          fi
+          echo "whoami:"
+          railway whoami || echo "whoami failed; proceeding to attempt environment delete"
 
           echo "Linking project $PROJECT_ID..."
           railway link --project "$PROJECT_ID"
