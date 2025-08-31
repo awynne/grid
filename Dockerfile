@@ -27,7 +27,7 @@ FROM node:20-bookworm-slim AS production
 # Install production dependencies and security updates
 RUN apt-get update \
   && apt-get upgrade -y \
-  && apt-get install -y --no-install-recommends dumb-init bash openssl ca-certificates \
+  && apt-get install -y --no-install-recommends dumb-init bash openssl libssl3 ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security (Debian syntax)

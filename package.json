@@ -25,7 +25,7 @@
     "test:remote:prod": "node scripts/test-remote-environment.js prod"
   },
   "dependencies": {
-    "@prisma/client": "^5.0.0",
+    "@prisma/client": "^5.19.0",
     "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.3",
@@ -38,7 +38,7 @@
     "isbot": "^5",
     "lucide-react": "^0.294.0",
     "pg": "^8.11.0",
-    "prisma": "^5.0.0",
+    "prisma": "^5.19.0",
     "react": "^18.2.0",
     "react-day-picker": "^9.9.0",
     "react-dom": "^18.2.0",
