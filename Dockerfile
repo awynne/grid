@@ -23,7 +23,7 @@ RUN npm run build
 FROM node:20-alpine AS production
 
 # Install production dependencies and security updates
-RUN apk update && apk upgrade && apk add --no-cache dumb-init
+RUN apk update && apk upgrade && apk add --no-cache dumb-init bash
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
