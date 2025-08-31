@@ -92,6 +92,7 @@ jobs:
       - name: Create PR to bump docker_image
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.PR_BOT_TOKEN }}
           title: "release: bump docker_image to ${{ env.IMAGE_TAG }}"
           body: |
             This PR bumps the production image to:
@@ -107,6 +108,15 @@ jobs:
           labels: release,infra
           add-paths: |
             secrets/prod.enc.tfvars
+
+      - name: Help if PR creation is blocked
+        if: failure()
+        run: |
+          echo "PR creation failed. This repository likely blocks GITHUB_TOKEN PR actions." >&2
+          echo "Two options to fix:" >&2
+          echo "  1) Use a fine-grained PAT with repo pull-requests/content write permissions as PR_BOT_TOKEN secret" >&2
+          echo "  2) Enable 'Allow GitHub Actions to create and approve pull requests' in org/repo settings" >&2
+          exit 1
 
       - name: Summarize image tag
         run: |
