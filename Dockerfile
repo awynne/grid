@@ -24,6 +24,10 @@ FROM node:20-alpine AS production
 
 # Install production dependencies and security updates
 RUN apk update && apk upgrade && apk add --no-cache dumb-init bash
+ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+RUN [ -x /bin/bash ] || (echo "bash missing after install" && exit 1) \
+  && ln -sf /bin/bash /usr/bin/bash \
+  && ln -sf /bin/bash /usr/local/bin/bash
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
