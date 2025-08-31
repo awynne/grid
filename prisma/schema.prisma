@@ -3,9 +3,9 @@
 
 generator client {
   provider      = "prisma-client-js"
-  // Ensure binaries for Alpine (musl) with OpenSSL 3 are available
-  // to avoid libssl 1.1 fallback and runtime crashes on Node:alpine.
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+  // Ensure binaries for both Debian (glibc, OpenSSL 3) and Alpine (musl, OpenSSL 3)
+  // This makes the generated client portable across the builder/runner images.
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {

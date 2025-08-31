@@ -1,8 +1,8 @@
 # Multi-stage Dockerfile optimized for Railway deployment
 # React Router 7 + Node.js application with build optimization
 
-# Build stage
-FROM node:20-alpine AS builder
+# Build stage (Debian-based to avoid Prisma/openssl issues on Alpine)
+FROM node:20-bookworm-slim AS builder
 
 # Set working directory
 WORKDIR /app
@@ -11,8 +11,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies (including devDependencies for build)
-# Force Prisma to fetch engines for Alpine + OpenSSL 3
-ENV PRISMA_CLI_BINARY_TARGETS=linux-musl-openssl-3.0.x
+# Hint Prisma to fetch engines compatible with Debian OpenSSL 3
+ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x
 RUN npm ci
 
 # Copy source code
@@ -21,16 +21,14 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Production stage
-FROM node:20-alpine AS production
+# Production stage (Debian-based for stable OpenSSL/glibc)
+FROM node:20-bookworm-slim AS production
 
 # Install production dependencies and security updates
-# Include OpenSSL (libssl3) for Prisma engines on Alpine
-RUN apk update && apk upgrade && apk add --no-cache dumb-init bash openssl
-ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-RUN [ -x /bin/bash ] || (echo "bash missing after install" && exit 1) \
-  && ln -sf /bin/bash /usr/bin/bash \
-  && ln -sf /bin/bash /usr/local/bin/bash
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get install -y --no-install-recommends dumb-init bash openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
@@ -43,8 +41,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install only production dependencies
-# Ensure Prisma downloads musl+openssl3 engines
-ENV PRISMA_CLI_BINARY_TARGETS=linux-musl-openssl-3.0.x
+# Ensure Prisma downloads Debian OpenSSL 3 engines
+ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x
 RUN npm ci --only=production && npm cache clean --force
 
 # Copy built application from builder stage
