@@ -30,9 +30,9 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends dumb-init bash openssl ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S reactrouter -u 1001
+# Create non-root user for security (Debian syntax)
+RUN groupadd --gid 1001 nodejs \
+  && useradd --uid 1001 --gid 1001 --create-home --shell /bin/bash reactrouter
 
 # Set working directory
 WORKDIR /app
