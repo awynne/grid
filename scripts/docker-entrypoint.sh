@@ -1,5 +1,6 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/usr/bin/env sh
+# BusyBox/Alpine shell (no bash); keep POSIX-compatible
+set -eu
 
 echo "🔧 Running database migrations (prisma migrate deploy)..."
 npx prisma migrate deploy
@@ -9,4 +10,3 @@ node database/setup.js || echo "⚠️  TimescaleDB setup skipped or already app
 
 echo "🚀 Starting application..."
 exec npm start
-
