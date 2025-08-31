@@ -83,9 +83,9 @@ jobs:
             printf "\n# Updated by Release Build workflow on $(date -u +%F)\n" >> "$tmpfile"
             printf "docker_image = \"%s\"\n" "$full_image" >> "$tmpfile"
           fi
-          # Re-encrypt back to the same path
-          sops --encrypt --in-place "$tmpfile"
+          # Move updated temp back, then encrypt in-place so .sops.yaml creation_rules match the path
           mv "$tmpfile" secrets/prod.enc.tfvars
+          sops --encrypt --in-place secrets/prod.enc.tfvars
           # Ensure no plaintext remains
           shred -u "$tmpfile" || rm -f "$tmpfile"
 
@@ -112,4 +112,3 @@ jobs:
         run: |
           echo "## Release Image" >> $GITHUB_STEP_SUMMARY
           echo "\`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}\`" >> $GITHUB_STEP_SUMMARY
-
