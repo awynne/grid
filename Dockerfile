@@ -11,6 +11,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies (including devDependencies for build)
+# Force Prisma to fetch engines for Alpine + OpenSSL 3
+ENV PRISMA_CLI_BINARY_TARGETS=linux-musl-openssl-3.0.x
 RUN npm ci
 
 # Copy source code
@@ -23,7 +25,8 @@ RUN npm run build
 FROM node:20-alpine AS production
 
 # Install production dependencies and security updates
-RUN apk update && apk upgrade && apk add --no-cache dumb-init bash
+# Include OpenSSL (libssl3) for Prisma engines on Alpine
+RUN apk update && apk upgrade && apk add --no-cache dumb-init bash openssl
 ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 RUN [ -x /bin/bash ] || (echo "bash missing after install" && exit 1) \
   && ln -sf /bin/bash /usr/bin/bash \
@@ -40,6 +43,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install only production dependencies
+# Ensure Prisma downloads musl+openssl3 engines
+ENV PRISMA_CLI_BINARY_TARGETS=linux-musl-openssl-3.0.x
 RUN npm ci --only=production && npm cache clean --force
 
 # Copy built application from builder stage

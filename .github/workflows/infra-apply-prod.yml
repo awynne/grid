@@ -60,6 +60,15 @@ jobs:
           npm run get
           npm run compile
 
+      - name: Validate docker_image is pinned (no :latest)
+        working-directory: infrastructure/cdktf
+        run: |
+          set -euo pipefail
+          if grep -qE '^\s*docker_image\s*=\s*"[^"]*:latest"' terraform.tfvars; then
+            echo "Refusing to apply: docker_image is set to :latest. Pin a specific tag via Release Build PR." >&2
+            exit 1
+          fi
+
       - name: Plan infrastructure (cdktf)
         working-directory: infrastructure/cdktf
         run: |
@@ -147,6 +156,15 @@ jobs:
           npm ci
           npm run get
           npm run compile
+
+      - name: Validate docker_image is pinned (no :latest)
+        working-directory: infrastructure/cdktf
+        run: |
+          set -euo pipefail
+          if grep -qE '^\s*docker_image\s*=\s*"[^"]*:latest"' terraform.tfvars; then
+            echo "Refusing to apply: docker_image is set to :latest. Pin a specific tag via Release Build PR." >&2
+            exit 1
+          fi
 
       - name: Apply infrastructure (cdktf deploy)
         working-directory: infrastructure/cdktf
