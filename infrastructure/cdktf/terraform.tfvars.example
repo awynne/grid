@@ -31,9 +31,11 @@ eia_api_key = "your-eia-api-key-for-data-ingestion"
 
 # Docker Deployment (RECOMMENDED)
 # Use Docker images for fast, reliable, consistent deployments
-docker_image = "ghcr.io/awynne/grid:latest"        # Docker image with tag
-docker_username = "your-github-username"           # GitHub username  
-docker_password = "your-github-token"              # GitHub personal access token
+# IMPORTANT: Pin to a specific, immutable tag produced by Release Build.
+# Avoid using ":latest" in production to prevent unintended rollouts.
+docker_image = "ghcr.io/owner/grid:v123-abcdef"     # Example pinned tag
+docker_username = "your-github-username"            # GitHub username  
+docker_password = "your-github-token"               # GitHub personal access token
 
 # Git Deployment (FALLBACK/DEVELOPMENT)
 # Use Git source for development or when Docker images aren't available
