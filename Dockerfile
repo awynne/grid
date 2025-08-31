@@ -37,19 +37,21 @@ RUN groupadd --gid 1001 nodejs \
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files and Prisma schema first so @prisma/client postinstall can generate correctly
 COPY package*.json ./
+COPY --chown=reactrouter:nodejs prisma ./prisma
 
-# Install only production dependencies
+# Install only production dependencies and generate Prisma client with correct engines
 # Ensure Prisma downloads Debian OpenSSL 3 engines
 ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --only=production \
+  && npx prisma generate --schema=./prisma/schema.prisma \
+  && npm cache clean --force
 
 # Copy built application from builder stage
 COPY --from=builder --chown=reactrouter:nodejs /app/build ./build
 
 # Copy necessary runtime files
-COPY --chown=reactrouter:nodejs prisma ./prisma
 COPY --chown=reactrouter:nodejs database ./database
 COPY --chown=reactrouter:nodejs scripts/docker-entrypoint.sh ./scripts/docker-entrypoint.sh
 
