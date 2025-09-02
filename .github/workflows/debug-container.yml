@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       image_tag:
-        description: "Image tag to build/run (defaults to PR-triggered build)"
+        description: "Image tag to build/run (leave blank to auto-generate)"
         required: false
-        default: "debug-${{ github.run_number }}-${{ github.sha }}"
+        default: ""
         type: string
 
 jobs:
@@ -31,15 +31,14 @@ jobs:
         run: echo "${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME || github.actor }}" --password-stdin
 
       - name: Build image
-        env:
-          TAG: ${{ inputs.image_tag }}
         run: |
           set -e
+          TAG="${{ inputs.image_tag }}"
+          if [ -z "$TAG" ]; then TAG="debug-${GITHUB_RUN_NUMBER}-${GITHUB_SHA}"; fi
+          echo "TAG=$TAG" >> $GITHUB_ENV
           docker build -t ghcr.io/${{ github.repository_owner }}/grid:${TAG} .
 
       - name: Run container (detached)
-        env:
-          TAG: ${{ inputs.image_tag }}
         run: |
           set -e
           docker rm -f grid-debug || true
@@ -47,7 +46,7 @@ jobs:
             --add-host=host.docker.internal:host-gateway \
             -e PORT=3000 \
             -e SESSION_SECRET=dev-session-secret-please-change \
-            -e DATABASE_URL=postgresql://postgres:postgres@postgres:5432/railway \
+            -e DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:5432/railway \
             -e RAILWAY_ENVIRONMENT_NAME=ci-debug \
             -e DEBUG_STARTUP=1 \
             ghcr.io/${{ github.repository_owner }}/grid:${TAG}
@@ -90,4 +89,3 @@ jobs:
         if: always()
         run: |
           docker rm -f grid-debug || true
-
