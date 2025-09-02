@@ -166,8 +166,16 @@ jobs:
             exit 1
           fi
 
-      - name: Apply infrastructure (cdktf deploy)
+      - name: Apply infrastructure (synth + terraform apply)
         working-directory: infrastructure/cdktf
+        env:
+          TF_IN_AUTOMATION: "true"
         run: |
-          set -e
-          npx cdktf deploy gridpulse-prod --auto-approve -var-file="terraform.tfvars"
+          set -euo pipefail
+          # Synthesize Terraform configuration
+          npx cdktf synth
+          # Ensure tfvars is available alongside the stack
+          cp -f terraform.tfvars cdktf.out/stacks/gridpulse-prod/terraform.tfvars
+          # Initialize and apply with Terraform directly to avoid CDKTF output parsing
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod init -input=false -no-color
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod apply -auto-approve -input=false -no-color
