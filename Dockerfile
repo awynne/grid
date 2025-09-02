@@ -1,8 +1,8 @@
 # Multi-stage Dockerfile optimized for Railway deployment
 # React Router 7 + Node.js application with build optimization
 
-# Build stage (Debian-based to avoid Prisma/openssl issues on Alpine)
-FROM node:20-bookworm-slim AS builder
+# Build stage (Debian bullseye to match OpenSSL 1.1 engines)
+FROM node:20-bullseye-slim AS builder
 
 # Set working directory
 WORKDIR /app
@@ -11,8 +11,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies (including devDependencies for build)
-# Hint Prisma to fetch engines compatible with Debian OpenSSL 3
-ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x
+# Hint Prisma to fetch engines compatible with Debian OpenSSL 1.1
+ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-1.1.x
 RUN npm ci
 
 # Copy source code
@@ -21,13 +21,13 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Production stage (Debian-based for stable OpenSSL/glibc)
-FROM node:20-bookworm-slim AS production
+# Production stage (Debian bullseye for libssl1.1 availability)
+FROM node:20-bullseye-slim AS production
 
 # Install production dependencies and security updates
 RUN apt-get update \
   && apt-get upgrade -y \
-  && apt-get install -y --no-install-recommends dumb-init bash openssl libssl3 ca-certificates \
+  && apt-get install -y --no-install-recommends dumb-init bash openssl libssl1.1 ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security (Debian syntax)
@@ -42,8 +42,8 @@ COPY package*.json ./
 COPY --chown=reactrouter:nodejs prisma ./prisma
 
 # Install only production dependencies and generate Prisma client with correct engines
-# Ensure Prisma downloads Debian OpenSSL 3 engines
-ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x
+# Ensure Prisma downloads Debian OpenSSL 1.1 engines
+ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-1.1.x
 RUN npm ci --only=production \
   && npx prisma generate --schema=./prisma/schema.prisma \
   && npm cache clean --force
