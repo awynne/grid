@@ -131,6 +131,7 @@ export class GridPulseEnvironment extends Construct {
       { name: "SESSION_SECRET", value: config.sessionSecret },
       { name: "DATABASE_URL", value: `postgresql://postgres:${config.postgresPassword}@postgres.railway.internal:5432/railway` },
       { name: "REDIS_URL", value: `redis://redis.railway.internal:6379` },
+      ...(config.dockerImage ? [{ name: "DEPLOYED_IMAGE", value: config.dockerImage }] : []),
     ];
 
     // Add Docker deployment variables
