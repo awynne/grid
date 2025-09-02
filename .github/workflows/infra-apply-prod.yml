@@ -82,7 +82,8 @@ jobs:
           cp -f terraform.tfvars cdktf.out/stacks/gridpulse-prod/terraform.tfvars
           terraform -chdir=cdktf.out/stacks/gridpulse-prod init -input=false -no-color
           terraform -chdir=cdktf.out/stacks/gridpulse-prod plan -input=false -no-color -out=tfplan
-          terraform -chdir=cdktf.out/stacks/gridpulse-prod show -no-color tfplan > plan.txt
+          # Write plan output to a stable path for upload
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod show -no-color tfplan > cdktf.out/stacks/gridpulse-prod/plan.txt
 
       - name: Upload plan output
         uses: actions/upload-artifact@v4
