@@ -124,12 +124,15 @@ export class GridPulseEnvironment extends Construct {
   }
 
   private createWebServiceVariables(config: GridPulseEnvironmentConfig) {
+    const encodedDbPassword = encodeURIComponent(config.postgresPassword);
     const webVariables = [
       { name: "NODE_ENV", value: "production" },
       { name: "RAILWAY_ENVIRONMENT_NAME", value: config.environmentName },
       { name: "PORT", value: "3000" },
       { name: "SESSION_SECRET", value: config.sessionSecret },
-      { name: "DATABASE_URL", value: `postgresql://postgres:${config.postgresPassword}@postgres.railway.internal:5432/railway` },
+      // Ensure password is URL-encoded to avoid P1013 when it contains special characters
+      { name: "DATABASE_URL", value: `postgresql://postgres:${encodedDbPassword}@postgres.railway.internal:5432/railway` },
+      { name: "POSTGRES_PASSWORD", value: config.postgresPassword },
       { name: "REDIS_URL", value: `redis://redis.railway.internal:6379` },
       // Force Prisma to use Debian OpenSSL 1.1 engines we package in the image
       { name: "PRISMA_SCHEMA_ENGINE_BINARY", value: "/app/node_modules/@prisma/engines/schema-engine-debian-openssl-1.1.x" },
