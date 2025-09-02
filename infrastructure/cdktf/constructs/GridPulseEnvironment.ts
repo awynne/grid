@@ -131,6 +131,9 @@ export class GridPulseEnvironment extends Construct {
       { name: "SESSION_SECRET", value: config.sessionSecret },
       { name: "DATABASE_URL", value: `postgresql://postgres:${config.postgresPassword}@postgres.railway.internal:5432/railway` },
       { name: "REDIS_URL", value: `redis://redis.railway.internal:6379` },
+      // Force Prisma to use Debian OpenSSL 1.1 engines we package in the image
+      { name: "PRISMA_SCHEMA_ENGINE_BINARY", value: "/app/node_modules/@prisma/engines/schema-engine-debian-openssl-1.1.x" },
+      { name: "PRISMA_QUERY_ENGINE_LIBRARY", value: "/app/node_modules/.prisma/client/libquery_engine-debian-openssl-1.1.x.so.node" },
       ...(config.dockerImage ? [{ name: "DEPLOYED_IMAGE", value: config.dockerImage }] : []),
     ];
 
