@@ -39,6 +39,16 @@ Each deployment includes:
 
 Deployments use the repository `Dockerfile`. Railway builds the image using the Dockerfile and runs it directly. Health checks are defined via Dockerfile `HEALTHCHECK`.
 
+Base image and engines (locked):
+- Base: `node:20-bullseye-slim` (Debian). Packages installed via `apt`: `dumb-init`, `bash`, `openssl`, `libssl1.1`, `ca-certificates`.
+- Prisma: `prisma` and `@prisma/client` 5.19.x. Client is generated at build time.
+- Prisma generator `binaryTargets`: `debian-openssl-1.1.x`, `debian-openssl-3.0.x`, `linux-musl-openssl-3.0.x`.
+- Do not change base image or Prisma minor without testing via the Debug workflow.
+
+Tagging and GitOps:
+- Avoid `:latest` in production. Use immutable tags from the Release Build workflow.
+- The “Plan + Apply Prod (CDKTF)” workflow blocks `docker_image` values ending with `:latest`.
+
 Typical local flow:
 ```bash
 docker build -t gridpulse:local .
