@@ -1,0 +1,93 @@
+name: Debug Container Startup
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to build/run (defaults to PR-triggered build)"
+        required: false
+        default: "debug-${{ github.run_number }}-${{ github.sha }}"
+        type: string
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: timescale/timescaledb:latest-pg15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: railway
+        options: >-
+          --health-cmd "pg_isready -U postgres" 
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME || github.actor }}" --password-stdin
+
+      - name: Build image
+        env:
+          TAG: ${{ inputs.image_tag }}
+        run: |
+          set -e
+          docker build -t ghcr.io/${{ github.repository_owner }}/grid:${TAG} .
+
+      - name: Run container (detached)
+        env:
+          TAG: ${{ inputs.image_tag }}
+        run: |
+          set -e
+          docker rm -f grid-debug || true
+          docker run -d --name grid-debug \
+            --add-host=host.docker.internal:host-gateway \
+            -e PORT=3000 \
+            -e SESSION_SECRET=dev-session-secret-please-change \
+            -e DATABASE_URL=postgresql://postgres:postgres@postgres:5432/railway \
+            -e RAILWAY_ENVIRONMENT_NAME=ci-debug \
+            -e DEBUG_STARTUP=1 \
+            ghcr.io/${{ github.repository_owner }}/grid:${TAG}
+
+      - name: Tail logs (60s)
+        run: |
+          set +e
+          timeout 60s docker logs -f grid-debug || true
+
+      - name: Engine diagnostics
+        run: |
+          set +e
+          echo "--- openssl version ---"
+          docker exec grid-debug bash -lc 'openssl version -v || true'
+          echo "--- node versions ---"
+          docker exec grid-debug bash -lc 'node -e "console.log(process.versions)" || true'
+          echo "--- prisma engines present ---"
+          docker exec grid-debug bash -lc 'ls -la node_modules/.prisma/client || true'
+          docker exec grid-debug bash -lc 'ls -la node_modules/@prisma/engines | sed -n "1,200p" || true'
+          echo "--- ldd on query engine (if present) ---"
+          docker exec grid-debug bash -lc 'ldd node_modules/.prisma/client/libquery_engine* 2>/dev/null || true'
+          echo "--- ldd on schema engine (if present) ---"
+          docker exec grid-debug bash -lc 'ldd node_modules/@prisma/engines/*schema-engine* 2>/dev/null || true'
+
+      - name: Dump container logs artifact
+        if: always()
+        run: |
+          docker logs grid-debug > startup-logs.txt || true
+        continue-on-error: true
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-startup-logs
+          path: |
+            startup-logs.txt
+
+      - name: Stop container
+        if: always()
+        run: |
+          docker rm -f grid-debug || true
+
