@@ -90,21 +90,27 @@ jobs:
           npm run get
           npm run compile
 
-      - name: Destroy prod (cdktf)
+      - name: Synthesize stack (cdktf synth)
         working-directory: infrastructure/cdktf
-        run: |
-          set +e
-          echo "Destroying gridpulse-prod stack (ignoring failures if state is missing)..."
-          npx cdktf destroy gridpulse-prod --auto-approve -var-file="terraform.tfvars"
-          code=$?
-          set -e
-          if [ "$code" -ne 0 ]; then
-            echo "Destroy reported errors (likely due to missing state). If Railway env pre-exists, delete it in the UI before redeploy."
-          fi
+        run: npx cdktf synth
 
-      - name: Deploy prod (cdktf)
+      - name: Terraform init + destroy
         working-directory: infrastructure/cdktf
+        env:
+          TF_IN_AUTOMATION: "true"
         run: |
-          set -e
-          echo "Re-deploying gridpulse-prod stack..."
-          npx cdktf deploy gridpulse-prod --auto-approve -var-file="terraform.tfvars"
+          set -euo pipefail
+          # Place tfvars next to synthesized stack
+          cp -f terraform.tfvars cdktf.out/stacks/gridpulse-prod/terraform.tfvars
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod init -input=false -no-color
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod destroy -auto-approve -input=false -no-color || true
+
+      - name: Terraform apply (recreate)
+        working-directory: infrastructure/cdktf
+        env:
+          TF_IN_AUTOMATION: "true"
+        run: |
+          set -euo pipefail
+          # After destroy, ensure init (no-op if already initialized)
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod init -input=false -no-color
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod apply -auto-approve -input=false -no-color
