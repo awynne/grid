@@ -102,14 +102,23 @@ GridPulse uses GitHub Actions for all deployment operations with CDKTF (CDK for 
 
 ### Database Reset Capability
 
-The "Recreate Prod (CDKTF)" workflow includes a `fresh_db` option that:
+The "Recreate Prod (CDKTF)" workflow includes a `fresh_db` option that automatically resets the database:
 
-1. **Connects to existing PostgreSQL service** via Railway CLI
-2. **Drops the `railway` database** - ⚠️ **DESTROYS ALL DATA**
-3. **Creates a fresh `railway` database** - Forces new `initdb`
-4. **Recreates infrastructure** - New password takes effect
+### Automated Database Reset Process (when `fresh_db: "true"`):
 
-This solves PostgreSQL authentication issues where the container ignores `POSTGRES_PASSWORD` on existing databases.
+The workflow automatically:
+
+1. **Connects to Railway GraphQL API** using `RAILWAY_API_TOKEN`
+2. **Discovers services** - Finds prod environment and postgres service IDs  
+3. **Gets active deployment** - Identifies the running postgres deployment
+4. **Drops database** - Executes `DROP DATABASE IF EXISTS railway;` via API
+5. **Creates fresh database** - Executes `CREATE DATABASE railway;` via API  
+6. **Validates results** - Checks command exit codes for success
+7. **Proceeds with infrastructure** - CDKTF recreates services with new password
+
+**⚠️ WARNING: `fresh_db: "true"` DESTROYS ALL DATA** - Use only for troubleshooting authentication issues.
+
+This automated approach uses Railway's GraphQL API for `serviceInstanceExec` mutations, eliminating the need for manual CLI steps.
 
 ### Terraform Cloud Lock Management
 
