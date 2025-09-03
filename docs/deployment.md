@@ -73,6 +73,8 @@ GridPulse uses GitHub Actions for all deployment operations with CDKTF (CDK for 
 2. **"Recreate Prod (CDKTF)"** - Destroy and recreate environment with optional database reset
 3. **"Publish Image (GHCR)"** - Build and publish Docker images to GitHub Container Registry
 4. **"Release Build"** - Create release builds with pinned image tags
+5. **"Terraform Cloud Force Unlock"** - Unlock locked Terraform Cloud workspaces
+6. **"Terraform Cloud Diagnostics & Unlock"** - Comprehensive workspace diagnostics and management
 
 #### Deployment Process
 
@@ -108,6 +110,24 @@ The "Recreate Prod (CDKTF)" workflow includes a `fresh_db` option that:
 4. **Recreates infrastructure** - New password takes effect
 
 This solves PostgreSQL authentication issues where the container ignores `POSTGRES_PASSWORD` on existing databases.
+
+### Terraform Cloud Lock Management
+
+When Terraform Cloud workspaces become locked (usually from interrupted operations), use these workflows:
+
+#### "Terraform Cloud Force Unlock" - Simple Unlock
+- **Purpose**: Quick unlock of a specific workspace
+- **Usage**: Run workflow → Type "UNLOCK" → Workspace unlocked
+- **Best for**: Simple lock resolution
+
+#### "Terraform Cloud Diagnostics & Unlock" - Comprehensive Management  
+- **Purpose**: Diagnose workspace issues and perform various actions
+- **Actions Available**:
+  - `status` - Check workspace status, recent runs, lock state
+  - `unlock` - Force unlock workspace
+  - `cancel-runs` - Cancel active/pending Terraform runs
+- **Usage**: Run workflow → Select action → Type "CONFIRM" for destructive actions
+- **Best for**: Troubleshooting complex workspace issues
 
 
 ## Testing & Validation Scripts

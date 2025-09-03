@@ -1,0 +1,147 @@
+name: Terraform Cloud Diagnostics & Unlock
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Action to perform"
+        required: true
+        default: "status"
+        type: choice
+        options: ["status", "unlock", "cancel-runs"]
+      workspace:
+        description: "Workspace name"
+        required: true
+        default: "gridpulse-prod"
+        type: string
+      confirm:
+        description: "Type CONFIRM for destructive actions (unlock/cancel-runs)"
+        required: false
+        type: string
+
+jobs:
+  terraform-diagnostics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Guard confirmation for destructive actions
+        if: github.event.inputs.action != 'status'
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "CONFIRM" ]; then
+            echo "❌ Destructive action requires confirmation. Type CONFIRM exactly to proceed." >&2
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+
+      - name: Terraform Cloud Diagnostics
+        env:
+          TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+          TF_CLOUD_ORG: ${{ secrets.TF_CLOUD_ORG }}
+          WORKSPACE_NAME: ${{ github.event.inputs.workspace }}
+          ACTION: ${{ github.event.inputs.action }}
+        run: |
+          set -euo pipefail
+          
+          echo "🔍 Terraform Cloud Diagnostics for workspace: $WORKSPACE_NAME"
+          echo "📋 Action: $ACTION"
+          
+          # Get workspace ID and details
+          echo "📡 Fetching workspace information..."
+          WORKSPACE_RESPONSE=$(curl -s \
+            --header "Authorization: Bearer $TF_API_TOKEN" \
+            --header "Content-Type: application/vnd.api+json" \
+            "https://app.terraform.io/api/v2/organizations/$TF_CLOUD_ORG/workspaces/$WORKSPACE_NAME")
+          
+          WORKSPACE_ID=$(echo "$WORKSPACE_RESPONSE" | jq -r '.data.id')
+          
+          if [ "$WORKSPACE_ID" = "null" ] || [ -z "$WORKSPACE_ID" ]; then
+            echo "❌ Workspace not found: $WORKSPACE_NAME"
+            echo "Available workspaces in organization:"
+            curl -s \
+              --header "Authorization: Bearer $TF_API_TOKEN" \
+              --header "Content-Type: application/vnd.api+json" \
+              "https://app.terraform.io/api/v2/organizations/$TF_CLOUD_ORG/workspaces" \
+              | jq -r '.data[].attributes.name'
+            exit 1
+          fi
+          
+          # Get workspace status
+          LOCKED=$(echo "$WORKSPACE_RESPONSE" | jq -r '.data.attributes.locked')
+          TERRAFORM_VERSION=$(echo "$WORKSPACE_RESPONSE" | jq -r '.data.attributes."terraform-version"')
+          WORKING_DIRECTORY=$(echo "$WORKSPACE_RESPONSE" | jq -r '.data.attributes."working-directory"')
+          
+          echo "✅ Workspace found: $WORKSPACE_ID"
+          echo "🔒 Locked: $LOCKED"
+          echo "📦 Terraform Version: $TERRAFORM_VERSION"
+          echo "📁 Working Directory: $WORKING_DIRECTORY"
+          
+          # Get current runs
+          echo "🏃 Checking current runs..."
+          RUNS_RESPONSE=$(curl -s \
+            --header "Authorization: Bearer $TF_API_TOKEN" \
+            --header "Content-Type: application/vnd.api+json" \
+            "https://app.terraform.io/api/v2/workspaces/$WORKSPACE_ID/runs?page%5Bsize%5D=5")
+          
+          echo "Recent runs:"
+          echo "$RUNS_RESPONSE" | jq -r '.data[] | "- \(.attributes.status) | \(.attributes."created-at") | \(.id)"'
+          
+          # Perform requested action
+          case "$ACTION" in
+            "status")
+              echo "ℹ️ Status check complete - see above for workspace details"
+              ;;
+              
+            "unlock")
+              if [ "$LOCKED" = "false" ]; then
+                echo "ℹ️ Workspace is not currently locked"
+              else
+                echo "🔓 Force unlocking workspace..."
+                UNLOCK_RESPONSE=$(curl -s -w "%{http_code}" \
+                  --request POST \
+                  --header "Authorization: Bearer $TF_API_TOKEN" \
+                  --header "Content-Type: application/vnd.api+json" \
+                  "https://app.terraform.io/api/v2/workspaces/$WORKSPACE_ID/actions/force-unlock")
+                
+                HTTP_CODE="${UNLOCK_RESPONSE: -3}"
+                if [ "$HTTP_CODE" = "200" ]; then
+                  echo "✅ Workspace successfully unlocked!"
+                else
+                  echo "❌ Failed to unlock workspace. HTTP: $HTTP_CODE"
+                  echo "${UNLOCK_RESPONSE%???}"
+                  exit 1
+                fi
+              fi
+              ;;
+              
+            "cancel-runs")
+              echo "🚫 Canceling active runs..."
+              ACTIVE_RUNS=$(echo "$RUNS_RESPONSE" | jq -r '.data[] | select(.attributes.status == "planning" or .attributes.status == "applying" or .attributes.status == "pending") | .id')
+              
+              if [ -z "$ACTIVE_RUNS" ]; then
+                echo "ℹ️ No active runs to cancel"
+              else
+                for RUN_ID in $ACTIVE_RUNS; do
+                  echo "Canceling run: $RUN_ID"
+                  curl -s \
+                    --request POST \
+                    --header "Authorization: Bearer $TF_API_TOKEN" \
+                    --header "Content-Type: application/vnd.api+json" \
+                    --data '{"comment": "Canceled via GitHub Actions"}' \
+                    "https://app.terraform.io/api/v2/runs/$RUN_ID/actions/cancel"
+                  echo "✅ Canceled run: $RUN_ID"
+                done
+              fi
+              ;;
+          esac
+
+      - name: Summary
+        run: |
+          echo "## 🔍 Terraform Cloud Diagnostics Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- **Workspace**: ${{ github.event.inputs.workspace }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Action**: ${{ github.event.inputs.action }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Organization**: ${{ secrets.TF_CLOUD_ORG }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check the job logs above for detailed workspace status and action results." >> $GITHUB_STEP_SUMMARY
