@@ -122,8 +122,8 @@ The "Recreate Prod (CDKTF)" workflow includes a `fresh_db` option that requires 
 
 3. **Reset the database** (⚠️ **DESTROYS ALL DATA**):
    ```bash
-   railway run --service postgres -- psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS railway;"
-   railway run --service postgres -- psql -U postgres -d postgres -c "CREATE DATABASE railway;"
+   railway run --service postgres -- psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS gridpulse;"
+   railway run --service postgres -- psql -U postgres -d postgres -c "CREATE DATABASE gridpulse;"
    ```
 
 4. **Verify database recreation**:

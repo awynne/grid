@@ -42,7 +42,7 @@ class GridPulseEnvironment extends constructs_1.Construct {
             environmentId: this.environment.id,
             serviceId: this.postgresService.id,
             name: "POSTGRES_DB",
-            value: "railway",
+            value: "gridpulse",
         });
         new variable_1.Variable(this, "postgres_user", {
             environmentId: this.environment.id,
@@ -120,7 +120,7 @@ class GridPulseEnvironment extends constructs_1.Construct {
             { name: "PORT", value: "3000" },
             { name: "SESSION_SECRET", value: config.sessionSecret },
             // Ensure password is URL-encoded to avoid P1013 when it contains special characters
-            { name: "DATABASE_URL", value: `postgresql://postgres:${encodedDbPassword}@postgres.railway.internal:5432/railway` },
+            { name: "DATABASE_URL", value: `postgresql://postgres:${encodedDbPassword}@postgres.railway.internal:5432/gridpulse` },
             { name: "POSTGRES_PASSWORD", value: config.postgresPassword },
             { name: "REDIS_URL", value: `redis://redis.railway.internal:6379` },
             // Force Prisma to use Debian OpenSSL 1.1 engines we package in the image
@@ -165,7 +165,7 @@ class GridPulseEnvironment extends constructs_1.Construct {
         const dataVariables = [
             { name: "NODE_ENV", value: "production" },
             { name: "EIA_API_KEY", value: this.config.eiaApiKey || "" },
-            { name: "DATABASE_URL", value: `postgresql://postgres:${this.config.postgresPassword}@postgres.railway.internal:5432/railway` },
+            { name: "DATABASE_URL", value: `postgresql://postgres:${this.config.postgresPassword}@postgres.railway.internal:5432/gridpulse` },
             { name: "REDIS_URL", value: "redis://redis.railway.internal:6379" },
         ];
         dataVariables.forEach((variable, index) => {
