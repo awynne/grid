@@ -113,6 +113,8 @@ jobs:
           if [ "${{ github.event.inputs.fresh_db }}" = "true" ]; then
             echo "Forcing Postgres destroy first (fresh_db=true)..."
             terraform -chdir=cdktf.out/stacks/gridpulse-prod destroy -target=railway_service.postgres -auto-approve -input=false -no-color || true
+            echo "Also destroying environment to guarantee new service resources (will recreate)..."
+            terraform -chdir=cdktf.out/stacks/gridpulse-prod destroy -target=railway_environment.environment -auto-approve -input=false -no-color || true
           fi
           terraform -chdir=cdktf.out/stacks/gridpulse-prod destroy -auto-approve -input=false -no-color || true
 
