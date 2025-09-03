@@ -1,0 +1,119 @@
+name: Terraform State Cleanup
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type CLEANUP to remove orphaned resources from Terraform state"
+        required: true
+        type: string
+
+jobs:
+  state-cleanup:
+    runs-on: ubuntu-latest
+    environment:
+      name: gridpulse/prod
+    env:
+      TF_CLOUD_ORG: ${{ secrets.TF_CLOUD_ORG }}
+      TF_CLOUD_WORKSPACE: gridpulse-prod
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
+    steps:
+      - name: Guard confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "CLEANUP" ]; then
+            echo "Confirmation mismatch. Type CLEANUP exactly to proceed." >&2
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.7.5'
+
+      - name: Install sops and age
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y age
+          SOPS_VERSION=v3.8.1
+          curl -Ls https://github.com/getsops/sops/releases/download/$SOPS_VERSION/sops-$SOPS_VERSION.linux.amd64 -o sops
+          sudo install -m 0755 sops /usr/local/bin/sops
+
+      - name: Decrypt tfvars (required)
+        env:
+          AGE_PRIVATE_KEY: ${{ secrets.AGE_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.config/sops/age
+          if [ -z "${AGE_PRIVATE_KEY:-}" ]; then
+            echo "AGE_PRIVATE_KEY not set; can't decrypt prod.enc.tfvars" >&2
+            exit 1
+          fi
+          printf "%s\n" "$AGE_PRIVATE_KEY" > ~/.config/sops/age/keys.txt
+          if [ ! -f secrets/prod.enc.tfvars ]; then
+            echo "secrets/prod.enc.tfvars not found. Commit encrypted tfvars first." >&2
+            exit 1
+          fi
+          echo "Decrypting prod.enc.tfvars → infrastructure/cdktf/terraform.tfvars"
+          sops -d secrets/prod.enc.tfvars > infrastructure/cdktf/terraform.tfvars
+
+      - name: Install CDKTF deps and synth
+        working-directory: infrastructure/cdktf
+        run: |
+          npm ci
+          npm run get
+          npm run compile
+          npx cdktf synth
+
+      - name: Remove orphaned resources from state
+        working-directory: infrastructure/cdktf
+        env:
+          TF_IN_AUTOMATION: "true"
+        run: |
+          set -euo pipefail
+          
+          # Copy tfvars to stack directory
+          cp -f terraform.tfvars cdktf.out/stacks/gridpulse-prod/terraform.tfvars
+          
+          # Initialize terraform
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod init -input=false -no-color
+          
+          echo "🧹 Removing orphaned resources from Terraform state..."
+          
+          # List current state to see what exists
+          echo "Current state resources:"
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod state list || echo "No state resources found"
+          
+          # Remove orphaned services (these fail because environment is gone)
+          echo "Removing orphaned services..."
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod state rm 'railway_service.prod_postgres_D0CEE84F' || echo "Resource not in state"
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod state rm 'railway_service.prod_redis_59E30633' || echo "Resource not in state"  
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod state rm 'railway_service.prod_web_B80EEB99' || echo "Resource not in state"
+          
+          # Remove environment (parent resource)
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod state rm 'railway_environment.prod_environment_836A6C1C' || echo "Resource not in state"
+          
+          # Remove any variables tied to the old environment
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod state list | grep railway_variable | xargs -r terraform -chdir=cdktf.out/stacks/gridpulse-prod state rm || echo "No variables to remove"
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod state list | grep railway_shared_variable | xargs -r terraform -chdir=cdktf.out/stacks/gridpulse-prod state rm || echo "No shared variables to remove"
+          
+          echo "✅ State cleanup complete"
+          
+          # Show final state
+          echo "Final state resources:"
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod state list || echo "State is now clean"
+
+      - name: Summary
+        run: |
+          echo "## 🧹 Terraform State Cleanup Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- Removed orphaned Railway resources from Terraform state" >> $GITHUB_STEP_SUMMARY
+          echo "- State is now clean and ready for fresh deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next Step:** Run 'Plan + Apply Prod (CDKTF)' to create fresh prod-00 environment" >> $GITHUB_STEP_SUMMARY
