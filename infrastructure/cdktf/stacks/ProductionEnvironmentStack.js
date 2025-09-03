@@ -53,7 +53,7 @@ class ProductionEnvironmentStack extends cdktf_1.TerraformStack {
         // Create Production Environment
         const prodEnvironment = new GridPulseEnvironment_1.GridPulseEnvironment(this, "prod", {
             projectId: projectId.stringValue,
-            environmentName: "prod",
+            environmentName: "prod-00",
             railwayToken: railwayToken.stringValue,
             postgresPassword: postgresPassword.stringValue,
             sessionSecret: sessionSecret.stringValue,
