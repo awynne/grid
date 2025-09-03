@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       fresh_db:
-        description: "Also force-create a brand new Postgres (wipe data)"
+        description: "Reset PostgreSQL database (DROP/CREATE) before recreation - DESTROYS ALL DATA"
         required: false
         default: "false"
         type: choice
@@ -44,13 +44,16 @@ jobs:
         with:
           terraform_version: '1.7.5'
 
-      - name: Install sops and age
+      - name: Install sops, age, and Railway CLI
         run: |
           sudo apt-get update
           sudo apt-get install -y age
           SOPS_VERSION=v3.8.1
           curl -Ls https://github.com/getsops/sops/releases/download/$SOPS_VERSION/sops-$SOPS_VERSION.linux.amd64 -o sops
           sudo install -m 0755 sops /usr/local/bin/sops
+          # Install Railway CLI
+          curl -fsSL https://railway.app/install.sh | sh
+          echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
       - name: Decrypt tfvars (required)
         env:
@@ -80,6 +83,29 @@ jobs:
       - name: Synthesize stack (cdktf synth)
         working-directory: infrastructure/cdktf
         run: npx cdktf synth
+
+      - name: Reset database (fresh_db=true)
+        if: github.event.inputs.fresh_db == 'true'
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "🗄️ Resetting PostgreSQL database (fresh_db=true)..."
+          
+          # Authenticate with Railway
+          railway login --token "$RAILWAY_TOKEN"
+          
+          # Connect to the project and environment
+          railway environment use prod --project 10593acb-4a7a-4331-a993-52d24860d1fa
+          
+          # Get the postgres service and reset the database
+          echo "📋 Dropping existing database..."
+          railway run --service postgres -- psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS railway;"
+          
+          echo "🆕 Creating fresh database..."
+          railway run --service postgres -- psql -U postgres -d postgres -c "CREATE DATABASE railway;"
+          
+          echo "✅ Database reset complete - fresh initdb will use new password on service recreation"
 
       - name: Terraform init + destroy
         working-directory: infrastructure/cdktf

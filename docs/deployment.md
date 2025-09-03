@@ -70,7 +70,7 @@ GridPulse uses GitHub Actions for all deployment operations with CDKTF (CDK for 
 #### Available Workflows
 
 1. **"Plan + Apply Prod (CDKTF)"** - Plan and apply infrastructure changes
-2. **"Recreate Prod (CDKTF)"** - Destroy and recreate environment (for troubleshooting)
+2. **"Recreate Prod (CDKTF)"** - Destroy and recreate environment with optional database reset
 3. **"Publish Image (GHCR)"** - Build and publish Docker images to GitHub Container Registry
 4. **"Release Build"** - Create release builds with pinned image tags
 
@@ -97,6 +97,17 @@ GridPulse uses GitHub Actions for all deployment operations with CDKTF (CDK for 
 - **Deployment**: Railway pulls images from GHCR
 - **Configuration**: SOPS-encrypted `secrets/prod.enc.tfvars`
 - **State**: Terraform Cloud remote backend
+
+### Database Reset Capability
+
+The "Recreate Prod (CDKTF)" workflow includes a `fresh_db` option that:
+
+1. **Connects to existing PostgreSQL service** via Railway CLI
+2. **Drops the `railway` database** - ⚠️ **DESTROYS ALL DATA**
+3. **Creates a fresh `railway` database** - Forces new `initdb`
+4. **Recreates infrastructure** - New password takes effect
+
+This solves PostgreSQL authentication issues where the container ignores `POSTGRES_PASSWORD` on existing databases.
 
 
 ## Testing & Validation Scripts
