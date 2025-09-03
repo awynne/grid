@@ -52,42 +52,23 @@ jobs:
           curl -Ls https://github.com/getsops/sops/releases/download/$SOPS_VERSION/sops-$SOPS_VERSION.linux.amd64 -o sops
           sudo install -m 0755 sops /usr/local/bin/sops
 
-      - name: Decrypt or generate tfvars
+      - name: Decrypt tfvars (required)
         env:
           AGE_PRIVATE_KEY: ${{ secrets.AGE_PRIVATE_KEY }}
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
         run: |
           set -euo pipefail
           mkdir -p ~/.config/sops/age
-          if [ -n "${AGE_PRIVATE_KEY:-}" ]; then
-            printf "%s\n" "$AGE_PRIVATE_KEY" > ~/.config/sops/age/keys.txt
+          if [ -z "${AGE_PRIVATE_KEY:-}" ]; then
+            echo "AGE_PRIVATE_KEY not set; can't decrypt prod.enc.tfvars" >&2
+            exit 1
           fi
-          if [ -f secrets/prod.enc.tfvars ]; then
-            echo "Preparing terraform.tfvars from secrets/prod.enc.tfvars"
-            if sops -d secrets/prod.enc.tfvars >/dev/null 2>&1; then
-              sops -d secrets/prod.enc.tfvars > infrastructure/cdktf/terraform.tfvars
-            else
-              echo "Warning: prod.enc.tfvars not encrypted or decryption failed; will fall back to GH secrets."
-            fi
+          printf "%s\n" "$AGE_PRIVATE_KEY" > ~/.config/sops/age/keys.txt
+          if [ ! -f secrets/prod.enc.tfvars ]; then
+            echo "secrets/prod.enc.tfvars not found. Commit encrypted tfvars first." >&2
+            exit 1
           fi
-          if [ ! -f infrastructure/cdktf/terraform.tfvars ]; then
-            echo "Generating terraform.tfvars from GitHub environment secrets..."
-            {
-              echo "railway_token     = \"${{ secrets.RAILWAY_TOKEN }}\""
-              echo "project_id        = \"${{ secrets.RAILWAY_PROJECT_ID }}\""
-              echo "postgres_password = \"${{ secrets.POSTGRES_PASSWORD }}\""
-              echo "session_secret    = \"${{ secrets.SESSION_SECRET }}\""
-              echo "eia_api_key       = \"${{ secrets.EIA_API_KEY }}\""
-              echo
-              echo "docker_image    = \"\""
-              echo "docker_username = \"\""
-              echo "docker_password = \"\""
-            } > infrastructure/cdktf/terraform.tfvars
-          fi
+          echo "Decrypting prod.enc.tfvars → infrastructure/cdktf/terraform.tfvars"
+          sops -d secrets/prod.enc.tfvars > infrastructure/cdktf/terraform.tfvars
 
       - name: Install CDKTF deps
         working-directory: infrastructure/cdktf
