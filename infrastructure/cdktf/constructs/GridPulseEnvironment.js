@@ -29,12 +29,12 @@ class GridPulseEnvironment extends constructs_1.Construct {
             projectId: config.projectId,
             value: config.postgresPassword,
         });
-        // PostgreSQL Service (TimescaleDB)
+        // PostgreSQL Service (Railway Managed PostgreSQL with SSL)
         // Depend on both environment AND the shared password variable
         this.postgresService = new service_1.Service(this, "postgres", {
             name: "postgres",
             projectId: config.projectId,
-            sourceImage: "timescale/timescaledb:latest-pg15",
+            sourceImage: "ghcr.io/railwayapp-templates/postgres-ssl:17",
             dependsOn: [this.environment, this.envPostgresPassword],
         });
         // PostgreSQL Environment Variables
