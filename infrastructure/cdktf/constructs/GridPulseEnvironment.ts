@@ -27,6 +27,7 @@ export class GridPulseEnvironment extends Construct {
   public readonly redisService: Service;
   public dataService?: Service;
   private readonly config: GridPulseEnvironmentConfig;
+  private readonly envPostgresPassword: SharedVariable;
 
   constructor(scope: Construct, id: string, config: GridPulseEnvironmentConfig) {
     super(scope, id);
@@ -45,14 +46,12 @@ export class GridPulseEnvironment extends Construct {
 
     // Set DB password at environment level BEFORE creating the Postgres service so
     // the container initializes with the intended password on first boot.
-    new SharedVariable(this, "env_postgres_password", {
-      environmentId: undefined as unknown as string, // placeholder to satisfy TS, set below
+    this.envPostgresPassword = new SharedVariable(this, "env_postgres_password", {
+      environmentId: this.environment.id,
       name: "POSTGRES_PASSWORD",
       projectId: config.projectId,
       value: config.postgresPassword,
     });
-    // Assign environmentId after environment creation
-    (this as any).env_postgres_password.environmentId = ((): string => this.environment.id)();
 
     // PostgreSQL Service (TimescaleDB)
     this.postgresService = new Service(this, "postgres", {

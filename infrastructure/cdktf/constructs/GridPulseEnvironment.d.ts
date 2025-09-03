@@ -18,9 +18,11 @@ export declare class GridPulseEnvironment extends Construct {
     readonly postgresService: Service;
     readonly redisService: Service;
     dataService?: Service;
+    private readonly config;
+    private readonly envPostgresPassword;
     constructor(scope: Construct, id: string, config: GridPulseEnvironmentConfig);
     private createWebServiceVariables;
-    addDataService(config: {
+    addDataService(serviceConfig: {
         cronSchedule?: string;
     }): Service;
 }
