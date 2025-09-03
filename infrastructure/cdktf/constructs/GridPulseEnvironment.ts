@@ -4,6 +4,7 @@ import { RailwayProvider } from "../.gen/providers/railway/provider";
 import { Environment } from "../.gen/providers/railway/environment";
 import { Service, type ServiceConfig } from "../.gen/providers/railway/service";
 import { Variable } from "../.gen/providers/railway/variable";
+import { SharedVariable } from "../.gen/providers/railway/shared-variable";
 
 export interface GridPulseEnvironmentConfig {
   projectId: string;
@@ -42,6 +43,17 @@ export class GridPulseEnvironment extends Construct {
       projectId: config.projectId,
     });
 
+    // Set DB password at environment level BEFORE creating the Postgres service so
+    // the container initializes with the intended password on first boot.
+    new SharedVariable(this, "env_postgres_password", {
+      environmentId: undefined as unknown as string, // placeholder to satisfy TS, set below
+      name: "POSTGRES_PASSWORD",
+      projectId: config.projectId,
+      value: config.postgresPassword,
+    });
+    // Assign environmentId after environment creation
+    (this as any).env_postgres_password.environmentId = ((): string => this.environment.id)();
+
     // PostgreSQL Service (TimescaleDB)
     this.postgresService = new Service(this, "postgres", {
       name: "postgres",
@@ -65,6 +77,7 @@ export class GridPulseEnvironment extends Construct {
       value: "postgres",
     });
 
+    // Keep service-scoped POSTGRES_PASSWORD in sync (harmless if env-level already set)
     new Variable(this, "postgres_password", {
       environmentId: this.environment.id,
       serviceId: this.postgresService.id,
