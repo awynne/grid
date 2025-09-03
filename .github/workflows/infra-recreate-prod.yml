@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       fresh_db:
-        description: "Reset PostgreSQL database (DROP/CREATE) before recreation - DESTROYS ALL DATA"
+        description: "Require manual PostgreSQL database reset before recreation - DESTROYS ALL DATA (see workflow output for instructions)"
         required: false
         default: "false"
         type: choice
@@ -81,123 +81,38 @@ jobs:
         working-directory: infrastructure/cdktf
         run: npx cdktf synth
 
-      - name: Reset database via Railway API (fresh_db=true)
+      - name: Manual database reset required (fresh_db=true)
         if: github.event.inputs.fresh_db == 'true'
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
         run: |
-          set -euo pipefail
-          echo "🗄️ Resetting PostgreSQL database via Railway GraphQL API..."
-          
-          # First, get the environment and postgres service IDs
-          echo "📋 Getting project information..."
-          PROJECT_QUERY='{
-            "query": "query GetProject($projectId: String!) { project(id: $projectId) { environments(first: 10) { edges { node { id name services(first: 20) { edges { node { id name } } } } } } } }",
-            "variables": { "projectId": "10593acb-4a7a-4331-a993-52d24860d1fa" }
-          }'
-          
-          PROJECT_RESPONSE=$(curl -s -X POST \
-            -H "Authorization: Bearer $RAILWAY_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "$PROJECT_QUERY" \
-            "https://backboard.railway.app/graphql")
-          
-          echo "Project response: $PROJECT_RESPONSE"
-          
-          # Extract prod environment ID and postgres service ID
-          PROD_ENV_ID=$(echo "$PROJECT_RESPONSE" | jq -r '.data.project.environments.edges[] | select(.node.name == "prod") | .node.id')
-          POSTGRES_SERVICE_ID=$(echo "$PROJECT_RESPONSE" | jq -r '.data.project.environments.edges[] | select(.node.name == "prod") | .node.services.edges[] | select(.node.name == "postgres") | .node.id')
-          
-          if [ -z "$PROD_ENV_ID" ] || [ "$PROD_ENV_ID" = "null" ]; then
-            echo "❌ Could not find prod environment"
-            exit 1
-          fi
-          
-          if [ -z "$POSTGRES_SERVICE_ID" ] || [ "$POSTGRES_SERVICE_ID" = "null" ]; then
-            echo "❌ Could not find postgres service"
-            exit 1
-          fi
-          
-          echo "✅ Found prod environment: $PROD_ENV_ID"
-          echo "✅ Found postgres service: $POSTGRES_SERVICE_ID"
-          
-          # Execute database reset commands directly via Railway API
-          echo "📋 Executing database reset commands via Railway API..."
-          
-          # Get current deployment ID for the postgres service
-          DEPLOYMENT_QUERY='{
-            "query": "query GetDeployment($environmentId: String!, $serviceId: String!) { deployments(first: 1, input: { environmentId: $environmentId, serviceId: $serviceId, status: SUCCESS }) { edges { node { id status } } } }",
-            "variables": { "environmentId": "'$PROD_ENV_ID'", "serviceId": "'$POSTGRES_SERVICE_ID'" }
-          }'
-          
-          DEPLOYMENT_RESPONSE=$(curl -s -X POST \
-            -H "Authorization: Bearer $RAILWAY_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "$DEPLOYMENT_QUERY" \
-            "https://backboard.railway.app/graphql")
-          
-          echo "Deployment response: $DEPLOYMENT_RESPONSE"
-          
-          DEPLOYMENT_ID=$(echo "$DEPLOYMENT_RESPONSE" | jq -r '.data.deployments.edges[0].node.id // empty')
-          
-          if [ -z "$DEPLOYMENT_ID" ] || [ "$DEPLOYMENT_ID" = "null" ]; then
-            echo "❌ Could not find active deployment for postgres service"
-            exit 1
-          fi
-          
-          echo "✅ Found deployment: $DEPLOYMENT_ID"
-          
-          # Execute DROP DATABASE command
-          echo "🗑️  Dropping existing railway database..."
-          
-          DROP_EXEC_QUERY='{
-            "query": "mutation ServiceInstanceExec($deploymentId: String!, $command: String!) { serviceInstanceExec(deploymentId: $deploymentId, command: $command) { exitCode output error } }",
-            "variables": { 
-              "deploymentId": "'$DEPLOYMENT_ID'",
-              "command": "psql -U postgres -d postgres -c \"DROP DATABASE IF EXISTS railway;\""
-            }
-          }'
-          
-          DROP_RESPONSE=$(curl -s -X POST \
-            -H "Authorization: Bearer $RAILWAY_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "$DROP_EXEC_QUERY" \
-            "https://backboard.railway.app/graphql")
-          
-          echo "Drop database response: $DROP_RESPONSE"
-          
-          # Execute CREATE DATABASE command  
-          echo "🆕 Creating fresh railway database..."
-          
-          CREATE_EXEC_QUERY='{
-            "query": "mutation ServiceInstanceExec($deploymentId: String!, $command: String!) { serviceInstanceExec(deploymentId: $deploymentId, command: $command) { exitCode output error } }",
-            "variables": { 
-              "deploymentId": "'$DEPLOYMENT_ID'",
-              "command": "psql -U postgres -d postgres -c \"CREATE DATABASE railway;\""
-            }
-          }'
-          
-          CREATE_RESPONSE=$(curl -s -X POST \
-            -H "Authorization: Bearer $RAILWAY_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "$CREATE_EXEC_QUERY" \
-            "https://backboard.railway.app/graphql")
-          
-          echo "Create database response: $CREATE_RESPONSE"
-          
-          # Check if commands were successful
-          DROP_EXIT_CODE=$(echo "$DROP_RESPONSE" | jq -r '.data.serviceInstanceExec.exitCode // 1')
-          CREATE_EXIT_CODE=$(echo "$CREATE_RESPONSE" | jq -r '.data.serviceInstanceExec.exitCode // 1')
-          
-          if [ "$DROP_EXIT_CODE" -eq 0 ] && [ "$CREATE_EXIT_CODE" -eq 0 ]; then
-            echo "✅ Database successfully reset via Railway API"
-          else
-            echo "⚠️  Database reset may have had issues, but proceeding with infrastructure recreation"
-            echo "Drop exit code: $DROP_EXIT_CODE"
-            echo "Create exit code: $CREATE_EXIT_CODE"
-          fi
-          
-          echo "✅ Database reset complete - infrastructure recreation will use new password"
+          echo "🗄️ Database reset requested (fresh_db=true)"
+          echo ""
+          echo "⚠️  MANUAL STEP REQUIRED - Railway API is not publicly accessible"
+          echo ""
+          echo "🔧 Before running this workflow, you must manually reset the database:"
+          echo ""
+          echo "1. Install Railway CLI:"
+          echo "   curl -fsSL https://railway.app/install.sh | sh"
+          echo ""
+          echo "2. Authenticate with Railway:"
+          echo "   railway login"
+          echo ""
+          echo "3. Connect to the GridPulse project:"
+          echo "   railway link 10593acb-4a7a-4331-a993-52d24860d1fa"
+          echo ""
+          echo "4. Switch to prod environment:"
+          echo "   railway environment prod"
+          echo ""
+          echo "5. Reset the database (⚠️ DESTROYS ALL DATA):"
+          echo "   railway run --service postgres -- psql -U postgres -d postgres -c \"DROP DATABASE IF EXISTS railway;\""
+          echo "   railway run --service postgres -- psql -U postgres -d postgres -c \"CREATE DATABASE railway;\""
+          echo ""
+          echo "6. Verify database was recreated:"
+          echo "   railway run --service postgres -- psql -U postgres -d postgres -c \"\\l\""
+          echo ""
+          echo "After completing these steps, this workflow will recreate the infrastructure"
+          echo "and the PostgreSQL service will initialize with the new password from tfvars."
+          echo ""
+          echo "✅ Proceeding with infrastructure recreation..."
 
       - name: Terraform init + destroy
         working-directory: infrastructure/cdktf

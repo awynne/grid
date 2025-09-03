@@ -102,23 +102,38 @@ GridPulse uses GitHub Actions for all deployment operations with CDKTF (CDK for 
 
 ### Database Reset Capability
 
-The "Recreate Prod (CDKTF)" workflow includes a `fresh_db` option that automatically resets the database:
+The "Recreate Prod (CDKTF)" workflow includes a `fresh_db` option that requires manual database reset:
 
-### Automated Database Reset Process (when `fresh_db: "true"`):
+### Manual Database Reset Process (when `fresh_db: "true"`):
 
-The workflow automatically:
+**⚠️ IMPORTANT: Complete these steps BEFORE running the GitHub Actions workflow:**
 
-1. **Connects to Railway GraphQL API** using `RAILWAY_API_TOKEN`
-2. **Discovers services** - Finds prod environment and postgres service IDs  
-3. **Gets active deployment** - Identifies the running postgres deployment
-4. **Drops database** - Executes `DROP DATABASE IF EXISTS railway;` via API
-5. **Creates fresh database** - Executes `CREATE DATABASE railway;` via API  
-6. **Validates results** - Checks command exit codes for success
-7. **Proceeds with infrastructure** - CDKTF recreates services with new password
+1. **Install Railway CLI locally**:
+   ```bash
+   curl -fsSL https://railway.app/install.sh | sh
+   ```
 
-**⚠️ WARNING: `fresh_db: "true"` DESTROYS ALL DATA** - Use only for troubleshooting authentication issues.
+2. **Authenticate and connect**:
+   ```bash
+   railway login
+   railway link 10593acb-4a7a-4331-a993-52d24860d1fa
+   railway environment prod
+   ```
 
-This automated approach uses Railway's GraphQL API for `serviceInstanceExec` mutations, eliminating the need for manual CLI steps.
+3. **Reset the database** (⚠️ **DESTROYS ALL DATA**):
+   ```bash
+   railway run --service postgres -- psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS railway;"
+   railway run --service postgres -- psql -U postgres -d postgres -c "CREATE DATABASE railway;"
+   ```
+
+4. **Verify database recreation**:
+   ```bash
+   railway run --service postgres -- psql -U postgres -d postgres -c "\l"
+   ```
+
+5. **Then run the GitHub Actions workflow** - Infrastructure recreation will initialize PostgreSQL with the new password from encrypted tfvars.
+
+**Why Manual?** Railway doesn't provide public API access for service execution. The workflow displays these instructions when `fresh_db: "true"` is selected.
 
 ### Terraform Cloud Lock Management
 
