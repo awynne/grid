@@ -19,8 +19,6 @@
     "db:setup": "./scripts/setup-database.sh",
     "db:timescale": "node database/setup.js",
     "test:local": "node scripts/test-local-setup.js",
-    "deploy:test": "./scripts/deploy-to-test.sh",
-    "deploy:prod": "./scripts/deploy-to-prod.sh",
     "test:remote:test": "node scripts/test-remote-environment.js test",
     "test:remote:prod": "node scripts/test-remote-environment.js prod"
   },

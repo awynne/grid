@@ -61,89 +61,42 @@ docker run --rm -p 3000:3000 \
 
 On Railway, configure the project to use the Dockerfile builder. Set environment variables in the dashboard. No separate start command is required.
 
-## Deployment Scripts
+## Deployment Infrastructure
 
-### Universal Deployment Script
+### GitHub Actions Workflows
 
-**File: `scripts/deploy.sh`**
-```bash
-#!/bin/bash
-# GridPulse Universal Deployment Script
-# Handles application build, database migrations, and startup
+GridPulse uses GitHub Actions for all deployment operations with CDKTF (CDK for Terraform) for Infrastructure as Code:
 
-set -e
+#### Available Workflows
 
-echo "🚀 Starting GridPulse deployment..."
+1. **"Plan + Apply Prod (CDKTF)"** - Plan and apply infrastructure changes
+2. **"Recreate Prod (CDKTF)"** - Destroy and recreate environment (for troubleshooting)
+3. **"Publish Image (GHCR)"** - Build and publish Docker images to GitHub Container Registry
+4. **"Release Build"** - Create release builds with pinned image tags
 
-# Environment detection
-ENVIRONMENT=${RAILWAY_ENVIRONMENT:-"unknown"}
-echo "📍 Deploying to environment: $ENVIRONMENT"
+#### Deployment Process
 
-# Build application
-echo "🏗️  Building application..."
-npm run build
+1. **Build Docker Image**:
+   - Run "Publish Image (GHCR)" workflow
+   - Creates immutable image with tag like `ghcr.io/owner/grid:v123-abcdef`
 
-# Database migrations
-echo "💾 Applying database migrations..."
-npx prisma migrate deploy
+2. **Update Infrastructure**:
+   - Update `secrets/prod.enc.tfvars` with new image tag
+   - Run "Plan + Apply Prod (CDKTF)" workflow
+   - CDKTF updates Railway services with new image
 
-# TimescaleDB features (if not already applied)
-echo "⚡ Setting up TimescaleDB features..."
-node database/setup.js || echo "⚠️  TimescaleDB setup skipped (may already be configured)"
+3. **Validate Deployment**:
+   - GitHub Actions automatically runs health checks
+   - Database migrations applied post-deployment
+   - Environment validation confirms success
 
-# Conditional seeding (dev only - prod skips seeding for live data)
-if [[ "$ENVIRONMENT" == "dev" ]]; then
-    echo "🌱 Seeding database with sample data..."
-    npx prisma db seed
-else
-    echo "📦 Production environment - skipping data seeding"
-fi
+### Docker-First Deployment Architecture
 
-# Health check preparation
-echo "🏥 Preparing health checks..."
-npx prisma generate
-
-# Start application
-echo "✅ Starting GridPulse application..."
-exec npm start
-```
-
-### Environment-Specific Deployment
-
-**File: `scripts/deploy-to-prod.sh`** (Simplified for single-environment deployment)
-```bash
-#!/bin/bash
-# Deploy to production environment
-
-set -e
-
-echo "🚀 Deploying to PRODUCTION environment..."
-
-# Confirmation required for production
-read -p "⚠️  Are you sure you want to deploy to PRODUCTION? (yes/no): " confirm
-if [[ $confirm != "yes" ]]; then
-    echo "❌ Production deployment cancelled"
-    exit 1
-fi
-
-# Ensure we're on main branch with latest changes
-git checkout main
-git pull origin main
-
-# Deploy database changes (NO SEEDING in production)
-echo "💾 Applying database schema to PRODUCTION..."
-npx prisma migrate deploy
-
-# Apply TimescaleDB features
-echo "⚡ Setting up TimescaleDB in PRODUCTION..."
-npm run db:timescale
-
-# Validate production deployment
-echo "✅ Validating PRODUCTION deployment..."
-npm run test:remote:prod
-
-echo "🎉 PRODUCTION deployment completed successfully!"
-```
+- **Build**: Multi-stage Dockerfile optimized for Railway
+- **Registry**: GitHub Container Registry (GHCR) for image storage  
+- **Deployment**: Railway pulls images from GHCR
+- **Configuration**: SOPS-encrypted `secrets/prod.enc.tfvars`
+- **State**: Terraform Cloud remote backend
 
 
 ## Testing & Validation Scripts
@@ -289,27 +242,21 @@ A feature is only considered complete when it passes all stages:
 - Performance degradation beyond thresholds
 
 ### Manual Rollback Process
-1. **Stop current deployment**
-   ```bash
-   railway service stop
-   ```
 
-2. **Revert database migrations (if necessary)**
-   ```bash
-   npx prisma migrate reset --skip-seed
-   # Restore from backup if needed
-   ```
+1. **Identify previous working image**:
+   - Check GHCR for previous image tag: `ghcr.io/owner/grid:v122-xyz`
 
-3. **Deploy previous working version**
-   ```bash
-   git checkout <previous-working-commit>
-   railway up
-   ```
+2. **Update infrastructure with previous image**:
+   - Update `docker_image` in `secrets/prod.enc.tfvars` to previous tag
+   - Run "Plan + Apply Prod (CDKTF)" workflow to rollback
+   
+3. **Revert database migrations (if necessary)**:
+   - Use Railway CLI: `railway connect postgres`
+   - Or use "Recreate Prod (CDKTF)" with `fresh_db: true` for full reset
 
-4. **Validate rollback success**
-   ```bash
-   npm run test:remote:<environment>
-   ```
+4. **Validate rollback success**:
+   - GitHub Actions validates deployment automatically
+   - Manual validation: `npm run test:remote:prod`
 
 ## Environment Variables
 
