@@ -7,6 +7,12 @@ on:
         description: "Type RECREATE to confirm you want to destroy and recreate the prod environment"
         required: true
         type: string
+      fresh_db:
+        description: "Also force-create a brand new Postgres (wipe data)"
+        required: false
+        default: "false"
+        type: choice
+        options: ["false", "true"]
 
 jobs:
   recreate:
@@ -103,6 +109,11 @@ jobs:
           # Place tfvars next to synthesized stack
           cp -f terraform.tfvars cdktf.out/stacks/gridpulse-prod/terraform.tfvars
           terraform -chdir=cdktf.out/stacks/gridpulse-prod init -input=false -no-color
+          # If fresh_db=true, explicitly destroy the postgres service first to ensure a clean data directory
+          if [ "${{ github.event.inputs.fresh_db }}" = "true" ]; then
+            echo "Forcing Postgres destroy first (fresh_db=true)..."
+            terraform -chdir=cdktf.out/stacks/gridpulse-prod destroy -target=railway_service.postgres -auto-approve -input=false -no-color || true
+          fi
           terraform -chdir=cdktf.out/stacks/gridpulse-prod destroy -auto-approve -input=false -no-color || true
 
       - name: Terraform apply (recreate)
