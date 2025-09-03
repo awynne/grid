@@ -124,7 +124,17 @@ export class GridPulseEnvironment extends Construct {
   }
 
   private createWebServiceVariables(config: GridPulseEnvironmentConfig) {
-    const encodedDbPassword = encodeURIComponent(config.postgresPassword);
+    // If the provided password already appears percent-encoded, avoid double-encoding
+    const isAlreadyEncoded = (() => {
+      try {
+        return decodeURIComponent(config.postgresPassword) !== config.postgresPassword;
+      } catch {
+        return false;
+      }
+    })();
+    const encodedDbPassword = isAlreadyEncoded
+      ? config.postgresPassword
+      : encodeURIComponent(config.postgresPassword);
     const webVariables = [
       { name: "NODE_ENV", value: "production" },
       { name: "RAILWAY_ENVIRONMENT_NAME", value: config.environmentName },
