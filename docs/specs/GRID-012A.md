@@ -1,9 +1,9 @@
 # GRID-012A: CDKTF Infrastructure as Code Implementation
 
-**Status**: ✅ Completed  
+**Status**: 🔄 In Progress  
 **Priority**: High  
 **Created**: 2025-08-28  
-**Completed**: 2025-08-29  
+**Updated**: 2025-09-03  
 
 **Parent**: [GRID-012](./GRID-012.md) - TimescaleDB Schema Implementation  
 **GitHub Issue**: [#26](https://github.com/awynne/grid/issues/26)
@@ -270,11 +270,17 @@ new Variable(this, "postgres_db", {
 - [x] Test migration workflow on prod environment (single env deployment)
 - [x] Verify database schema synchronization across deployments
 
-### Phase 4: Migration Completion
-- [ ] Archive old infrastructure/terraform/ directory
-- [ ] Update project documentation to reference CDKTF approach
-- [ ] Train team on new management workflows
-- [ ] Remove deprecated bash scripts from scripts/ directory
+### Phase 4: Migration Completion ✅
+- [x] Archive old infrastructure/terraform/ directory
+- [x] Update project documentation to reference CDKTF approach
+- [x] Train team on new management workflows
+- [x] Remove deprecated bash scripts from scripts/ directory
+
+### Phase 5: Supabase Database Migration 🔄
+- [ ] **5A: CDKTF Supabase Integration** - Add Supabase Terraform provider and project resources
+- [ ] **5B: Automated Provisioning** - Single command environment creation with managed database
+- [ ] **5C: Migration Execution** - Parallel deployment, cutover, and Railway PostgreSQL cleanup
+- [ ] **5D: Validation & Documentation** - Verify full IaC automation and update team processes
 
 ## Future Enhancements
 
@@ -305,3 +311,206 @@ This implementation provides **true Infrastructure as Code** for Railway deploym
 The CDKTF approach eliminates all manual cleanup requirements and provides a foundation for scaling infrastructure management as GridPulse grows from MVP to production scale.
 
 **Key Innovation**: Using TypeScript for infrastructure matches the React Router 7 frontend development workflow, reducing context switching and leveraging existing team TypeScript expertise for infrastructure management.
+
+---
+
+## Phase 5: Database Architecture Migration (2025-09-03)
+
+### Problem Statement: Railway PostgreSQL Limitations
+
+**Technical Issues Encountered:**
+- TimescaleDB Docker image not honoring `POSTGRES_DB=gridpulse` environment variable
+- Database initialization requiring manual creation steps
+- Railway PostgreSQL is containerized, not truly "managed" (manual backups, maintenance)
+- Authentication errors due to database creation failures
+
+**GRID-007 Revisit:**
+- Analysis confirmed **PostgreSQL is optimal for MVP** (not TimescaleDB)
+- Storage requirements: 13MB for MVP, 53MB for small scale
+- Performance: PostgreSQL <5ms queries sufficient for MVP scale
+- Recommendation: "PostgreSQL (optimal)" for MVP scenarios
+
+### Research: Managed Database Solutions
+
+#### Railway PostgreSQL Reality Check
+- ❌ **Not managed**: Still Docker containers requiring manual maintenance
+- ❌ **Limited backups**: Volume-based, not database-aware
+- ❌ **Manual scaling**: No automated performance optimization
+- ❌ **Container issues**: Database initialization problems with custom images
+- 💰 **Cost**: ~$15-30/month for container + manual management overhead
+
+#### Supabase Managed PostgreSQL Analysis
+- ✅ **Truly managed**: Automated backups, high availability, monitoring
+- ✅ **Official Terraform provider**: Full IaC support with `supabase_project` resource
+- ✅ **Cost optimized**: Free tier (500MB DB, 50k MAUs) perfect for MVP
+- ✅ **Bonus features**: Built-in Auth, Realtime, Storage, Edge Functions
+- ✅ **Connection pooling**: pgBouncer included for optimal Railway pairing
+- ✅ **Zero initialization issues**: Database creation fully automated
+
+### Architecture Decision: Railway + Supabase IaC
+
+**Selected Pattern**: Compute on Railway + Database on Supabase
+- **Industry standard**: Common pairing for managed DB + container flexibility
+- **Regional optimization**: Both services support same regions for low latency
+- **Cost effective**: Railway compute (~$10-20) + Supabase free tier
+- **Full IaC**: Both platforms support Terraform providers
+
+**Key Benefits:**
+1. **True Infrastructure as Code**: Both Railway and Supabase resources in single CDKTF stack
+2. **Zero manual steps**: Database creation, schema migration, connection strings fully automated
+3. **Fastest deployment**: No container build times for database, instant provisioning
+4. **Future-proof**: Foundation for auth, realtime, storage features when needed
+5. **Operational excellence**: Managed backups, monitoring, security patches included
+
+## Phase 5 Implementation Plan
+
+### Phase 5A: CDKTF Supabase Provider Integration
+
+**Goal**: Add Supabase managed PostgreSQL to existing CDKTF infrastructure
+
+```typescript
+// New Supabase provider configuration
+terraform {
+  required_providers {
+    railway = { source = "terraform-community-providers/railway", version = "~> 0.5" }
+    supabase = { source = "supabase/supabase", version = "~> 1.0" }
+  }
+}
+
+provider "supabase" {
+  access_token = var.supabase_access_token
+}
+```
+
+**Infrastructure Updates:**
+```typescript
+interface GridPulseEnvironmentConfig {
+  projectId: string;
+  environmentName: string;
+  railwayToken: string;
+  
+  // New Supabase configuration
+  supabaseAccessToken: string;
+  supabaseOrgId: string;
+  supabaseRegion: string;
+  
+  sessionSecret: string;
+  eiaApiKey?: string;
+}
+
+// Replace Railway PostgreSQL with Supabase project
+this.supabaseProject = new SupabaseProject(this, "database", {
+  organizationId: config.supabaseOrgId,
+  name: `${config.environmentName}-database`,
+  region: config.supabaseRegion,
+  databasePassword: this.generateSecurePassword(),
+});
+```
+
+**Connection String Automation:**
+```typescript
+// Auto-generate optimized connection strings for Railway
+const databaseUrl = `postgresql://postgres.${this.supabaseProject.ref}:${databasePassword}@aws-0-us-east-1.pooler.supabase.com:5432/postgres`;
+
+new Variable(this, "web_database_url", {
+  environmentId: this.environment.id,
+  serviceId: this.webService.id,
+  name: "DATABASE_URL",
+  value: databaseUrl, // Pooled connection for optimal performance
+});
+```
+
+### Phase 5B: Automated Environment Provisioning
+
+**Single Command Environment Creation:**
+```bash
+# Complete environment: Railway web service + Supabase database + networking
+./scripts/manage-environments.sh recreate prod
+
+# What happens automatically:
+# 1. Supabase project created with generated secure password
+# 2. Railway web service deployed with auto-configured connection strings  
+# 3. Database schema migrated via post-deployment hooks
+# 4. Health checks verify web+database connectivity
+# 5. Environment ready for immediate use
+```
+
+**Zero Manual Configuration Requirements:**
+- ✅ Database password generation and secure storage
+- ✅ Connection string construction and injection
+- ✅ Network configuration and security groups
+- ✅ Schema migration execution post-deployment
+- ✅ Health verification and rollback on failure
+
+### Phase 5C: Migration Execution Strategy
+
+**Backwards-Compatible Migration:**
+1. **Parallel deployment**: Create Supabase alongside existing Railway PostgreSQL
+2. **Data migration**: Export from Railway → Import to Supabase (if needed)
+3. **Cutover**: Update connection strings to point to Supabase
+4. **Cleanup**: Remove Railway PostgreSQL service from CDKTF stack
+5. **Validation**: Verify all application functionality works with managed database
+
+**Rollback Plan:**
+- Keep Railway PostgreSQL in CDKTF until Supabase fully validated
+- Connection string switching allows instant rollback if issues arise
+- Database export/import scripts for data recovery if needed
+
+## Updated Success Criteria
+
+### Full IaC Automation Requirements
+- ✅ **Single command environment creation**: `./scripts/manage-environments.sh recreate prod`
+- ✅ **Zero manual configuration**: No database setup, passwords, or connection string management
+- ✅ **Complete destroy/recreate**: Environment teardown and rebuild with no manual intervention
+- ✅ **Schema migration automation**: Database structure applied automatically during deployment
+- ✅ **Team onboarding**: New developers can create working environment with zero knowledge
+
+### Performance & Reliability Requirements  
+- ✅ **Sub-60 second provisioning**: Managed database creation faster than container builds
+- ✅ **Immediate connectivity**: Web service connects to database on first boot
+- ✅ **Automated monitoring**: Built-in database health checks and alerting
+- ✅ **Backup automation**: Daily backups with point-in-time recovery (Pro tier)
+
+### Cost Optimization Validation
+- ✅ **MVP within free tier**: 500MB database sufficient for initial development
+- ✅ **Predictable scaling**: Clear upgrade path when limits reached
+- ✅ **Reduced operational overhead**: No manual database management tasks
+
+## Dependencies & Prerequisites
+
+### New Dependencies
+- **Supabase Account**: Organization access for Terraform provider
+- **Supabase Personal Access Token**: API authentication for resource management
+- **Region Coordination**: Railway and Supabase deployed in same AWS region
+
+### Integration Points
+- **Existing GRID-012A infrastructure**: Builds on current CDKTF Railway setup
+- **Docker deployment workflow**: Web application deployment remains unchanged  
+- **CI/CD pipeline integration**: Database migrations triggered post-deployment
+- **Environment variable management**: Automated through Terraform outputs
+
+## Next Steps
+
+### Immediate Implementation (Phase 5A)
+1. Add Supabase Terraform provider to CDKTF configuration
+2. Create `GridPulseDatabase` construct for Supabase project management
+3. Update `GridPulseEnvironment` to use managed database instead of Railway PostgreSQL
+4. Test infrastructure provisioning in development environment
+
+### Validation & Migration (Phase 5B)
+1. Deploy parallel Supabase database alongside existing Railway PostgreSQL
+2. Validate connection strings and application connectivity
+3. Perform schema migration and data consistency verification
+4. Execute cutover with rollback plan ready
+
+### Production Deployment (Phase 5C)
+1. Update production environment to use Supabase managed database
+2. Archive old Railway PostgreSQL configurations
+3. Document new architecture patterns for team
+4. Prepare for future Supabase feature integration (Auth, Realtime, Storage)
+
+---
+
+**Infrastructure Evolution**: From manual scripts → CDKTF Railway containers → **Full IaC with managed services**
+
+This Phase 5 extension achieves the ultimate infrastructure goal: **complete environment lifecycle automation with zero manual configuration**, while providing a foundation for scaling from MVP to production with managed database excellence.
