@@ -87,8 +87,8 @@ infrastructure/cdktf/
 .github/workflows/                   # Primary infrastructure interface
 ├── infra-apply-prod.yml            # Plan + Apply Prod (CDKTF)
 ├── infra-recreate-prod.yml         # Recreate Prod (CDKTF) 
-├── docker-publish.yml              # Publish Image (GHCR)
-└── terraform-state-cleanup.yml     # State cleanup utilities
+├── deploy-prod.yml                 # Publish Image (GHCR)
+└── release-build.yml               # Release Build (Build + PR)
 ```
 
 ## Implementation Details
@@ -163,34 +163,38 @@ new Variable(this, "postgres_db", {
 
 ### Available Workflows
 
-GridPulse uses GitHub Actions workflows as the primary interface for infrastructure management, achieving **single-command environment creation** through the GitHub UI:
+GridPulse uses 4 essential GitHub Actions workflows as the primary interface for infrastructure management:
 
 **1. Plan + Apply Prod (CDKTF)**
 - **Purpose**: Plan and apply infrastructure changes to production
 - **Usage**: Run workflow → Type "APPLY" → Complete environment deployed
-- **Replaces**: Local `plan` and `deploy` commands
+- **Use case**: Regular infrastructure updates, configuration changes
 
 **2. Recreate Prod (CDKTF)**  
 - **Purpose**: Destroy and recreate entire production environment
 - **Usage**: Run workflow → Type "RECREATE" → Fresh environment created
-- **Replaces**: Local `recreate` command
+- **Use case**: Environment reset, major infrastructure changes
 - **Supports**: Optional database reset with `fresh_db` parameter
 
 **3. Publish Image (GHCR)**
-- **Purpose**: Build and publish Docker images to GitHub Container Registry  
-- **Usage**: Triggered on main branch or manual dispatch
-- **Output**: Immutable container images for deployment
+- **Purpose**: Build and publish Docker images without version bumping
+- **Usage**: Manual dispatch → Docker image built and pushed to GHCR
+- **Use case**: Quick image builds for testing, no infrastructure updates
 
-**4. Terraform State Cleanup**
-- **Purpose**: Remove orphaned resources from Terraform state
-- **Usage**: Run workflow → Type "CLEANUP" → State cleaned up
-- **Use case**: Recovery from failed deployments or manual changes
+**4. Release Build (Build + PR)**
+- **Purpose**: Build image AND create PR to bump docker_image version
+- **Usage**: Manual dispatch → Image built + PR created with version update
+- **Use case**: **Primary deployment workflow** - full release process
 
 ### Zero-Configuration Environment Creation
 
-**Complete environment deployment in 3 steps:**
-1. **Run "Plan + Apply Prod (CDKTF)" workflow**
-2. **Type "APPLY" for confirmation**  
+**Typical deployment workflow (2 steps):**
+1. **Run "Release Build (Build + PR)" workflow** → Creates Docker image + PR with version bump
+2. **Merge PR** → Automatically triggers Railway deployment with new image
+
+**Fresh environment creation (3 steps):**
+1. **Run "Recreate Prod (CDKTF)" workflow**
+2. **Type "RECREATE" for confirmation**  
 3. **Wait ~2-3 minutes for complete environment**
 
 **Result**: Working production environment with:
