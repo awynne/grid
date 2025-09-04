@@ -98,7 +98,7 @@ export class ProductionEnvironmentStack extends TerraformStack {
     
     const prodEnvironment = new GridPulseEnvironment(this, "prod", {
       projectId: projectId.stringValue,
-      environmentName: "prod-00", 
+      environmentName: "prod-supabase", 
       railwayToken: railwayToken.stringValue,
       sessionSecret: sessionSecret.stringValue,
       eiaApiKey: eiaApiKey.stringValue,
