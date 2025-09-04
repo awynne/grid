@@ -90,6 +90,19 @@ export class ProductionEnvironmentStack extends TerraformStack {
       default: "",
     });
 
+    // Optional domain configuration
+    const railwaySubdomain = new TerraformVariable(this, "railway_subdomain", {
+      type: "string",
+      description: "Railway-provided subdomain (e.g., 'myapp' -> myapp.up.railway.app)",
+      default: "",
+    });
+
+    const customDomain = new TerraformVariable(this, "custom_domain", {
+      type: "string",
+      description: "Custom domain for the web service (e.g., app.example.com)",
+      default: "",
+    });
+
     // Railway builds Docker images automatically from connected repository using Dockerfile
 
     // Create Production Environment
@@ -120,6 +133,12 @@ export class ProductionEnvironmentStack extends TerraformStack {
       dockerImage: dockerImage.stringValue || undefined,
       dockerUsername: dockerUsername.stringValue || undefined,
       dockerPassword: dockerPassword.stringValue || undefined,
+      
+      // Domain configuration - both options are optional
+      domain: (railwaySubdomain.stringValue || customDomain.stringValue) ? {
+        railwaySubdomain: railwaySubdomain.stringValue || undefined,
+        customDomain: customDomain.stringValue || undefined,
+      } : undefined,
     });
 
     // Data service is not provisioned in prod for now

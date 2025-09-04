@@ -5,6 +5,8 @@ import { Environment } from "../.gen/providers/railway/environment";
 import { Service, type ServiceConfig } from "../.gen/providers/railway/service";
 import { Variable } from "../.gen/providers/railway/variable";
 import { SharedVariable } from "../.gen/providers/railway/shared-variable";
+import { ServiceDomain } from "../.gen/providers/railway/service-domain";
+import { CustomDomain } from "../.gen/providers/railway/custom-domain";
 import { SupabaseProvider } from "../.gen/providers/supabase/provider";
 import { Project } from "../.gen/providers/supabase/project";
 import { Settings } from "../.gen/providers/supabase/settings";
@@ -35,6 +37,14 @@ export interface GridPulseEnvironmentConfig {
   dockerImage?: string;               // e.g., ghcr.io/awynne/grid:v1.2.3
   dockerUsername?: string;            // Registry username (for private images)
   dockerPassword?: string;            // Registry token/password
+
+  // Optional: Domain configuration
+  domain?: {
+    // Option 1: Railway-provided subdomain (e.g., "myapp" -> myapp.up.railway.app)
+    railwaySubdomain?: string;
+    // Option 2: Custom domain you own (requires DNS setup)
+    customDomain?: string;            // e.g., app.example.com
+  };
 }
 
 export class GridPulseEnvironment extends Construct {
@@ -44,6 +54,8 @@ export class GridPulseEnvironment extends Construct {
   public readonly redisService: Service;
   public readonly supabaseProject?: Project; // Optional for Supabase
   public readonly supabaseSettings?: Settings;
+  public readonly serviceDomain?: ServiceDomain; // Optional Railway subdomain
+  public readonly customDomain?: CustomDomain; // Optional custom domain
   public dataService?: Service;
   private readonly config: GridPulseEnvironmentConfig;
   private readonly envPostgresPassword?: SharedVariable;
@@ -188,6 +200,23 @@ export class GridPulseEnvironment extends Construct {
     // Web Service Environment Variables
     this.createWebServiceVariables(config);
 
+    // Domain Configuration
+    if (config.domain?.railwaySubdomain) {
+      this.serviceDomain = new ServiceDomain(this, "web_service_domain", {
+        serviceId: this.webService.id,
+        environmentId: this.environment.id,
+        subdomain: config.domain.railwaySubdomain,
+      });
+    }
+
+    if (config.domain?.customDomain) {
+      this.customDomain = new CustomDomain(this, "web_custom_domain", {
+        serviceId: this.webService.id,
+        environmentId: this.environment.id,
+        domain: config.domain.customDomain,
+      });
+    }
+
     // Outputs
     new TerraformOutput(this, "web_service_id", {
       description: "Web service ID",
@@ -198,6 +227,21 @@ export class GridPulseEnvironment extends Construct {
       description: "Redis service ID",
       value: this.redisService.id,
     });
+
+    // Domain outputs - conditional on domain configuration
+    if (this.serviceDomain) {
+      new TerraformOutput(this, "web_service_domain", {
+        description: "Railway-provided service domain URL",
+        value: `https://${this.serviceDomain.domain}`,
+      });
+    }
+
+    if (this.customDomain) {
+      new TerraformOutput(this, "web_custom_domain", {
+        description: "Custom domain URL",
+        value: `https://${this.customDomain.domain}`,
+      });
+    }
 
     // Database outputs - conditional on which database is used
     if (config.supabase) {
