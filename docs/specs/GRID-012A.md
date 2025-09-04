@@ -33,13 +33,13 @@ Current infrastructure management suffers from:
 - **Multi-stage Dockerfile** optimized for Railway deployment
 - Automated environment variable and secrets management
 - Complete replacement of bash scripts with declarative workflows
-- **Docker and Git deployment method** support with automatic selection
+- **CI/CD pipeline integration** with GitHub Actions workflows
 
 ### Out of Scope  
 - Python data service implementation (GRID-013 dependency)
 - Advanced Railway features (volumes, custom domains)
 - Multi-region deployments
-- CI/CD pipeline integration (future enhancement)
+- Git-based deployment methods (Docker-only approach)
 
 ## Technical Architecture
 
@@ -101,6 +101,11 @@ interface GridPulseEnvironmentConfig {
   postgresPassword: string;
   sessionSecret: string;
   eiaApiKey?: string;
+  
+  // Docker deployment (required)
+  dockerImage: string;
+  dockerUsername?: string;
+  dockerPassword?: string;
 }
 
 class GridPulseEnvironment extends Construct {
@@ -115,20 +120,14 @@ class GridPulseEnvironment extends Construct {
 ### React Router 7 Service Configuration
 
 ```typescript
-// Web service configuration prefers Docker image if provided; otherwise Git build
-this.webService = new Service(this, "web", config.dockerImage
-  ? {
-      name: "web",
-      projectId: config.projectId,
-      sourceImage: config.dockerImage,
-      sourceImageRegistryUsername: config.dockerUsername,
-      sourceImageRegistryPassword: config.dockerPassword,
-    }
-  : {
-      name: "web",
-      projectId: config.projectId,
-    }
-);
+// Docker-only web service deployment for consistency and speed
+this.webService = new Service(this, "web", {
+  name: "web",
+  projectId: config.projectId,
+  sourceImage: config.dockerImage,
+  sourceImageRegistryUsername: config.dockerUsername,
+  sourceImageRegistryPassword: config.dockerPassword,
+});
 
 // Web environment variables (PORT, SESSION_SECRET, DATABASE_URL, REDIS_URL, etc.)
 const webVariables = [
