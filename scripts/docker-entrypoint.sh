@@ -23,7 +23,20 @@ for i in $(seq 1 $ATTEMPTS); do
   if node -e '
     const { Client } = require("pg");
     const c = new Client({ connectionString: process.env.DATABASE_URL, connectionTimeoutMillis: 2000 });
-    c.connect().then(()=>c.end()).then(()=>process.exit(0)).catch(()=>process.exit(1));
+    
+    // Handle error events to prevent unhandled error crashes
+    c.on("error", () => {
+      c.end().catch(() => {});
+      process.exit(1);
+    });
+    
+    c.connect()
+      .then(() => c.end())
+      .then(() => process.exit(0))
+      .catch(() => {
+        c.end().catch(() => {});
+        process.exit(1);
+      });
   '; then
     echo "✅ Database is reachable"
     break
@@ -46,6 +59,11 @@ const client = new Client({ connectionString: process.env.DATABASE_URL });
 
 async function checkMigrationState() {
   try {
+    // Handle error events to prevent unhandled error crashes
+    client.on("error", () => {
+      client.end().catch(() => {});
+    });
+    
     await client.connect();
     
     // Check if _prisma_migrations table exists
@@ -77,6 +95,7 @@ async function checkMigrationState() {
       console.log("OK");
     }
   } catch (error) {
+    client.end().catch(() => {});
     console.log("OK"); // If we can'\''t check, proceed normally
   }
 }
@@ -92,11 +111,23 @@ if [ "$MIGRATION_CHECK" = "RESET_NEEDED" ]; then
   node -e '
     const { Client } = require("pg");
     const client = new Client({ connectionString: process.env.DATABASE_URL });
+    
+    // Handle error events to prevent unhandled error crashes
+    client.on("error", (err) => {
+      console.error("❌ Failed to reset migration state:", err.message);
+      client.end().catch(() => {});
+      process.exit(1);
+    });
+    
     client.connect()
       .then(() => client.query("DROP TABLE IF EXISTS _prisma_migrations CASCADE;"))
       .then(() => client.end())
       .then(() => console.log("✅ Migration state reset"))
-      .catch(err => console.error("❌ Failed to reset migration state:", err.message));
+      .catch(err => {
+        console.error("❌ Failed to reset migration state:", err.message);
+        client.end().catch(() => {});
+        process.exit(1);
+      });
   '
   
   echo "🔧 Running database migrations (prisma migrate deploy with reset state)..."
