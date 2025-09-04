@@ -117,35 +117,61 @@ jobs:
           git push origin "$BRANCH_NAME"
           
           echo "📋 Creating PR..."
-          PR_URL=$(gh pr create \
-            --title "chore(infra): bump docker_image to $IMAGE_TAG" \
-            --body "## Release Deployment
           
-          🚀 **Auto-generated release deployment**
+          # Create PR using REST API directly since gh CLI is restricted
+          PR_RESPONSE=$(curl -s -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
+            https://api.github.com/repos/${{ github.repository }}/pulls \
+            -d "{
+              \"title\": \"chore(infra): bump docker_image to $IMAGE_TAG\",
+              \"body\": \"## Release Deployment\n\n🚀 **Auto-generated release deployment**\n\n- **Image**: \\\`$IMAGE_TAG\\\`\n- **Commit**: \\\`$(git rev-parse --short HEAD)\\\`\n- **Changes**: Database connection error handling fixes\n\n### Changes in this release:\n- Fix database readiness check error handling\n- Fix migration state check error handling\n- Add proper error event handlers to prevent container crashes\n- Disable TimescaleDB setup for Supabase compatibility\n\n**This PR will be auto-merged and deployed immediately.**\n\n🤖 Generated with [Claude Code](https://claude.ai/code)\",
+              \"head\": \"$BRANCH_NAME\",
+              \"base\": \"main\"
+            }")
           
-          - **Image**: \`$IMAGE_TAG\`
-          - **Commit**: \`$(git rev-parse --short HEAD)\`
-          - **Changes**: Database connection error handling fixes
+          PR_NUMBER=$(echo "$PR_RESPONSE" | jq -r .number)
+          PR_URL=$(echo "$PR_RESPONSE" | jq -r .html_url)
           
-          ### Changes in this release:
-          - Fix database readiness check error handling  
-          - Fix migration state check error handling
-          - Add proper error event handlers to prevent container crashes
-          - Disable TimescaleDB setup for Supabase compatibility
+          if [ "$PR_NUMBER" = "null" ] || [ "$PR_NUMBER" = "" ]; then
+            echo "❌ Failed to create PR. Response: $PR_RESPONSE"
+            exit 1
+          fi
           
-          **This PR will be auto-merged and deployed immediately.**
-          
-          🤖 Generated with [Claude Code](https://claude.ai/code)" \
-            --head "$BRANCH_NAME" \
-            --base "main")
-          
-          echo "PR created: $PR_URL"
+          echo "PR created: $PR_URL (PR #$PR_NUMBER)"
           
           echo "🔄 Auto-merging PR..."
           sleep 5  # Give GitHub a moment to process the PR
-          gh pr merge "$PR_URL" --auto --squash --delete-branch
           
-          echo "✅ PR auto-merged successfully"
+          # Merge PR using REST API
+          MERGE_RESPONSE=$(curl -s -X PUT \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
+            https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER/merge \
+            -d "{
+              \"commit_title\": \"chore(infra): bump docker_image to $IMAGE_TAG\",
+              \"commit_message\": \"Auto-merged by Release and Deploy workflow\",
+              \"merge_method\": \"squash\"
+            }")
+          
+          MERGE_STATUS=$(echo "$MERGE_RESPONSE" | jq -r .merged)
+          
+          if [ "$MERGE_STATUS" = "true" ]; then
+            echo "✅ PR auto-merged successfully"
+            
+            # Delete the branch
+            curl -s -X DELETE \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/${{ github.repository }}/git/refs/heads/$BRANCH_NAME
+            
+            echo "🗑️ Branch deleted"
+          else
+            echo "❌ Failed to merge PR. Response: $MERGE_RESPONSE"
+            exit 1
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
