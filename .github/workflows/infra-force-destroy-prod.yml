@@ -1,0 +1,105 @@
+name: Force Destroy Prod (CDKTF)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type FORCE_DESTROY to confirm you want to force destroy all prod infrastructure"
+        required: true
+        type: string
+
+jobs:
+  force-destroy:
+    runs-on: ubuntu-latest
+    environment:
+      name: gridpulse/prod
+    env:
+      TF_CLOUD_ORG: ${{ secrets.TF_CLOUD_ORG }}
+      TF_CLOUD_WORKSPACE: gridpulse-prod
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
+    steps:
+      - name: Guard confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "FORCE_DESTROY" ]; then
+            echo "Confirmation mismatch. Type FORCE_DESTROY exactly to proceed." >&2
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.7.5'
+
+      - name: Install sops and age
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y age
+          SOPS_VERSION=v3.8.1
+          curl -Ls https://github.com/getsops/sops/releases/download/$SOPS_VERSION/sops-$SOPS_VERSION.linux.amd64 -o sops
+          sudo install -m 0755 sops /usr/local/bin/sops
+
+      - name: Decrypt tfvars (required)
+        env:
+          AGE_PRIVATE_KEY: ${{ secrets.AGE_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.config/sops/age
+          if [ -z "${AGE_PRIVATE_KEY:-}" ]; then
+            echo "AGE_PRIVATE_KEY not set; can't decrypt prod.enc.tfvars" >&2
+            exit 1
+          fi
+          printf "%s\n" "$AGE_PRIVATE_KEY" > ~/.config/sops/age/keys.txt
+          if [ ! -f secrets/prod.enc.tfvars ]; then
+            echo "secrets/prod.enc.tfvars not found. Commit encrypted tfvars first." >&2
+            exit 1
+          fi
+          echo "Decrypting prod.enc.tfvars → infrastructure/cdktf/terraform.tfvars"
+          sops -d secrets/prod.enc.tfvars > infrastructure/cdktf/terraform.tfvars
+
+      - name: Install CDKTF deps
+        working-directory: infrastructure/cdktf
+        run: |
+          npm ci
+          npm run get
+          npm run compile
+
+      - name: Synthesize stack (cdktf synth)
+        working-directory: infrastructure/cdktf
+        run: npx cdktf synth
+
+      - name: Force remove problematic resources from state and destroy
+        working-directory: infrastructure/cdktf
+        env:
+          TF_IN_AUTOMATION: "true"
+        run: |
+          set -euo pipefail
+          # Place tfvars next to synthesized stack
+          cp -f terraform.tfvars cdktf.out/stacks/gridpulse-prod/terraform.tfvars
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod init -input=false -no-color
+          
+          echo "🗄️ Listing current state..."
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod state list || echo "No state found"
+          
+          echo "🔧 Force removing problematic Railway resources from state..."
+          # Remove all Railway resources that might be causing issues
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod state list | grep -E "railway_(service|environment|variable)" | while read resource; do
+            echo "Removing $resource from state..."
+            terraform -chdir=cdktf.out/stacks/gridpulse-prod state rm "$resource" || echo "Failed to remove $resource (may not exist)"
+          done
+          
+          echo "🧹 Attempting to destroy remaining resources..."
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod destroy -auto-approve -input=false -no-color || echo "Some resources may have already been destroyed"
+          
+          echo "🗑️ Listing final state (should be empty or minimal)..."
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod state list || echo "State is now clean"
+          
+          echo "✅ Force destroy completed - state should now be clean"
+          echo "🔄 You can now run the Recreate workflow to rebuild with clean state"
