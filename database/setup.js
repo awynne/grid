@@ -105,9 +105,13 @@ async function runMigrations() {
   }
 }
 
-// Run if called directly
+// TimescaleDB setup disabled for Supabase compatibility  
+// Supabase doesn't support TimescaleDB extensions
+console.log("⚠️  TimescaleDB setup disabled - not supported on Supabase");
+
+// Run if called directly (disabled)
 if (import.meta.url === `file://${process.argv[1]}`) {
-  runMigrations().catch(console.error);
+  console.log("✅ TimescaleDB setup skipped - using regular PostgreSQL");
 }
 
 export { runMigrations };
