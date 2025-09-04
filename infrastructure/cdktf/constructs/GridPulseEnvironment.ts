@@ -98,8 +98,8 @@ export class GridPulseEnvironment extends Construct {
         }),
       });
 
-      // Supabase connection string format
-      this.databaseUrl = `postgresql://postgres.${this.supabaseProject.id}:${config.supabase.databasePassword}@aws-0-${config.supabase.region || "us-east-1"}.pooler.supabase.com:6543/postgres`;
+      // Supabase direct connection string format (required for Prisma migrations)
+      this.databaseUrl = `postgresql://postgres:${config.supabase.databasePassword}@db.${this.supabaseProject.id}.supabase.co:5432/postgres?sslmode=require`;
     } else {
       // Railway PostgreSQL (legacy)
       // Set DB password at environment level BEFORE creating the Postgres service
