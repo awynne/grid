@@ -246,8 +246,8 @@ GridPulse uses GitHub Actions workflows as the primary interface for infrastruct
 ### Developer Experience Requirements
 - [ ] TypeScript provides autocomplete and type checking for infrastructure code
 - [ ] Error messages clearly indicate configuration issues
-- [ ] Management scripts provide clear feedback and progress indicators
-- [ ] Setup process can be completed by new developers in <15 minutes
+- [ ] GitHub Actions workflows provide clear feedback and progress indicators
+- [ ] Environment creation can be completed by new developers in <15 minutes
 
 ### Integration Requirements
 - [ ] React Router 7 service deploys with correct build configuration
@@ -472,7 +472,7 @@ new Variable(this, "web_database_url", {
 ## Updated Success Criteria
 
 ### Full IaC Automation Requirements
-- ✅ **Single command environment creation**: `./scripts/manage-environments.sh recreate prod`
+- ✅ **Single command environment creation**: "Recreate Prod (CDKTF)" workflow via GitHub Actions
 - ✅ **Zero manual configuration**: No database setup, passwords, or connection string management
 - ✅ **Complete destroy/recreate**: Environment teardown and rebuild with no manual intervention
 - ✅ **Schema migration automation**: Database structure applied automatically during deployment
