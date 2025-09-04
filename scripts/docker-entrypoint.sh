@@ -24,17 +24,25 @@ for i in $(seq 1 $ATTEMPTS); do
     const { Client } = require("pg");
     const c = new Client({ connectionString: process.env.DATABASE_URL, connectionTimeoutMillis: 2000 });
     
-    // Handle error events to prevent unhandled error crashes
-    c.on("error", () => {
-      c.end().catch(() => {});
+    // Handle error events IMMEDIATELY after client creation
+    c.on("error", (err) => {
+      try { c.end(); } catch (e) {}
+      process.exit(1);
+    });
+    
+    // Also handle unhandled promise rejections
+    process.on("unhandledRejection", (err) => {
+      try { c.end(); } catch (e) {}
       process.exit(1);
     });
     
     c.connect()
-      .then(() => c.end())
-      .then(() => process.exit(0))
-      .catch(() => {
-        c.end().catch(() => {});
+      .then(() => {
+        c.end();
+        process.exit(0);
+      })
+      .catch((err) => {
+        try { c.end(); } catch (e) {}
         process.exit(1);
       });
   '; then
@@ -57,13 +65,20 @@ MIGRATION_CHECK=$(node -e '
 const { Client } = require("pg");
 const client = new Client({ connectionString: process.env.DATABASE_URL });
 
+// Handle error events IMMEDIATELY after client creation
+client.on("error", (err) => {
+  try { client.end(); } catch (e) {}
+  process.exit(1);
+});
+
+// Also handle unhandled promise rejections
+process.on("unhandledRejection", (err) => {
+  try { client.end(); } catch (e) {}
+  process.exit(1);
+});
+
 async function checkMigrationState() {
   try {
-    // Handle error events to prevent unhandled error crashes
-    client.on("error", () => {
-      client.end().catch(() => {});
-    });
-    
     await client.connect();
     
     // Check if _prisma_migrations table exists
