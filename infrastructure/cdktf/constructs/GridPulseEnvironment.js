@@ -8,6 +8,8 @@ const environment_1 = require("../.gen/providers/railway/environment");
 const service_1 = require("../.gen/providers/railway/service");
 const variable_1 = require("../.gen/providers/railway/variable");
 const shared_variable_1 = require("../.gen/providers/railway/shared-variable");
+const service_domain_1 = require("../.gen/providers/railway/service-domain");
+const custom_domain_1 = require("../.gen/providers/railway/custom-domain");
 const provider_2 = require("../.gen/providers/supabase/provider");
 const project_1 = require("../.gen/providers/supabase/project");
 const settings_1 = require("../.gen/providers/supabase/settings");
@@ -136,6 +138,21 @@ class GridPulseEnvironment extends constructs_1.Construct {
         this.webService = new service_1.Service(this, "web", webServiceConfig);
         // Web Service Environment Variables
         this.createWebServiceVariables(config);
+        // Domain Configuration
+        if (config.domain?.railwaySubdomain) {
+            this.serviceDomain = new service_domain_1.ServiceDomain(this, "railway_subdomain", {
+                serviceId: this.webService.id,
+                environmentId: this.environment.id,
+                subdomain: config.domain.railwaySubdomain,
+            });
+        }
+        if (config.domain?.customDomain) {
+            this.customDomain = new custom_domain_1.CustomDomain(this, "custom_domain", {
+                serviceId: this.webService.id,
+                environmentId: this.environment.id,
+                domain: config.domain.customDomain,
+            });
+        }
         // Outputs
         new cdktf_1.TerraformOutput(this, "web_service_id", {
             description: "Web service ID",
@@ -145,6 +162,19 @@ class GridPulseEnvironment extends constructs_1.Construct {
             description: "Redis service ID",
             value: this.redisService.id,
         });
+        // Domain outputs - conditional on domain configuration
+        if (this.serviceDomain) {
+            new cdktf_1.TerraformOutput(this, "web_service_domain", {
+                description: "Railway-provided service domain URL",
+                value: `https://${this.serviceDomain.domain}`,
+            });
+        }
+        if (this.customDomain) {
+            new cdktf_1.TerraformOutput(this, "web_custom_domain", {
+                description: "Custom domain URL",
+                value: `https://${this.customDomain.domain}`,
+            });
+        }
         // Database outputs - conditional on which database is used
         if (config.supabase) {
             new cdktf_1.TerraformOutput(this, "supabase_project_id", {

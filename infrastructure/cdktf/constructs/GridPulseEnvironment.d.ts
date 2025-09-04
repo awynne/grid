@@ -1,6 +1,8 @@
 import { Construct } from "constructs";
 import { Environment } from "../.gen/providers/railway/environment";
 import { Service } from "../.gen/providers/railway/service";
+import { ServiceDomain } from "../.gen/providers/railway/service-domain";
+import { CustomDomain } from "../.gen/providers/railway/custom-domain";
 import { Project } from "../.gen/providers/supabase/project";
 import { Settings } from "../.gen/providers/supabase/settings";
 export interface GridPulseEnvironmentConfig {
@@ -20,6 +22,10 @@ export interface GridPulseEnvironmentConfig {
     dockerImage?: string;
     dockerUsername?: string;
     dockerPassword?: string;
+    domain?: {
+        railwaySubdomain?: string;
+        customDomain?: string;
+    };
 }
 export declare class GridPulseEnvironment extends Construct {
     readonly environment: Environment;
@@ -28,6 +34,8 @@ export declare class GridPulseEnvironment extends Construct {
     readonly redisService: Service;
     readonly supabaseProject?: Project;
     readonly supabaseSettings?: Settings;
+    readonly serviceDomain?: ServiceDomain;
+    readonly customDomain?: CustomDomain;
     dataService?: Service;
     private readonly config;
     private readonly envPostgresPassword?;

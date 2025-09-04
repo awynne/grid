@@ -202,7 +202,7 @@ export class GridPulseEnvironment extends Construct {
 
     // Domain Configuration
     if (config.domain?.railwaySubdomain) {
-      this.serviceDomain = new ServiceDomain(this, "web_service_domain", {
+      this.serviceDomain = new ServiceDomain(this, "railway_subdomain", {
         serviceId: this.webService.id,
         environmentId: this.environment.id,
         subdomain: config.domain.railwaySubdomain,
@@ -210,7 +210,7 @@ export class GridPulseEnvironment extends Construct {
     }
 
     if (config.domain?.customDomain) {
-      this.customDomain = new CustomDomain(this, "web_custom_domain", {
+      this.customDomain = new CustomDomain(this, "custom_domain", {
         serviceId: this.webService.id,
         environmentId: this.environment.id,
         domain: config.domain.customDomain,
