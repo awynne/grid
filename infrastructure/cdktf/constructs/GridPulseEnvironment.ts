@@ -17,11 +17,12 @@ export interface GridPulseEnvironmentConfig {
   sessionSecret: string;
   eiaApiKey?: string;
 
-  // Database configuration - choose one
+  // Database configuration - choose exactly one (no fallback)
   // Option 1: Railway PostgreSQL (legacy)
   postgresPassword?: string;
 
   // Option 2: Supabase managed database (preferred)
+  // NOTE: If neither database option is provided, deployment will fail fast
   supabase?: {
     accessToken: string;
     organizationId: string;
@@ -52,12 +53,12 @@ export class GridPulseEnvironment extends Construct {
     super(scope, id);
     this.config = config;
 
-    // Validate configuration
+    // Validate configuration - require explicit database choice (no fallback)
     if (!config.supabase && !config.postgresPassword) {
-      throw new Error("Either supabase configuration or postgresPassword must be provided");
+      throw new Error("Database configuration required: Either supabase configuration or postgresPassword must be explicitly provided. No fallback available.");
     }
     if (config.supabase && config.postgresPassword) {
-      throw new Error("Cannot configure both supabase and Railway PostgreSQL - choose one");
+      throw new Error("Cannot configure both supabase and Railway PostgreSQL - choose exactly one database backend");
     }
 
     // Railway Provider (always needed for web service)

@@ -93,7 +93,7 @@ export class ProductionEnvironmentStack extends TerraformStack {
     // Railway builds Docker images automatically from connected repository using Dockerfile
 
     // Create Production Environment
-    // Use Supabase if supabase_access_token is provided, otherwise use Railway PostgreSQL
+    // Explicit database backend choice - no fallback, fail fast if misconfigured
     const useSupabase = supabaseAccessToken.stringValue !== "";
     
     const prodEnvironment = new GridPulseEnvironment(this, "prod", {

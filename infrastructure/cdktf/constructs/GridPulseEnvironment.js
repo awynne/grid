@@ -15,12 +15,12 @@ class GridPulseEnvironment extends constructs_1.Construct {
     constructor(scope, id, config) {
         super(scope, id);
         this.config = config;
-        // Validate configuration
+        // Validate configuration - require explicit database choice (no fallback)
         if (!config.supabase && !config.postgresPassword) {
-            throw new Error("Either supabase configuration or postgresPassword must be provided");
+            throw new Error("Database configuration required: Either supabase configuration or postgresPassword must be explicitly provided. No fallback available.");
         }
         if (config.supabase && config.postgresPassword) {
-            throw new Error("Cannot configure both supabase and Railway PostgreSQL - choose one");
+            throw new Error("Cannot configure both supabase and Railway PostgreSQL - choose exactly one database backend");
         }
         // Railway Provider (always needed for web service)
         new provider_1.RailwayProvider(this, "railway", {
