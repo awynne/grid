@@ -2,7 +2,7 @@
 # Replace the age recipient below with your actual public key (age1...)
 # Generate a key pair locally with: age-keygen -o ~/.config/sops/age/keys.txt
 creation_rules:
-  - path_regex: secrets/.+\.enc\.tfvars$
+  - path_regex: secrets/.+\.(enc|dec)\.tfvars$
     # Encrypt entire file contents
     encrypted_regex: '^(.*)$'
     # Single age recipient (string form to satisfy sops parser)
