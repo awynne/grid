@@ -78,15 +78,17 @@ Current infrastructure management suffers from:
 infrastructure/cdktf/
 ├── main.ts                          # Application entry point
 ├── stacks/                          # Environment-specific stacks  
-│   ├── TestEnvironmentStack.ts      # Test environment
 │   └── ProductionEnvironmentStack.ts # Production environment
 ├── constructs/                      # Reusable components
 │   └── GridPulseEnvironment.ts      # Environment construct
-├── scripts/                         # Management automation
-│   ├── manage-environments.sh       # Lifecycle commands
-│   └── setup.sh                     # One-time setup
 ├── .gen/                           # Generated provider bindings
 └── terraform.tfvars.example        # Configuration template
+
+.github/workflows/                   # Primary infrastructure interface
+├── infra-apply-prod.yml            # Plan + Apply Prod (CDKTF)
+├── infra-recreate-prod.yml         # Recreate Prod (CDKTF) 
+├── docker-publish.yml              # Publish Image (GHCR)
+└── terraform-state-cleanup.yml     # State cleanup utilities
 ```
 
 ## Implementation Details
@@ -157,36 +159,48 @@ new Variable(this, "postgres_db", {
 });
 ```
 
-## Management Workflows
+## GitHub Actions Infrastructure Interface
 
-### Environment Lifecycle Commands
+### Available Workflows
 
-```bash
-# Idempotent environment recreation
-./scripts/manage-environments.sh recreate test
+GridPulse uses GitHub Actions workflows as the primary interface for infrastructure management, achieving **single-command environment creation** through the GitHub UI:
 
-# Incremental deployments  
-./scripts/manage-environments.sh deploy test
+**1. Plan + Apply Prod (CDKTF)**
+- **Purpose**: Plan and apply infrastructure changes to production
+- **Usage**: Run workflow → Type "APPLY" → Complete environment deployed
+- **Replaces**: Local `plan` and `deploy` commands
 
-# Infrastructure planning
-./scripts/manage-environments.sh plan test
+**2. Recreate Prod (CDKTF)**  
+- **Purpose**: Destroy and recreate entire production environment
+- **Usage**: Run workflow → Type "RECREATE" → Fresh environment created
+- **Replaces**: Local `recreate` command
+- **Supports**: Optional database reset with `fresh_db` parameter
 
-# Status monitoring
-./scripts/manage-environments.sh status test
-```
+**3. Publish Image (GHCR)**
+- **Purpose**: Build and publish Docker images to GitHub Container Registry  
+- **Usage**: Triggered on main branch or manual dispatch
+- **Output**: Immutable container images for deployment
 
-### Setup Process
+**4. Terraform State Cleanup**
+- **Purpose**: Remove orphaned resources from Terraform state
+- **Usage**: Run workflow → Type "CLEANUP" → State cleaned up
+- **Use case**: Recovery from failed deployments or manual changes
 
-```bash
-# One-time setup
-./scripts/setup.sh
+### Zero-Configuration Environment Creation
 
-# Regular deployment workflow
-./scripts/manage-environments.sh plan test
-./scripts/manage-environments.sh deploy test
-```
+**Complete environment deployment in 3 steps:**
+1. **Run "Plan + Apply Prod (CDKTF)" workflow**
+2. **Type "APPLY" for confirmation**  
+3. **Wait ~2-3 minutes for complete environment**
 
-## CI/CD Outcome
+**Result**: Working production environment with:
+- ✅ Railway web service with Docker deployment
+- ✅ PostgreSQL database with schema applied  
+- ✅ Redis caching layer
+- ✅ All environment variables configured
+- ✅ Health checks validated
+
+## CI/CD Architecture
 
 - GitHub Actions workflow `.github/workflows/deploy-prod.yml` builds and pushes GHCR images on `main`.
 - Railway redeploy is triggered automatically after image push:
@@ -271,9 +285,9 @@ new Variable(this, "postgres_db", {
 
 ### Phase 4: Migration Completion ✅
 - [x] Archive old infrastructure/terraform/ directory
-- [x] Update project documentation to reference CDKTF approach
-- [x] Train team on new management workflows
-- [x] Remove deprecated bash scripts from scripts/ directory
+- [x] Update project documentation to reference GitHub Actions workflows as primary interface
+- [x] Establish GitHub Actions-based infrastructure management (replaces local scripts)
+- [x] Implement zero-configuration environment creation via workflow dispatch
 
 ### Phase 5: Supabase Database Migration 🔄
 - [ ] **5A: CDKTF Supabase Integration** - Add Supabase Terraform provider and project resources
