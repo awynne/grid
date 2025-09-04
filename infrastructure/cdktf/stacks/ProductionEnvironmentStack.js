@@ -32,6 +32,34 @@ class ProductionEnvironmentStack extends cdktf_1.TerraformStack {
             description: "EIA API key for data ingestion",
             sensitive: true,
         });
+        // Supabase variables (optional - for managed database)
+        const supabaseAccessToken = new cdktf_1.TerraformVariable(this, "supabase_access_token", {
+            type: "string",
+            description: "Supabase API access token",
+            sensitive: true,
+            default: "",
+        });
+        const supabaseOrganizationId = new cdktf_1.TerraformVariable(this, "supabase_organization_id", {
+            type: "string",
+            description: "Supabase organization ID",
+            default: "",
+        });
+        const supabaseProjectName = new cdktf_1.TerraformVariable(this, "supabase_project_name", {
+            type: "string",
+            description: "Supabase project name",
+            default: "",
+        });
+        const supabaseDatabasePassword = new cdktf_1.TerraformVariable(this, "supabase_database_password", {
+            type: "string",
+            description: "Database password for Supabase project",
+            sensitive: true,
+            default: "",
+        });
+        const supabaseRegion = new cdktf_1.TerraformVariable(this, "supabase_region", {
+            type: "string",
+            description: "AWS region for Supabase project",
+            default: "us-east-1",
+        });
         // Optional Docker deployment variables (recommended for prod)
         const dockerImage = new cdktf_1.TerraformVariable(this, "docker_image", {
             type: "string",
@@ -51,14 +79,27 @@ class ProductionEnvironmentStack extends cdktf_1.TerraformStack {
         });
         // Railway builds Docker images automatically from connected repository using Dockerfile
         // Create Production Environment
+        // Use Supabase if supabase_access_token is provided, otherwise use Railway PostgreSQL
+        const useSupabase = supabaseAccessToken.stringValue !== "";
         const prodEnvironment = new GridPulseEnvironment_1.GridPulseEnvironment(this, "prod", {
             projectId: projectId.stringValue,
             environmentName: "prod-00",
             railwayToken: railwayToken.stringValue,
-            postgresPassword: postgresPassword.stringValue,
             sessionSecret: sessionSecret.stringValue,
             eiaApiKey: eiaApiKey.stringValue,
-            // If docker_image is provided, deploy via Docker; otherwise use Git
+            // Database configuration - choose one
+            ...(useSupabase ? {
+                supabase: {
+                    accessToken: supabaseAccessToken.stringValue,
+                    organizationId: supabaseOrganizationId.stringValue,
+                    projectName: supabaseProjectName.stringValue,
+                    databasePassword: supabaseDatabasePassword.stringValue,
+                    region: supabaseRegion.stringValue,
+                }
+            } : {
+                postgresPassword: postgresPassword.stringValue,
+            }),
+            // Docker deployment configuration
             dockerImage: dockerImage.stringValue || undefined,
             dockerUsername: dockerUsername.stringValue || undefined,
             dockerPassword: dockerPassword.stringValue || undefined,

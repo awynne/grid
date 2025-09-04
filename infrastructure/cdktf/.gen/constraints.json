@@ -1,6 +1,7 @@
 {
   "cdktf": "0.21.0",
   "providers": {
-    "railway": "~> 0.1"
+    "railway": "~> 0.1",
+    "supabase": "~> 1.0"
   }
 }

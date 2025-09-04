@@ -1,3 +1,4 @@
 {
-  "registry.terraform.io/terraform-community-providers/railway": "0.5.2"
+  "registry.terraform.io/terraform-community-providers/railway": "0.5.2",
+  "registry.terraform.io/supabase/supabase": "1.5.1"
 }

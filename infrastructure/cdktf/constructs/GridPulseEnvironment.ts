@@ -5,14 +5,30 @@ import { Environment } from "../.gen/providers/railway/environment";
 import { Service, type ServiceConfig } from "../.gen/providers/railway/service";
 import { Variable } from "../.gen/providers/railway/variable";
 import { SharedVariable } from "../.gen/providers/railway/shared-variable";
+import { SupabaseProvider } from "../.gen/providers/supabase/provider";
+import { Project } from "../.gen/providers/supabase/project";
+import { Settings } from "../.gen/providers/supabase/settings";
 
 export interface GridPulseEnvironmentConfig {
+  // Railway configuration (for web service hosting)
   projectId: string;
   environmentName: string;
   railwayToken: string;
-  postgresPassword: string;
   sessionSecret: string;
   eiaApiKey?: string;
+
+  // Database configuration - choose one
+  // Option 1: Railway PostgreSQL (legacy)
+  postgresPassword?: string;
+
+  // Option 2: Supabase managed database (preferred)
+  supabase?: {
+    accessToken: string;
+    organizationId: string;
+    projectName: string;
+    databasePassword: string;
+    region?: string; // defaults to us-east-1
+  };
 
   // Optional: Deploy web from a registry image
   dockerImage?: string;               // e.g., ghcr.io/awynne/grid:v1.2.3
@@ -23,20 +39,38 @@ export interface GridPulseEnvironmentConfig {
 export class GridPulseEnvironment extends Construct {
   public readonly environment: Environment;
   public readonly webService: Service;
-  public readonly postgresService: Service;
+  public readonly postgresService?: Service; // Optional for Railway PostgreSQL
   public readonly redisService: Service;
+  public readonly supabaseProject?: Project; // Optional for Supabase
+  public readonly supabaseSettings?: Settings;
   public dataService?: Service;
   private readonly config: GridPulseEnvironmentConfig;
-  private readonly envPostgresPassword: SharedVariable;
+  private readonly envPostgresPassword?: SharedVariable;
+  private readonly databaseUrl: string;
 
   constructor(scope: Construct, id: string, config: GridPulseEnvironmentConfig) {
     super(scope, id);
     this.config = config;
 
-    // Railway Provider
+    // Validate configuration
+    if (!config.supabase && !config.postgresPassword) {
+      throw new Error("Either supabase configuration or postgresPassword must be provided");
+    }
+    if (config.supabase && config.postgresPassword) {
+      throw new Error("Cannot configure both supabase and Railway PostgreSQL - choose one");
+    }
+
+    // Railway Provider (always needed for web service)
     new RailwayProvider(this, "railway", {
       token: config.railwayToken,
     });
+
+    // Supabase Provider (if using Supabase)
+    if (config.supabase) {
+      new SupabaseProvider(this, "supabase", {
+        accessToken: config.supabase.accessToken,
+      });
+    }
 
     // Environment
     this.environment = new Environment(this, "environment", {
@@ -44,46 +78,80 @@ export class GridPulseEnvironment extends Construct {
       projectId: config.projectId,
     });
 
-    // Set DB password at environment level BEFORE creating the Postgres service so
-    // the container initializes with the intended password on first boot.
-    this.envPostgresPassword = new SharedVariable(this, "env_postgres_password", {
-      environmentId: this.environment.id,
-      name: "POSTGRES_PASSWORD",
-      projectId: config.projectId,
-      value: config.postgresPassword,
-    });
+    // Database setup - either Railway PostgreSQL or Supabase
+    if (config.supabase) {
+      // Supabase managed database
+      this.supabaseProject = new Project(this, "supabase_project", {
+        name: config.supabase.projectName,
+        organizationId: config.supabase.organizationId,
+        databasePassword: config.supabase.databasePassword,
+        region: config.supabase.region || "us-east-1",
+      });
 
-    // PostgreSQL Service (Railway Managed PostgreSQL with SSL)
-    // Depend on both environment AND the shared password variable
-    this.postgresService = new Service(this, "postgres", {
-      name: "postgres",
-      projectId: config.projectId,
-      sourceImage: "ghcr.io/railwayapp-templates/postgres-ssl:17",
-      dependsOn: [this.environment, this.envPostgresPassword],
-    });
+      this.supabaseSettings = new Settings(this, "supabase_settings", {
+        projectRef: this.supabaseProject.id,
+        api: JSON.stringify({
+          db_schema: "public,storage,graphql_public",
+          db_extra_search_path: "public,extensions",
+          max_rows: 1000,
+        }),
+      });
 
-    // PostgreSQL Environment Variables
-    new Variable(this, "postgres_db", {
-      environmentId: this.environment.id,
-      serviceId: this.postgresService.id,
-      name: "POSTGRES_DB",
-      value: "gridpulse",
-    });
+      // Supabase connection string format
+      this.databaseUrl = `postgresql://postgres.${this.supabaseProject.id}:${config.supabase.databasePassword}@aws-0-${config.supabase.region || "us-east-1"}.pooler.supabase.com:6543/postgres`;
+    } else {
+      // Railway PostgreSQL (legacy)
+      // Set DB password at environment level BEFORE creating the Postgres service
+      this.envPostgresPassword = new SharedVariable(this, "env_postgres_password", {
+        environmentId: this.environment.id,
+        name: "POSTGRES_PASSWORD",
+        projectId: config.projectId,
+        value: config.postgresPassword!,
+      });
 
-    new Variable(this, "postgres_user", {
-      environmentId: this.environment.id,
-      serviceId: this.postgresService.id,
-      name: "POSTGRES_USER", 
-      value: "postgres",
-    });
+      // PostgreSQL Service (Railway Managed PostgreSQL with SSL)
+      this.postgresService = new Service(this, "postgres", {
+        name: "postgres",
+        projectId: config.projectId,
+        sourceImage: "ghcr.io/railwayapp-templates/postgres-ssl:17",
+        dependsOn: [this.environment, this.envPostgresPassword],
+      });
 
-    // Keep service-scoped POSTGRES_PASSWORD in sync (harmless if env-level already set)
-    new Variable(this, "postgres_password", {
-      environmentId: this.environment.id,
-      serviceId: this.postgresService.id,
-      name: "POSTGRES_PASSWORD",
-      value: config.postgresPassword,
-    });
+      // PostgreSQL Environment Variables
+      new Variable(this, "postgres_db", {
+        environmentId: this.environment.id,
+        serviceId: this.postgresService.id,
+        name: "POSTGRES_DB",
+        value: "gridpulse",
+      });
+
+      new Variable(this, "postgres_user", {
+        environmentId: this.environment.id,
+        serviceId: this.postgresService.id,
+        name: "POSTGRES_USER", 
+        value: "postgres",
+      });
+
+      new Variable(this, "postgres_password", {
+        environmentId: this.environment.id,
+        serviceId: this.postgresService.id,
+        name: "POSTGRES_PASSWORD",
+        value: config.postgresPassword!,
+      });
+
+      // Railway PostgreSQL connection string
+      const isAlreadyEncoded = (() => {
+        try {
+          return decodeURIComponent(config.postgresPassword!) !== config.postgresPassword!;
+        } catch {
+          return false;
+        }
+      })();
+      const encodedDbPassword = isAlreadyEncoded
+        ? config.postgresPassword!
+        : encodeURIComponent(config.postgresPassword!);
+      this.databaseUrl = `postgresql://postgres:${encodedDbPassword}@postgres.railway.internal:5432/gridpulse`;
+    }
 
     // Redis Service
     this.redisService = new Service(this, "redis", {
@@ -119,49 +187,74 @@ export class GridPulseEnvironment extends Construct {
     // Web Service Environment Variables
     this.createWebServiceVariables(config);
 
-    // Outputs (simplified for initial implementation)
+    // Outputs
     new TerraformOutput(this, "web_service_id", {
       description: "Web service ID",
       value: this.webService.id,
-    });
-
-    new TerraformOutput(this, "postgres_service_id", {
-      description: "PostgreSQL service ID",
-      value: this.postgresService.id,
     });
 
     new TerraformOutput(this, "redis_service_id", {
       description: "Redis service ID",
       value: this.redisService.id,
     });
+
+    // Database outputs - conditional on which database is used
+    if (config.supabase) {
+      new TerraformOutput(this, "supabase_project_id", {
+        description: "Supabase project ID",
+        value: this.supabaseProject!.id,
+      });
+
+      new TerraformOutput(this, "supabase_project_ref", {
+        description: "Supabase project reference",
+        value: this.supabaseProject!.id,
+      });
+
+      new TerraformOutput(this, "database_url", {
+        description: "Database connection URL",
+        value: this.databaseUrl,
+        sensitive: true,
+      });
+    } else {
+      new TerraformOutput(this, "postgres_service_id", {
+        description: "Railway PostgreSQL service ID",
+        value: this.postgresService!.id,
+      });
+
+      new TerraformOutput(this, "database_url", {
+        description: "Database connection URL", 
+        value: this.databaseUrl,
+        sensitive: true,
+      });
+    }
   }
 
   private createWebServiceVariables(config: GridPulseEnvironmentConfig) {
-    // If the provided password already appears percent-encoded, avoid double-encoding
-    const isAlreadyEncoded = (() => {
-      try {
-        return decodeURIComponent(config.postgresPassword) !== config.postgresPassword;
-      } catch {
-        return false;
-      }
-    })();
-    const encodedDbPassword = isAlreadyEncoded
-      ? config.postgresPassword
-      : encodeURIComponent(config.postgresPassword);
     const webVariables = [
       { name: "NODE_ENV", value: "production" },
       { name: "RAILWAY_ENVIRONMENT_NAME", value: config.environmentName },
       { name: "PORT", value: "3000" },
       { name: "SESSION_SECRET", value: config.sessionSecret },
-      // Ensure password is URL-encoded to avoid P1013 when it contains special characters
-      { name: "DATABASE_URL", value: `postgresql://postgres:${encodedDbPassword}@postgres.railway.internal:5432/gridpulse` },
-      { name: "POSTGRES_PASSWORD", value: config.postgresPassword },
+      { name: "DATABASE_URL", value: this.databaseUrl },
       { name: "REDIS_URL", value: `redis://redis.railway.internal:6379` },
       // Force Prisma to use Debian OpenSSL 1.1 engines we package in the image
       { name: "PRISMA_SCHEMA_ENGINE_BINARY", value: "/app/node_modules/@prisma/engines/schema-engine-debian-openssl-1.1.x" },
       { name: "PRISMA_QUERY_ENGINE_LIBRARY", value: "/app/node_modules/.prisma/client/libquery_engine-debian-openssl-1.1.x.so.node" },
       ...(config.dockerImage ? [{ name: "DEPLOYED_IMAGE", value: config.dockerImage }] : []),
     ];
+
+    // Add database-specific variables
+    if (config.supabase) {
+      webVariables.push(
+        { name: "DATABASE_TYPE", value: "supabase" },
+        { name: "SUPABASE_PROJECT_REF", value: this.supabaseProject!.id }
+      );
+    } else {
+      webVariables.push(
+        { name: "DATABASE_TYPE", value: "railway" },
+        { name: "POSTGRES_PASSWORD", value: config.postgresPassword! }
+      );
+    }
 
     // Add Docker deployment variables
     webVariables.push(
@@ -207,7 +300,7 @@ export class GridPulseEnvironment extends Construct {
     const dataVariables = [
       { name: "NODE_ENV", value: "production" },
       { name: "EIA_API_KEY", value: this.config.eiaApiKey || "" },
-      { name: "DATABASE_URL", value: `postgresql://postgres:${this.config.postgresPassword}@postgres.railway.internal:5432/gridpulse` },
+      { name: "DATABASE_URL", value: this.databaseUrl },
       { name: "REDIS_URL", value: "redis://redis.railway.internal:6379" },
     ];
 

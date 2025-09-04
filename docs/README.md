@@ -66,6 +66,16 @@ This directory contains all project documentation for the GridPulse electric gri
 
 **Use this when:** Understanding product goals, planning features, or making product decisions.
 
+### 🔐 [sops-secrets-management.md](./sops-secrets-management.md)
+**Encrypted Secrets Management**
+- SOPS and age encryption setup and usage
+- Local development configuration
+- GitHub Actions integration patterns
+- Security best practices and troubleshooting
+- Emergency recovery procedures
+
+**Use this when:** Working with encrypted secrets, setting up local development, or troubleshooting secret management issues.
+
 ### 📚 [documentation.md](./documentation.md)
 **Documentation Guidelines & Standards**
 - Documentation principles and formatting standards
