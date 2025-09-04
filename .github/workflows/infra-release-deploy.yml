@@ -14,7 +14,7 @@ jobs:
     environment:
       name: gridpulse/prod
     permissions:
-      contents: read
+      contents: write
       packages: write
       pull-requests: write
     env:
@@ -96,6 +96,9 @@ jobs:
           echo "🔧 Configuring git..."
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Configure git to use the GITHUB_TOKEN for authentication
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           
           BRANCH_NAME="release/bump-docker-image-$(date +%Y%m%d-%H%M%S)"
           echo "🌿 Creating branch: $BRANCH_NAME"
