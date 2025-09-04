@@ -13,6 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: gridpulse/prod
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: write
     env:
       TF_CLOUD_ORG: ${{ secrets.TF_CLOUD_ORG }}
       TF_CLOUD_WORKSPACE: gridpulse-prod
@@ -52,12 +56,14 @@ jobs:
           
           # Generate version tag based on commit
           VERSION="v$(date +%Y%m%d)-$(git rev-parse --short HEAD)"
-          IMAGE_TAG="ghcr.io/${{ github.repository }}:$VERSION"
+          IMAGE_TAG="ghcr.io/${{ github.repository_owner }}/grid:$VERSION"
           
           echo "📦 Building image: $IMAGE_TAG"
           
-          # Build and push image
+          # Login to GitHub Container Registry
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          
+          # Build and push image
           docker build -t "$IMAGE_TAG" .
           docker push "$IMAGE_TAG"
           
