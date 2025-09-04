@@ -1,0 +1,92 @@
+name: Destroy Prod (CDKTF)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type DESTROY to confirm you want to destroy all prod infrastructure"
+        required: true
+        type: string
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    environment:
+      name: gridpulse/prod
+    env:
+      TF_CLOUD_ORG: ${{ secrets.TF_CLOUD_ORG }}
+      TF_CLOUD_WORKSPACE: gridpulse-prod
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
+    steps:
+      - name: Guard confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "DESTROY" ]; then
+            echo "Confirmation mismatch. Type DESTROY exactly to proceed." >&2
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.7.5'
+
+      - name: Install sops and age
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y age
+          SOPS_VERSION=v3.8.1
+          curl -Ls https://github.com/getsops/sops/releases/download/$SOPS_VERSION/sops-$SOPS_VERSION.linux.amd64 -o sops
+          sudo install -m 0755 sops /usr/local/bin/sops
+
+      - name: Decrypt tfvars (required)
+        env:
+          AGE_PRIVATE_KEY: ${{ secrets.AGE_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.config/sops/age
+          if [ -z "${AGE_PRIVATE_KEY:-}" ]; then
+            echo "AGE_PRIVATE_KEY not set; can't decrypt prod.enc.tfvars" >&2
+            exit 1
+          fi
+          printf "%s\n" "$AGE_PRIVATE_KEY" > ~/.config/sops/age/keys.txt
+          if [ ! -f secrets/prod.enc.tfvars ]; then
+            echo "secrets/prod.enc.tfvars not found. Commit encrypted tfvars first." >&2
+            exit 1
+          fi
+          echo "Decrypting prod.enc.tfvars → infrastructure/cdktf/terraform.tfvars"
+          sops -d secrets/prod.enc.tfvars > infrastructure/cdktf/terraform.tfvars
+
+      - name: Install CDKTF deps
+        working-directory: infrastructure/cdktf
+        run: |
+          npm ci
+          npm run get
+          npm run compile
+
+      - name: Synthesize stack (cdktf synth)
+        working-directory: infrastructure/cdktf
+        run: npx cdktf synth
+
+      - name: Terraform init + destroy all resources
+        working-directory: infrastructure/cdktf
+        env:
+          TF_IN_AUTOMATION: "true"
+        run: |
+          set -euo pipefail
+          # Place tfvars next to synthesized stack
+          cp -f terraform.tfvars cdktf.out/stacks/gridpulse-prod/terraform.tfvars
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod init -input=false -no-color
+          
+          echo "🗄️ Destroying all infrastructure resources..."
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod destroy -auto-approve -input=false -no-color
+          
+          echo "✅ All resources destroyed successfully"
+          echo "🔄 You can now run the Recreate workflow to rebuild with clean state"
