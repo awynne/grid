@@ -83,7 +83,7 @@ class ProductionEnvironmentStack extends cdktf_1.TerraformStack {
         const useSupabase = supabaseAccessToken.stringValue !== "";
         const prodEnvironment = new GridPulseEnvironment_1.GridPulseEnvironment(this, "prod", {
             projectId: projectId.stringValue,
-            environmentName: "prod-01",
+            environmentName: "prod-02",
             railwayToken: railwayToken.stringValue,
             sessionSecret: sessionSecret.stringValue,
             eiaApiKey: eiaApiKey.stringValue,
