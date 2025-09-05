@@ -3,6 +3,10 @@
 
 console.log("🔧 Startup wrapper: Beginning server initialization...");
 
+// Log Docker image version for debugging deployment issues
+const deployedImage = process.env.DEPLOYED_IMAGE || 'unknown';
+console.log(`📦 Docker image version: ${deployedImage}`);
+
 // Set up global error handlers
 process.on('uncaughtException', (error) => {
   console.error("❌ UNCAUGHT EXCEPTION:", error.message);

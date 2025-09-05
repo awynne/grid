@@ -202,9 +202,19 @@ jobs:
           set -euo pipefail
           
           echo "🚀 Deploying infrastructure with new docker image..."
+          echo "📦 Docker image being deployed: $IMAGE_TAG"
+          
+          # Log current docker_image value from tfvars for verification
+          echo "🔍 Verifying docker_image in tfvars:"
+          grep "docker_image" terraform.tfvars || echo "⚠️  docker_image not found in tfvars"
+          
           cp -f terraform.tfvars cdktf.out/stacks/gridpulse-prod/terraform.tfvars
           
+          echo "🔧 Initializing Terraform..."
           terraform -chdir=cdktf.out/stacks/gridpulse-prod init -input=false -no-color
+          
+          echo "🚀 Applying Terraform changes..."
+          echo "📦 About to deploy image: $IMAGE_TAG"
           terraform -chdir=cdktf.out/stacks/gridpulse-prod apply -auto-approve -input=false -no-color
           
           echo "✅ Infrastructure deployment completed successfully"
