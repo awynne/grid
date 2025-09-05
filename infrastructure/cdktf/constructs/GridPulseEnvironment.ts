@@ -200,20 +200,23 @@ export class GridPulseEnvironment extends Construct {
     // Web Service Environment Variables
     this.createWebServiceVariables(config);
 
-    // Domain Configuration
-    if (config.domain?.railwaySubdomain && config.domain.railwaySubdomain.trim()) {
+    // Domain Configuration - only create resources for non-empty, trimmed strings
+    const trimmedRailwaySubdomain = config.domain?.railwaySubdomain?.trim();
+    const trimmedCustomDomain = config.domain?.customDomain?.trim();
+
+    if (trimmedRailwaySubdomain && trimmedRailwaySubdomain.length > 0) {
       this.serviceDomain = new ServiceDomain(this, "railway_subdomain", {
         serviceId: this.webService.id,
         environmentId: this.environment.id,
-        subdomain: config.domain.railwaySubdomain.trim(),
+        subdomain: trimmedRailwaySubdomain,
       });
     }
 
-    if (config.domain?.customDomain && config.domain.customDomain.trim()) {
+    if (trimmedCustomDomain && trimmedCustomDomain.length > 0) {
       this.customDomain = new CustomDomain(this, "custom_domain", {
         serviceId: this.webService.id,
         environmentId: this.environment.id,
-        domain: config.domain.customDomain.trim(),
+        domain: trimmedCustomDomain,
       });
     }
 

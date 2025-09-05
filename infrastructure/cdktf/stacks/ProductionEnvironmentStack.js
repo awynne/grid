@@ -81,14 +81,12 @@ class ProductionEnvironmentStack extends cdktf_1.TerraformStack {
         const railwaySubdomain = new cdktf_1.TerraformVariable(this, "railway_subdomain", {
             type: "string",
             description: "Railway-provided subdomain (e.g., 'myapp' -> myapp.up.railway.app)",
-            default: null,
-            nullable: true,
+            default: "",
         });
         const customDomain = new cdktf_1.TerraformVariable(this, "custom_domain", {
             type: "string",
             description: "Custom domain for the web service (e.g., app.example.com)",
-            default: null,
-            nullable: true,
+            default: "",
         });
         // Railway builds Docker images automatically from connected repository using Dockerfile
         // Create Production Environment
@@ -117,9 +115,9 @@ class ProductionEnvironmentStack extends cdktf_1.TerraformStack {
             dockerUsername: dockerUsername.stringValue || undefined,
             dockerPassword: dockerPassword.stringValue || undefined,
             // Domain configuration - both options are optional
-            domain: (railwaySubdomain.stringValue?.trim() || customDomain.stringValue?.trim()) ? {
-                railwaySubdomain: railwaySubdomain.stringValue?.trim() || undefined,
-                customDomain: customDomain.stringValue?.trim() || undefined,
+            domain: (railwaySubdomain.stringValue.trim() || customDomain.stringValue.trim()) ? {
+                railwaySubdomain: railwaySubdomain.stringValue.trim() || undefined,
+                customDomain: customDomain.stringValue.trim() || undefined,
             } : undefined,
         });
         // Data service is not provisioned in prod for now
