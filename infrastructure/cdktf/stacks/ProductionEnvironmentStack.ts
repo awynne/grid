@@ -94,13 +94,15 @@ export class ProductionEnvironmentStack extends TerraformStack {
     const railwaySubdomain = new TerraformVariable(this, "railway_subdomain", {
       type: "string",
       description: "Railway-provided subdomain (e.g., 'myapp' -> myapp.up.railway.app)",
-      default: "",
+      default: null,
+      nullable: true,
     });
 
     const customDomain = new TerraformVariable(this, "custom_domain", {
       type: "string",
       description: "Custom domain for the web service (e.g., app.example.com)",
-      default: "",
+      default: null,
+      nullable: true,
     });
 
     // Railway builds Docker images automatically from connected repository using Dockerfile
@@ -135,9 +137,9 @@ export class ProductionEnvironmentStack extends TerraformStack {
       dockerPassword: dockerPassword.stringValue || undefined,
       
       // Domain configuration - both options are optional
-      domain: (railwaySubdomain.stringValue.trim() || customDomain.stringValue.trim()) ? {
-        railwaySubdomain: railwaySubdomain.stringValue.trim() || undefined,
-        customDomain: customDomain.stringValue.trim() || undefined,
+      domain: (railwaySubdomain.stringValue?.trim() || customDomain.stringValue?.trim()) ? {
+        railwaySubdomain: railwaySubdomain.stringValue?.trim() || undefined,
+        customDomain: customDomain.stringValue?.trim() || undefined,
       } : undefined,
     });
 
