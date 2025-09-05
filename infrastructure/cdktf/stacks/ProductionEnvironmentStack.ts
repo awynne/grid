@@ -135,9 +135,9 @@ export class ProductionEnvironmentStack extends TerraformStack {
       dockerPassword: dockerPassword.stringValue || undefined,
       
       // Domain configuration - both options are optional
-      domain: (railwaySubdomain.stringValue || customDomain.stringValue) ? {
-        railwaySubdomain: railwaySubdomain.stringValue || undefined,
-        customDomain: customDomain.stringValue || undefined,
+      domain: (railwaySubdomain.stringValue.trim() || customDomain.stringValue.trim()) ? {
+        railwaySubdomain: railwaySubdomain.stringValue.trim() || undefined,
+        customDomain: customDomain.stringValue.trim() || undefined,
       } : undefined,
     });
 

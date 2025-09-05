@@ -139,18 +139,18 @@ class GridPulseEnvironment extends constructs_1.Construct {
         // Web Service Environment Variables
         this.createWebServiceVariables(config);
         // Domain Configuration
-        if (config.domain?.railwaySubdomain) {
+        if (config.domain?.railwaySubdomain && config.domain.railwaySubdomain.trim()) {
             this.serviceDomain = new service_domain_1.ServiceDomain(this, "railway_subdomain", {
                 serviceId: this.webService.id,
                 environmentId: this.environment.id,
-                subdomain: config.domain.railwaySubdomain,
+                subdomain: config.domain.railwaySubdomain.trim(),
             });
         }
-        if (config.domain?.customDomain) {
+        if (config.domain?.customDomain && config.domain.customDomain.trim()) {
             this.customDomain = new custom_domain_1.CustomDomain(this, "custom_domain", {
                 serviceId: this.webService.id,
                 environmentId: this.environment.id,
-                domain: config.domain.customDomain,
+                domain: config.domain.customDomain.trim(),
             });
         }
         // Outputs
