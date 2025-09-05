@@ -109,6 +109,10 @@ export class ProductionEnvironmentStack extends TerraformStack {
     // Explicit database backend choice - no fallback, fail fast if misconfigured
     const useSupabase = supabaseAccessToken.stringValue !== "";
     
+    // Debug logging for dockerImage value
+    const dockerImageValue = dockerImage.stringValue.length > 0 ? dockerImage.stringValue : undefined;
+    console.log(`[DEBUG] Docker image value: "${dockerImage.stringValue}" -> ${dockerImageValue}`);
+    
     const prodEnvironment = new GridPulseEnvironment(this, "prod", {
       projectId: projectId.stringValue,
       environmentName: "prod-02", 
@@ -129,10 +133,10 @@ export class ProductionEnvironmentStack extends TerraformStack {
         postgresPassword: postgresPassword.stringValue,
       }),
       
-      // Docker deployment configuration
-      dockerImage: dockerImage.stringValue || undefined,
-      dockerUsername: dockerUsername.stringValue || undefined,
-      dockerPassword: dockerPassword.stringValue || undefined,
+      // Docker deployment configuration  
+      dockerImage: dockerImageValue,
+      dockerUsername: dockerUsername.stringValue.length > 0 ? dockerUsername.stringValue : undefined,
+      dockerPassword: dockerPassword.stringValue.length > 0 ? dockerPassword.stringValue : undefined,
       
       // Domain configuration - Switch to custom domain to avoid Railway subdomain state issues
       domain: customDomain.stringValue.trim() ? {
