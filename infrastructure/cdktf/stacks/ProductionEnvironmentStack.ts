@@ -134,10 +134,11 @@ export class ProductionEnvironmentStack extends TerraformStack {
       dockerUsername: dockerUsername.stringValue || undefined,
       dockerPassword: dockerPassword.stringValue || undefined,
       
-      // Domain configuration - RE-ENABLED with fresh resource name
-      domain: railwaySubdomain.stringValue.trim() ? {
+      // Domain configuration - Switch to custom domain to avoid Railway subdomain state issues
+      domain: customDomain.stringValue.trim() ? {
+        customDomain: customDomain.stringValue.trim(),
+      } : railwaySubdomain.stringValue.trim() ? {
         railwaySubdomain: railwaySubdomain.stringValue.trim(),
-        // customDomain: INTENTIONALLY EXCLUDED to prevent resource creation
       } : undefined,
     });
 
