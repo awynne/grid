@@ -207,7 +207,7 @@ export class GridPulseEnvironment extends Construct {
 
       // Only create Railway service domain if subdomain is provided and non-empty
       if (trimmedRailwaySubdomain && trimmedRailwaySubdomain.length > 0) {
-        this.serviceDomain = new ServiceDomain(this, "railway_subdomain", {
+        this.serviceDomain = new ServiceDomain(this, "railway_subdomain_v2", {
           serviceId: this.webService.id,
           environmentId: this.environment.id,
           subdomain: trimmedRailwaySubdomain,
