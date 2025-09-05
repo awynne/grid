@@ -70,7 +70,8 @@ jobs:
             INCREMENT="01"
             echo "📝 No existing tags found, using increment: $INCREMENT"
           else
-            INCREMENT=$(printf "%02d" $((EXISTING_TAGS + 1)))
+            # Force base-10 interpretation to avoid octal issues with numbers like 08, 09
+            INCREMENT=$(printf "%02d" $((10#$EXISTING_TAGS + 1)))
             echo "📝 Found highest existing increment: $EXISTING_TAGS, using next: $INCREMENT"
           fi
           
