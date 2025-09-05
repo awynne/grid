@@ -54,29 +54,9 @@ jobs:
         run: |
           echo "🏗️ Building Docker image..."
           
-          # Generate incremental daily version tag (e.g., v20250905-01, v20250905-02)
-          DATE_PREFIX="v$(date +%Y%m%d)"
-          
-          # Fetch existing tags to ensure we see remote tags
-          git fetch --tags
-          
-          # Get existing tags for today to determine next increment
-          echo "🔍 Looking for existing tags with prefix: ${DATE_PREFIX}-"
-          git tag -l "${DATE_PREFIX}-*"
-          
-          EXISTING_TAGS=$(git tag -l "${DATE_PREFIX}-*" | grep -o "${DATE_PREFIX}-[0-9]\+" | grep -o "[0-9]\+$" | sort -n | tail -1)
-          
-          if [ -z "$EXISTING_TAGS" ]; then
-            INCREMENT="01"
-            echo "📝 No existing tags found, using increment: $INCREMENT"
-          else
-            # Force base-10 interpretation to avoid octal issues with numbers like 08, 09
-            INCREMENT=$(printf "%02d" $((10#$EXISTING_TAGS + 1)))
-            echo "📝 Found highest existing increment: $EXISTING_TAGS, using next: $INCREMENT"
-          fi
-          
-          VERSION="${DATE_PREFIX}-${INCREMENT}"
-          echo "🏷️ Final version tag: $VERSION"
+          # Generate timestamp-based version tag (e.g., v20250905.1847)
+          VERSION="v$(date +%Y%m%d.%H%M)"
+          echo "🏷️ Generated version tag: $VERSION"
           IMAGE_TAG="ghcr.io/${{ github.repository_owner }}/grid:$VERSION"
           
           echo "📦 Building image: $IMAGE_TAG"
