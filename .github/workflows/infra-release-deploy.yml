@@ -54,8 +54,19 @@ jobs:
         run: |
           echo "🏗️ Building Docker image..."
           
-          # Generate version tag based on commit
-          VERSION="v$(date +%Y%m%d)-$(git rev-parse --short HEAD)"
+          # Generate incremental daily version tag (e.g., v20250905-01, v20250905-02)
+          DATE_PREFIX="v$(date +%Y%m%d)"
+          
+          # Get existing tags for today to determine next increment
+          EXISTING_TAGS=$(git tag -l "${DATE_PREFIX}-*" | grep -o "${DATE_PREFIX}-[0-9]\+" | grep -o "[0-9]\+$" | sort -n | tail -1)
+          
+          if [ -z "$EXISTING_TAGS" ]; then
+            INCREMENT="01"
+          else
+            INCREMENT=$(printf "%02d" $((EXISTING_TAGS + 1)))
+          fi
+          
+          VERSION="${DATE_PREFIX}-${INCREMENT}"
           IMAGE_TAG="ghcr.io/${{ github.repository_owner }}/grid:$VERSION"
           
           echo "📦 Building image: $IMAGE_TAG"
@@ -69,6 +80,13 @@ jobs:
           
           echo "✅ Image built and pushed: $IMAGE_TAG"
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          
+          # Create and push version tag for tracking
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$VERSION" -m "Docker image build: $IMAGE_TAG"
+          git push origin "$VERSION"
+          echo "🏷️ Created and pushed tag: $VERSION"
 
       - name: Decrypt tfvars and update docker_image
         env:
