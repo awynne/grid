@@ -2,8 +2,9 @@
 # Terraform Cloud environment variables for local development
 # 
 # USAGE:
-#   Source this file before running any terraform or cdktf commands locally:
-#   $ source terraform-cloud-env.sh
+#   1. First, replace YOUR_TF_API_TOKEN_HERE below with your actual Terraform Cloud API token
+#   2. Source this file before running any terraform or cdktf commands locally:
+#      $ source terraform-cloud-env.sh
 #   
 #   Or for a single command:
 #   $ source terraform-cloud-env.sh && terraform plan
