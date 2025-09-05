@@ -139,21 +139,25 @@ class GridPulseEnvironment extends constructs_1.Construct {
         // Web Service Environment Variables
         this.createWebServiceVariables(config);
         // Domain Configuration - only create resources for non-empty, trimmed strings
-        const trimmedRailwaySubdomain = config.domain?.railwaySubdomain?.trim();
-        const trimmedCustomDomain = config.domain?.customDomain?.trim();
-        if (trimmedRailwaySubdomain && trimmedRailwaySubdomain.length > 0) {
-            this.serviceDomain = new service_domain_1.ServiceDomain(this, "railway_subdomain", {
-                serviceId: this.webService.id,
-                environmentId: this.environment.id,
-                subdomain: trimmedRailwaySubdomain,
-            });
-        }
-        if (trimmedCustomDomain && trimmedCustomDomain.length > 0) {
-            this.customDomain = new custom_domain_1.CustomDomain(this, "custom_domain", {
-                serviceId: this.webService.id,
-                environmentId: this.environment.id,
-                domain: trimmedCustomDomain,
-            });
+        if (config.domain) {
+            const trimmedRailwaySubdomain = config.domain.railwaySubdomain?.trim();
+            const trimmedCustomDomain = config.domain.customDomain?.trim();
+            // Only create Railway service domain if subdomain is provided and non-empty
+            if (trimmedRailwaySubdomain && trimmedRailwaySubdomain.length > 0) {
+                this.serviceDomain = new service_domain_1.ServiceDomain(this, "railway_subdomain", {
+                    serviceId: this.webService.id,
+                    environmentId: this.environment.id,
+                    subdomain: trimmedRailwaySubdomain,
+                });
+            }
+            // Only create custom domain if domain is provided and non-empty
+            if (trimmedCustomDomain && trimmedCustomDomain.length > 0) {
+                this.customDomain = new custom_domain_1.CustomDomain(this, "custom_domain", {
+                    serviceId: this.webService.id,
+                    environmentId: this.environment.id,
+                    domain: trimmedCustomDomain,
+                });
+            }
         }
         // Outputs
         new cdktf_1.TerraformOutput(this, "web_service_id", {

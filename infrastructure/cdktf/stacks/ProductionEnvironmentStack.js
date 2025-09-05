@@ -115,10 +115,21 @@ class ProductionEnvironmentStack extends cdktf_1.TerraformStack {
             dockerUsername: dockerUsername.stringValue || undefined,
             dockerPassword: dockerPassword.stringValue || undefined,
             // Domain configuration - both options are optional
-            domain: (railwaySubdomain.stringValue.trim() || customDomain.stringValue.trim()) ? {
-                railwaySubdomain: railwaySubdomain.stringValue.trim() || undefined,
-                customDomain: customDomain.stringValue.trim() || undefined,
-            } : undefined,
+            domain: (() => {
+                const trimmedRailwaySubdomain = railwaySubdomain.stringValue.trim();
+                const trimmedCustomDomain = customDomain.stringValue.trim();
+                if (!trimmedRailwaySubdomain && !trimmedCustomDomain) {
+                    return undefined;
+                }
+                const domainConfig = {};
+                if (trimmedRailwaySubdomain) {
+                    domainConfig.railwaySubdomain = trimmedRailwaySubdomain;
+                }
+                if (trimmedCustomDomain) {
+                    domainConfig.customDomain = trimmedCustomDomain;
+                }
+                return domainConfig;
+            })(),
         });
         // Data service is not provisioned in prod for now
         // prodEnvironment.addDataService({ cronSchedule: "15 * * * *" });
