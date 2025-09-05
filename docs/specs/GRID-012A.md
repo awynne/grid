@@ -442,7 +442,7 @@ new Variable(this, "web_database_url", {
 **Single Command Environment Creation:**
 ```bash
 # Complete environment: Railway web service + Supabase database + networking
-./scripts/manage-environments.sh recreate prod
+gh workflow run "Recreate Prod (CDKTF)" --field confirm="RECREATE_PROD"
 
 # What happens automatically:
 # 1. Supabase project created with generated secure password
