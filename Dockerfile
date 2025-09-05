@@ -27,7 +27,7 @@ FROM node:20-bullseye-slim AS production
 # Install production dependencies and security updates
 RUN apt-get update \
   && apt-get upgrade -y \
-  && apt-get install -y --no-install-recommends dumb-init bash openssl libssl1.1 ca-certificates \
+  && apt-get install -y --no-install-recommends dumb-init bash openssl libssl1.1 ca-certificates curl \
   && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security (Debian syntax)
@@ -55,14 +55,15 @@ COPY --from=builder --chown=reactrouter:nodejs /app/build ./build
 COPY --chown=reactrouter:nodejs database ./database
 COPY --chown=reactrouter:nodejs scripts/docker-entrypoint.sh ./scripts/docker-entrypoint.sh
 COPY --from=builder --chown=reactrouter:nodejs /app/server.js ./server.js
+COPY --from=builder --chown=reactrouter:nodejs /app/startup-wrapper.js ./startup-wrapper.js
 
 # Set permissions
 RUN chown -R reactrouter:nodejs /app
 USER reactrouter
 
-# Health check for Railway
+# Health check for Railway (using curl to avoid module system issues)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:' + (process.env.PORT || 3000) + '/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => { process.exit(1) })"
+  CMD curl -f http://localhost:${PORT:-3000}/health || exit 1
 
 # Expose port (Railway will set PORT environment variable)
 EXPOSE ${PORT:-3000}
