@@ -1,0 +1,43 @@
+name: Cleanup Old Docker Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type DELETE_ALL_OLD_IMAGES to confirm cleanup"
+        required: true
+        type: string
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Guard confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "DELETE_ALL_OLD_IMAGES" ]; then
+            echo "Confirmation mismatch. Type DELETE_ALL_OLD_IMAGES exactly to proceed." >&2
+            exit 1
+          fi
+
+      - name: Cleanup old Docker images (keep only latest 1)
+        run: |
+          echo "🧹 Cleaning up old Docker images from GHCR..."
+          echo "⚠️  Keeping only the LATEST version, deleting ALL others"
+          
+          # Get all package versions, sort by created date (newest first)
+          versions=$(gh api /user/packages/container/grid/versions --paginate | jq -r 'sort_by(.created_at) | reverse | .[] | .id')
+          
+          # Skip the first (latest) version, delete all others
+          echo "$versions" | tail -n +2 | while read -r version_id; do
+            if [ -n "$version_id" ]; then
+              echo "🗑️  Deleting version ID: $version_id"
+              gh api -X DELETE "/user/packages/container/grid/versions/$version_id" || echo "⚠️ Failed to delete $version_id"
+            fi
+          done
+          
+          echo "✅ Cleanup completed - only latest version remains"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
