@@ -134,24 +134,11 @@ export class ProductionEnvironmentStack extends TerraformStack {
       dockerUsername: dockerUsername.stringValue || undefined,
       dockerPassword: dockerPassword.stringValue || undefined,
       
-      // Domain configuration - both options are optional
-      domain: (() => {
-        const trimmedRailwaySubdomain = railwaySubdomain.stringValue.trim();
-        const trimmedCustomDomain = customDomain.stringValue.trim();
-        
-        if (!trimmedRailwaySubdomain && !trimmedCustomDomain) {
-          return undefined;
-        }
-        
-        const domainConfig: any = {};
-        if (trimmedRailwaySubdomain) {
-          domainConfig.railwaySubdomain = trimmedRailwaySubdomain;
-        }
-        if (trimmedCustomDomain) {
-          domainConfig.customDomain = trimmedCustomDomain;
-        }
-        return domainConfig;
-      })(),
+      // Domain configuration - TEMPORARY: only Railway subdomain to test
+      domain: railwaySubdomain.stringValue.trim() ? {
+        railwaySubdomain: railwaySubdomain.stringValue.trim(),
+        // customDomain: INTENTIONALLY EXCLUDED to prevent resource creation
+      } : undefined,
     });
 
     // Data service is not provisioned in prod for now
