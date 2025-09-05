@@ -1,6 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 
 export async function loader() {
+  const deployedImage = process.env.DEPLOYED_IMAGE || "unknown";
+  const imageVersion = deployedImage.includes(":") ? deployedImage.split(":").pop() || "unknown" : "unknown";
+  
   const checks: Record<string, unknown> = {
     timestamp: new Date().toISOString(),
     service: "web",
@@ -8,7 +11,9 @@ export async function loader() {
     version: process.env.npm_package_version || "unknown",
     environment: process.env.NODE_ENV || "unknown",
     deployment_test: "web-test_service_fix",
-    railway_environment: process.env.RAILWAY_ENVIRONMENT_NAME || process.env.RAILWAY_ENVIRONMENT || "unknown"
+    railway_environment: process.env.RAILWAY_ENVIRONMENT_NAME || process.env.RAILWAY_ENVIRONMENT || "unknown",
+    deployed_image: deployedImage,
+    image_version: imageVersion
   };
 
   // Test database connection with timeout

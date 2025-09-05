@@ -1,3 +1,4 @@
+import { LoaderFunction, useLoaderData } from "@remix-run/react";
 import { Layout } from "@/components/layout";
 import { DashboardCard } from "@/components/gridpulse";
 import { FEATURE_CARDS } from "@/lib/constants";
@@ -9,7 +10,20 @@ export function meta() {
   ];
 }
 
+export const loader: LoaderFunction = async () => {
+  const deployedImage = process.env.DEPLOYED_IMAGE || "unknown";
+  // Extract just the version tag from the full image string (e.g., "ghcr.io/awynne/grid:v20250905-19" -> "v20250905-19")
+  const version = deployedImage.includes(":") ? deployedImage.split(":").pop() || "unknown" : "unknown";
+  
+  return {
+    version,
+    deployedImage
+  };
+};
+
 export default function Home() {
+  const { version } = useLoaderData<typeof loader>();
+  
   return (
     <Layout>
       <div className="space-y-8">
@@ -20,7 +34,7 @@ export default function Home() {
           </h1>
           <div className="inline-flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <span className="px-2 py-0.5 rounded-md bg-muted">Deployment check</span>
-            <span className="font-mono">v2</span>
+            <span className="font-mono">{version}</span>
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Real-time insights from EIA-930 hourly electric grid data. 

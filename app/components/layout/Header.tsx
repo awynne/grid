@@ -1,9 +1,26 @@
 import { BASelector } from "@/components/gridpulse/BASelector";
 import { FreshnessIndicator } from "@/components/gridpulse/FreshnessIndicator";
-import { useState } from "react";
+import { AboutDialog } from "./AboutDialog";
+import { useState, useEffect } from "react";
 
 export function Header() {
   const [selectedBA, setSelectedBA] = useState<string>('');
+  const [versionInfo, setVersionInfo] = useState({ version: "unknown", deployedImage: "unknown" });
+
+  // Fetch version info from the API
+  useEffect(() => {
+    fetch('/health')
+      .then(res => res.json())
+      .then(data => {
+        setVersionInfo({ 
+          version: data.image_version || "unknown", 
+          deployedImage: data.deployed_image || "unknown" 
+        });
+      })
+      .catch(() => {
+        // Keep default unknown values on error
+      });
+  }, []);
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -25,6 +42,10 @@ export function Header() {
             <FreshnessIndicator 
               status="stale" 
               lastUpdated={new Date(Date.now() - 2 * 60 * 60 * 1000)} // 2 hours ago
+            />
+            <AboutDialog 
+              version={versionInfo.version}
+              deployedImage={versionInfo.deployedImage}
             />
           </div>
         </div>
