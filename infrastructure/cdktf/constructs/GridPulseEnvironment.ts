@@ -211,6 +211,7 @@ export class GridPulseEnvironment extends Construct {
           serviceId: this.webService.id,
           environmentId: this.environment.id,
           subdomain: trimmedRailwaySubdomain,
+          dependsOn: [this.webService, this.environment], // Ensure service and environment are ready
         });
       }
 
