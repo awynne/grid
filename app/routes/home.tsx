@@ -1,4 +1,4 @@
-import { LoaderFunction, useLoaderData } from "@remix-run/react";
+import { LoaderFunction, useLoaderData } from "react-router";
 import { Layout } from "@/components/layout";
 import { DashboardCard } from "@/components/gridpulse";
 import { FEATURE_CARDS } from "@/lib/constants";
