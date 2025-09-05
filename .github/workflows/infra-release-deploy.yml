@@ -57,16 +57,25 @@ jobs:
           # Generate incremental daily version tag (e.g., v20250905-01, v20250905-02)
           DATE_PREFIX="v$(date +%Y%m%d)"
           
+          # Fetch existing tags to ensure we see remote tags
+          git fetch --tags
+          
           # Get existing tags for today to determine next increment
+          echo "🔍 Looking for existing tags with prefix: ${DATE_PREFIX}-"
+          git tag -l "${DATE_PREFIX}-*"
+          
           EXISTING_TAGS=$(git tag -l "${DATE_PREFIX}-*" | grep -o "${DATE_PREFIX}-[0-9]\+" | grep -o "[0-9]\+$" | sort -n | tail -1)
           
           if [ -z "$EXISTING_TAGS" ]; then
             INCREMENT="01"
+            echo "📝 No existing tags found, using increment: $INCREMENT"
           else
             INCREMENT=$(printf "%02d" $((EXISTING_TAGS + 1)))
+            echo "📝 Found highest existing increment: $EXISTING_TAGS, using next: $INCREMENT"
           fi
           
           VERSION="${DATE_PREFIX}-${INCREMENT}"
+          echo "🏷️ Final version tag: $VERSION"
           IMAGE_TAG="ghcr.io/${{ github.repository_owner }}/grid:$VERSION"
           
           echo "📦 Building image: $IMAGE_TAG"
@@ -81,12 +90,16 @@ jobs:
           echo "✅ Image built and pushed: $IMAGE_TAG"
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           
-          # Create and push version tag for tracking
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "$VERSION" -m "Docker image build: $IMAGE_TAG"
-          git push origin "$VERSION"
-          echo "🏷️ Created and pushed tag: $VERSION"
+          # Create and push version tag for tracking (only if it doesn't exist)
+          if ! git tag -l | grep -q "^${VERSION}$"; then
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$VERSION" -m "Docker image build: $IMAGE_TAG"
+            git push origin "$VERSION"
+            echo "🏷️ Created and pushed tag: $VERSION"
+          else
+            echo "🏷️ Tag $VERSION already exists, skipping creation"
+          fi
 
       - name: Decrypt tfvars and update docker_image
         env:
