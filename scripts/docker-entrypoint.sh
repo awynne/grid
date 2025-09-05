@@ -150,7 +150,13 @@ else
   echo "🔧 Running database migrations (prisma migrate deploy)..."
 fi
 
-./node_modules/.bin/prisma migrate deploy
+echo "🔧 About to run prisma migrate deploy..."
+if ./node_modules/.bin/prisma migrate deploy; then
+  echo "✅ Database migrations completed successfully"
+else
+  echo "⚠️  Database migrations failed, but continuing with application startup"
+  echo "❓ This might be due to database connectivity issues or schema conflicts"
+fi
 
 echo "🚀 Starting application..."
 if [ -n "${DEPLOYED_IMAGE:-}" ]; then
@@ -159,4 +165,14 @@ fi
 if [ -n "${PRISMA_SCHEMA_ENGINE_BINARY:-}" ]; then
   echo "ℹ️  Prisma schema engine: ${PRISMA_SCHEMA_ENGINE_BINARY}"
 fi
+echo "🔄 About to execute npm start..."
+echo "📍 Current directory: $(pwd)"
+echo "📋 Node.js version: $(node --version)"
+echo "📋 NPM version: $(npm --version)"
+echo "🗂️  Files in /app:"
+ls -la /app/
+echo "🗂️  Files in /app/build:"
+ls -la /app/build/ || echo "No build directory found"
+echo "🗂️  server.js exists: $(test -f server.js && echo 'YES' || echo 'NO')"
+echo "🔥 Executing npm start now..."
 exec npm start
