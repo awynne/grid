@@ -58,17 +58,36 @@ async function startServer() {
 
   // CRITICAL: Bind to 0.0.0.0 to accept connections from Railway's proxy
   console.log("🚀 Starting server listener...");
-  app.listen(port, "0.0.0.0", () => {
-    console.log(`✅ Server listening on http://0.0.0.0:${port}`);
+  
+  return new Promise((resolve, reject) => {
+    const server = app.listen(port, "0.0.0.0", () => {
+      console.log(`✅ Server listening on http://0.0.0.0:${port}`);
+      console.log(`🎯 Server ready to accept connections`);
+      resolve(server);
+    });
+
+    server.on('error', (error) => {
+      console.error(`❌ Server error:`, error);
+      reject(error);
+    });
+
+    server.on('close', () => {
+      console.log(`🔚 Server closed`);
+    });
+
+    console.log("🏁 Server setup completed");
   });
 }
 
 // Start the server
 console.log("🎬 Calling startServer function...");
-startServer().catch((error) => {
-  console.error("❌ Failed to start server:", error);
-  console.error("Stack trace:", error.stack);
-  process.exit(1);
-});
-
-console.log("📋 Server startup script completed");
+startServer()
+  .then((server) => {
+    console.log("🎉 Server started successfully!");
+    console.log("📋 Server startup script completed");
+  })
+  .catch((error) => {
+    console.error("❌ Failed to start server:", error);
+    console.error("Stack trace:", error.stack);
+    process.exit(1);
+  });
