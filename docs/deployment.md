@@ -63,6 +63,35 @@ On Railway, configure the project to use the Dockerfile builder. Set environment
 
 ## Deployment Infrastructure
 
+### Infrastructure Management
+
+**Standard Method**: Use GitHub Actions for all infrastructure changes:
+
+```bash
+# Deploy infrastructure changes via GitHub Actions
+gh workflow run "Release and Deploy (Full Pipeline)" --field confirm="RELEASE_DEPLOY"
+```
+
+**Development/Troubleshooting Only**: Local Terraform access for debugging:
+
+```bash
+# Configure local environment (development/troubleshooting only)
+cd infrastructure/cdktf
+source terraform-cloud-env.sh
+
+# Synthesize and prepare for local operations
+npx cdktf synth
+sops -d ../../secrets/prod.enc.tfvars > terraform.tfvars
+cp terraform.tfvars cdktf.out/stacks/gridpulse-prod/
+cd cdktf.out/stacks/gridpulse-prod/
+
+# Development operations (use sparingly)
+source ../../../terraform-cloud-env.sh              # Re-source in stack directory
+terraform state list                                 # View remote state  
+terraform plan                                       # Plan changes
+# Apply changes locally only when troubleshooting
+```
+
 ### GitHub Actions Workflows
 
 GridPulse uses GitHub Actions for all deployment operations with CDKTF (CDK for Terraform) for Infrastructure as Code:

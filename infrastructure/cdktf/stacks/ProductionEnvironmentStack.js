@@ -114,10 +114,11 @@ class ProductionEnvironmentStack extends cdktf_1.TerraformStack {
             dockerImage: dockerImage.stringValue || undefined,
             dockerUsername: dockerUsername.stringValue || undefined,
             dockerPassword: dockerPassword.stringValue || undefined,
-            // Domain configuration - TEMPORARY: only Railway subdomain to test
-            domain: railwaySubdomain.stringValue.trim() ? {
+            // Domain configuration - Switch to custom domain to avoid Railway subdomain state issues
+            domain: customDomain.stringValue.trim() ? {
+                customDomain: customDomain.stringValue.trim(),
+            } : railwaySubdomain.stringValue.trim() ? {
                 railwaySubdomain: railwaySubdomain.stringValue.trim(),
-                // customDomain: INTENTIONALLY EXCLUDED to prevent resource creation
             } : undefined,
         });
         // Data service is not provisioned in prod for now

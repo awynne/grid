@@ -8,7 +8,6 @@ const environment_1 = require("../.gen/providers/railway/environment");
 const service_1 = require("../.gen/providers/railway/service");
 const variable_1 = require("../.gen/providers/railway/variable");
 const shared_variable_1 = require("../.gen/providers/railway/shared-variable");
-const service_domain_1 = require("../.gen/providers/railway/service-domain");
 const custom_domain_1 = require("../.gen/providers/railway/custom-domain");
 const provider_2 = require("../.gen/providers/supabase/provider");
 const project_1 = require("../.gen/providers/supabase/project");
@@ -144,11 +143,13 @@ class GridPulseEnvironment extends constructs_1.Construct {
             const trimmedCustomDomain = config.domain.customDomain?.trim();
             // Only create Railway service domain if subdomain is provided and non-empty
             if (trimmedRailwaySubdomain && trimmedRailwaySubdomain.length > 0) {
-                this.serviceDomain = new service_domain_1.ServiceDomain(this, "railway_subdomain", {
-                    serviceId: this.webService.id,
-                    environmentId: this.environment.id,
-                    subdomain: trimmedRailwaySubdomain,
-                });
+                // REMOVED: Railway subdomain to avoid state conflicts
+                // this.serviceDomain = new ServiceDomain(this, "railway_subdomain_20250905", {
+                //   serviceId: this.webService.id,
+                //   environmentId: this.environment.id,
+                //   subdomain: trimmedRailwaySubdomain,
+                //   dependsOn: [this.webService, this.environment],
+                // });
             }
             // Only create custom domain if domain is provided and non-empty
             if (trimmedCustomDomain && trimmedCustomDomain.length > 0) {
