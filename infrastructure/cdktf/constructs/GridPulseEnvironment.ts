@@ -294,6 +294,8 @@ export class GridPulseEnvironment extends Construct {
       // Force Prisma to use Debian OpenSSL 1.1 engines we package in the image
       { name: "PRISMA_SCHEMA_ENGINE_BINARY", value: "/app/node_modules/@prisma/engines/schema-engine-debian-openssl-1.1.x" },
       { name: "PRISMA_QUERY_ENGINE_LIBRARY", value: "/app/node_modules/.prisma/client/libquery_engine-debian-openssl-1.1.x.so.node" },
+      // Force Railway to bypass Docker image cache and always pull latest version
+      { name: "NO_CACHE", value: "1" },
       ...(config.dockerImage ? [{ name: "DEPLOYED_IMAGE", value: config.dockerImage }] : []),
     ];
 
