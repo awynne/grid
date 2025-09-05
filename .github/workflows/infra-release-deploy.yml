@@ -213,9 +213,15 @@ jobs:
           echo "🔧 Initializing Terraform..."
           terraform -chdir=cdktf.out/stacks/gridpulse-prod init -input=false -no-color
           
+          echo "🔍 Current Terraform state before apply:"
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod show -json | jq -r '.values.root_module.resources[]? | select(.type == "railway_service" and .name == "web") | "Service ID: " + .values.id' || echo "⚠️ No web service found in state"
+          
           echo "🚀 Applying Terraform changes..."
           echo "📦 About to deploy image: $IMAGE_TAG"
           terraform -chdir=cdktf.out/stacks/gridpulse-prod apply -auto-approve -input=false -no-color
+          
+          echo "🔍 Terraform state after apply:"
+          terraform -chdir=cdktf.out/stacks/gridpulse-prod show -json | jq -r '.values.root_module.resources[]? | select(.type == "railway_service" and .name == "web") | "Service ID: " + .values.id + ", Source Image: " + (.values.source_image // "none")' || echo "⚠️ No web service found in state after apply"
           
           echo "✅ Infrastructure deployment completed successfully"
           echo "🎉 Release deployment pipeline completed!"

@@ -5,7 +5,11 @@ console.log("🔧 Startup wrapper: Beginning server initialization...");
 
 // Log Docker image version for debugging deployment issues
 const deployedImage = process.env.DEPLOYED_IMAGE || 'unknown';
+const railwayServiceId = process.env.RAILWAY_SERVICE_ID || 'unknown';
+const railwayEnvironmentName = process.env.RAILWAY_ENVIRONMENT_NAME || 'unknown';
 console.log(`📦 Docker image version: ${deployedImage}`);
+console.log(`🚂 Railway service ID: ${railwayServiceId}`);
+console.log(`🏷️ Railway environment: ${railwayEnvironmentName}`);
 
 // Set up global error handlers
 process.on('uncaughtException', (error) => {
